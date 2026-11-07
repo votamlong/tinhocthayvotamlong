@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Thu Chi Quỹ Lớp 2627</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      padding: 22px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border-radius: 14px;
+      padding: 20px 24px;
+    }
+    .stat-card {
+      border-radius: 14px;
+      border: none;
+      padding: 18px;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #475569;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      vertical-align: middle;
+      border-bottom: 2px solid #cbd5e1;
+    }
+    .badge-thu {
+      background-color: #dcfce7;
+      color: #15803d;
+      font-weight: 700;
+      border: 1px solid #bbf7d0;
+    }
+    .badge-chi {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      font-weight: 700;
+      border: 1px solid #fecaca;
+    }
+
+    /* Mẫu in sổ quỹ / quyết toán A4 */
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .print-footer { display: flex !important; }
+      .panel-box { border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; }
+      @page { size: landscape; margin: 12mm; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1300px;">
+    
+    <!-- THANH BANNER & BỘ LỌC (ẨN KHI IN) -->
+    <div class="header-banner mb-4 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <h5 class="fw-bold mb-1"><i class="fas fa-wallet me-2"></i>QUẢN LÝ THU - CHI QUỸ LỚP 2627</h5>
+        <small class="opacity-75">Tự động cập nhật trực tiếp vào Sheet QUY_LOP_MOI_2627</small>
+      </div>
+      <div class="d-flex align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-success" style="width: 130px;" onchange="onClassChange()">
+          <option value="">-- Chọn lớp --</option>
+        </select>
+        <button onclick="loadFundData()" class="btn btn-success btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-sync-alt me-1"></i> Làm mới
+        </button>
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In sổ quỹ
+        </button>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA BÁO CÁO (CHỈ HIỆN KHI IN) -->
+    <div class="print-header d-none text-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">Lớp: <b class="text-dark fs-6" id="printClassName">...</b></div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">BẢNG CÔNG KHAI THU CHI QUỸ LỚP</h3>
+      <p class="text-secondary small fst-italic">Cập nhật đến ngày: <b class="text-dark" id="printTodayDate">...</b> | GVCN: <b class="text-dark" id="printTeacherName">...</b></p>
+      <hr>
+    </div>
+
+    <!-- 3 THẺ TỔNG HỢP SỐ DƯ QUỸ -->
+    <div class="row g-3 mb-4 text-center">
+      <div class="col-md-4">
+        <div class="stat-card bg-success">
+          <small class="fw-bold text-uppercase opacity-75 d-block">1. Tổng Các Khoản Thu</small>
+          <h2 class="fw-bold my-1" id="statThu">0 đ</h2>
+          <small class="opacity-75">Tiền quỹ đã thu từ học sinh</small>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card bg-danger">
+          <small class="fw-bold text-uppercase opacity-75 d-block">2. Tổng Các Khoản Chi</small>
+          <h2 class="fw-bold my-1" id="statChi">0 đ</h2>
+          <small class="opacity-75">Tiền đã chi cho hoạt động lớp</small>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card bg-primary">
+          <small class="fw-bold text-uppercase opacity-75 d-block">3. Tồn Quỹ Hiện Tại</small>
+          <h2 class="fw-bold my-1" id="statTon">0 đ</h2>
+          <small class="opacity-75">Số dư khả dụng trong quỹ</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM NHẬP PHIẾU THU/CHI MỚI (ẨN KHI IN) -->
+    <div class="panel-box mb-4 no-print border-start border-4 border-success">
+      <h6 class="fw-bold text-success mb-3 text-uppercase">
+        <i class="fas fa-plus-circle me-1"></i> Lập Phiếu Giao Dịch Mới (Ghi vào Sheet)
+      </h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="small fw-bold text-secondary mb-1">1. Nội dung khoản thu / chi</label>
+          <input type="text" id="inpContent" class="form-control form-control-sm" placeholder="Vd: Đóng quỹ HK1, Mua nước liên hoan...">
+        </div>
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">2. Loại phiếu</label>
+          <select id="selType" class="form-select form-select-sm fw-bold">
+            <option value="THU" class="text-success">➕ THU TIỀN</option>
+            <option value="CHI" class="text-danger">➖ CHI TIỀN</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">3. Số tiền (VNĐ)</label>
+          <input type="number" id="inpAmount" class="form-control form-control-sm fw-bold" placeholder="Vd: 50000">
+        </div>
+        <div class="col-md-3">
+          <label class="small fw-bold text-secondary mb-1">4. Học sinh (nếu thu cá nhân)</label>
+          <select id="selStudent" class="form-select form-select-sm" onchange="onStudentSelect()">
+            <option value="">-- Chi chung / Không chọn --</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">5. Tên người nộp/nhận</label>
+          <input type="text" id="inpPerson" class="form-control form-control-sm" value="Thủ quỹ lớp">
+        </div>
+        <div class="col-md-2 mt-2">
+          <label class="small fw-bold text-secondary mb-1">6. Ngày lập</label>
+          <input type="date" id="inpDate" class="form-control form-control-sm">
+        </div>
+        <div class="col-md-2 mt-2">
+          <label class="small fw-bold text-secondary mb-1">7. Người thực hiện</label>
+          <input type="text" id="inpHandler" class="form-control form-control-sm" value="Thủ quỹ lớp">
+        </div>
+        <div class="col-md-5 mt-2">
+          <label class="small fw-bold text-secondary mb-1">8. Ghi chú</label>
+          <input type="text" id="inpNote" class="form-control form-control-sm" placeholder="Vd: Tiền mặt, chuyển khoản...">
+        </div>
+        <div class="col-md-3 mt-2">
+          <button onclick="submitTransaction()" id="btnSubmit" class="btn btn-success btn-sm w-100 fw-bold rounded-pill">
+            <i class="fas fa-save me-1"></i> GHI VÀO SHEET
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BẢNG CHI TIẾT SỔ GIAO DỊCH -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle mb-0 text-center small" id="fundTable">
+          <thead>
+            <tr>
+              <th style="width: 140px;">MÃ GD</th>
+              <th style="width: 70px;">LỚP</th>
+              <th>KHOẢN THU / CHI</th>
+              <th style="width: 75px;">LOẠI</th>
+              <th style="width: 85px;">MÃ HS</th>
+              <th>NGƯỜI NỘP / NHẬN</th>
+              <th style="width: 120px;" class="text-end pe-3">SỐ TIỀN</th>
+              <th style="width: 100px;">NGÀY GD</th>
+              <th style="width: 110px;">NGƯỜI THU/CHI</th>
+              <th>GHI CHÚ</th>
+              <th style="width: 50px;" class="no-print">XÓA</th>
+            </tr>
+          </thead>
+          <tbody id="fundTableBody">
+            <tr><td colspan="11" class="p-5 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu quỹ lớp...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- KHUNG CHỮ KÝ BÁO CÁO (CHỈ HIỆN KHI IN) -->
+    <div class="row mt-5 pt-4 text-center print-footer d-none">
+      <div class="col-4">
+        <p class="fw-bold mb-1">THỦ QUỸ LỚP</p>
+        <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+      </div>
+      <div class="col-4">
+        <p class="fw-bold mb-1">ĐẠI DIỆN BAN PHỤ HUYNH</p>
+        <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+      </div>
+      <div class="col-4">
+        <p class="fw-bold mb-1">GIÁO VIÊN CHỦ NHIỆM</p>
+        <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+        <div class="mt-5 fw-bold" id="printTeacherSign">...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwEfYYAGdJd08ltbHRXYz4LBJmn3ayWBxHMpR7wixdgWCo1KMuke_O-8kJQ8YT1Fg68ig/exec";
+
+    let currentStudentList = [];
+
+    const formatVND = n => Number(n || 0).toLocaleString('vi-VN') + ' đ';
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      document.getElementById('inpDate').value = todayStr;
+      document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('vi-VN');
+
+      try {
+        const classes = await callApi('getAllClasses');
+        const selClass = document.getElementById('selClass');
+        let html = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => html += `<option value="${c}">${c}</option>`);
+        selClass.innerHTML = html;
+
+        if (classes && classes.length > 0) {
+          selClass.value = classes[0];
+          await onClassChange();
+        }
+      } catch (err) {
+        console.error("Lỗi nạp danh sách lớp:", err);
+      }
+    };
+
+    // Khi đổi lớp: Lấy tên GVCN, nạp học sinh và tải sổ quỹ
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      document.getElementById('printClassName').innerText = className;
+
+      // 1. Lấy tên GVCN
+      try {
+        const gv = await callApi('getTeacherByClass', className);
+        document.getElementById('printTeacherName').innerText = gv || "Thầy Võ Tâm Long";
+        document.getElementById('printTeacherSign').innerText = gv || "Thầy Võ Tâm Long";
+      } catch(e) {}
+
+      // 2. Lấy học sinh để gợi ý nộp tiền
+      try {
+        currentStudentList = await callApi('getStudentList', className);
+        const selStd = document.getElementById('selStudent');
+        let h = '<option value="">-- Chi chung / Không chọn --</option>';
+        (currentStudentList || []).forEach(s => {
+          h += `<option value="${s.id}" data-name="${s.name}">${s.name} (${s.id})</option>`;
+        });
+        selStd.innerHTML = h;
+      } catch(e) {}
+
+      await loadFundData();
+    }
+
+    function onStudentSelect() {
+      const selStd = document.getElementById('selStudent');
+      const opt = selStd.selectedOptions[0];
+      if (opt && opt.value) {
+        document.getElementById('inpPerson').value = opt.getAttribute('data-name');
+      } else {
+        document.getElementById('inpPerson').value = "Thủ quỹ lớp";
+      }
+    }
+
+    // TẢI DỮ LIỆU SỔ QUỸ TỪ SHEET
+    async function loadFundData() {
+      const className = document.getElementById('selClass').value;
+      const body = document.getElementById('fundTableBody');
+      if (!className) return;
+
+      body.innerHTML = '<tr><td colspan="11" class="p-5 text-muted"><i class="fas fa-sync fa-spin me-2"></i>Đang tải sổ quỹ lớp ' + className + '...</td></tr>';
+
+      try {
+        const res = await callApi('getQuyLop2627Data', className);
+
+        if (!res || !res.items) {
+          body.innerHTML = '<tr><td colspan="11" class="p-4 text-muted">Chưa có giao dịch nào cho lớp này.</td></tr>';
+          return;
+        }
+
+        // Cập nhật 3 ô tổng kết
+        document.getElementById('statThu').innerText = formatVND(res.summary.thu);
+        document.getElementById('statChi').innerText = formatVND(res.summary.chi);
+        document.getElementById('statTon').innerText = formatVND(res.summary.du);
+
+        let html = '';
+        res.items.forEach(item => {
+          const isThu = (item.type === 'THU');
+          const badgeClass = isThu ? 'badge-thu' : 'badge-chi';
+          const amountColor = isThu ? 'text-success' : 'text-danger';
+
+          html += `<tr>
+            <td class="text-muted fw-bold">${item.id}</td>
+            <td class="fw-bold text-primary">${item.class}</td>
+            <td class="text-start ps-3 fw-bold">${item.content}</td>
+            <td><span class="badge ${badgeClass} px-2 py-1">${item.type}</span></td>
+            <td class="small text-muted">${item.studentId || '—'}</td>
+            <td class="text-start ps-2">${item.person || '—'}</td>
+            <td class="text-end pe-3 fw-bold ${amountColor}">${formatVND(item.amount)}</td>
+            <td>${item.date}</td>
+            <td>${item.handler || '—'}</td>
+            <td class="text-muted small">${item.note || '—'}</td>
+            <td class="no-print">
+              <button onclick="deleteTransaction('${item.id}')" class="btn btn-sm btn-link text-danger p-0" title="Xóa giao dịch">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>`;
+        });
+
+        body.innerHTML = html || '<tr><td colspan="11" class="p-4 text-muted">Lớp này chưa có phát sinh giao dịch.</td></tr>';
+      } catch (err) {
+        body.innerHTML = `<tr><td colspan="11" class="p-4 text-danger">Lỗi kết nối: ${err.message}</td></tr>`;
+      }
+    }
+
+    // THÊM GIAO DỊCH MỚI VÀO SHEET
+    async function submitTransaction() {
+      const className = document.getElementById('selClass').value;
+      const content = document.getElementById('inpContent').value.trim();
+      const type = document.getElementById('selType').value;
+      const amount = document.getElementById('inpAmount').value;
+      const studentId = document.getElementById('selStudent').value;
+      const person = document.getElementById('inpPerson').value.trim();
+      const dateInp = document.getElementById('inpDate').value;
+      const handler = document.getElementById('inpHandler').value.trim();
+      const note = document.getElementById('inpNote').value.trim();
+
+      if (!className) return alert("Vui lòng chọn lớp!");
+      if (!content || !amount) return alert("Vui lòng điền nội dung và số tiền!");
+
+      // Đổi format ngày yyyy-mm-dd sang dd/mm/yyyy
+      let formattedDate = "";
+      if (dateInp) {
+        const parts = dateInp.split('-');
+        formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+
+      const item = {
+        class: className,
+        content: content,
+        type: type,
+        studentId: studentId,
+        person: person,
+        amount: Number(amount),
+        date: formattedDate,
+        handler: handler,
+        note: note
+      };
+
+      const btn = document.getElementById('btnSubmit');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      try {
+        const msg = await callApi('saveQuyLop2627Transaction', item);
+        alert(msg);
+        document.getElementById('inpContent').value = "";
+        document.getElementById('inpAmount').value = "";
+        document.getElementById('inpNote').value = "";
+        await loadFundData();
+      } catch (err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    // XÓA GIAO DỊCH KHỎI SHEET
+    async function deleteTransaction(transId) {
+      if (!confirm("Thầy có chắc chắn muốn xóa giao dịch [" + transId + "] khỏi Google Sheets?")) return;
+
+      try {
+        const msg = await callApi('deleteQuyLop2627Transaction', transId);
+        alert(msg);
+        await loadFundData();
+      } catch (err) {
+        alert("Lỗi khi xóa: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
