@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TKB - Sơ Đồ Giảng Dạy 2627</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      padding: 20px 24px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: white;
+      border-radius: 14px;
+      padding: 20px 24px;
+    }
+    /* Bảng Thời khóa biểu */
+    .tkb-table th {
+      background-color: #0284c7 !important;
+      color: white !important;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      vertical-align: middle;
+      border: 1px solid #bae6fd !important;
+    }
+    .tkb-table td {
+      vertical-align: middle;
+      padding: 0 !important;
+      border: 1px solid #e2e8f0;
+    }
+    .tkb-input-cell {
+      height: 48px;
+      border: none;
+      border-radius: 0;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      background: transparent;
+      transition: all 0.2s;
+    }
+    .tkb-input-cell:focus {
+      background-color: #f0f9ff;
+      outline: 2px solid #0284c7;
+      z-index: 5;
+      position: relative;
+    }
+    /* Đổi màu nổi bật các tiết đặc biệt (QT, GDDP) */
+    .cell-qt { background-color: #fef3c7 !important; color: #b45309 !important; }
+    .cell-gddp { background-color: #dcfce7 !important; color: #15803d !important; }
+
+    /* In ấn khổ ngang A4 dán bàn làm việc / sổ giáo án */
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .tkb-table { border: 2px solid #000 !important; }
+      .tkb-table th { background-color: #f1f5f9 !important; color: #000 !important; border: 1px solid #000 !important; }
+      .tkb-table td { border: 1px solid #000 !important; }
+      .tkb-input-cell { font-weight: bold !important; color: #000 !important; }
+      @page { size: landscape; margin: 12mm; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1300px;">
+    
+    <!-- THANH ĐIỀU HƯỚNG & CÔNG CỤ (ẨN KHI IN) -->
+    <div class="header-banner mb-4 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <h5 class="fw-bold mb-1"><i class="fas fa-calendar-alt me-2"></i>LỊCH GIẢNG DẠY - THỜI KHÓA BIỂU 2627</h5>
+        <small class="opacity-75">Tự động đồng bộ chính xác cấu trúc 11 cột với Sheet TKB Google Sheets</small>
+      </div>
+
+      <div class="d-flex align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Tuần:</span>
+        <select id="selWeek" class="form-select form-select-sm border-0 fw-bold text-primary" style="width: 110px;" onchange="loadTKBData()">
+          <option value="">-- Tuần --</option>
+        </select>
+        <button onclick="addNewWeekPrompt()" class="btn btn-outline-primary btn-sm rounded-circle" title="Thêm tuần mới">
+          <i class="fas fa-plus"></i>
+        </button>
+        <button onclick="saveTKBData()" id="btnSave" class="btn btn-success btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-save me-1"></i> Lưu vào Sheet
+        </button>
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In Lịch A4
+        </button>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header d-none text-center mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">TỔ TIN HỌC - CÔNG NGHỆ</div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">LỊCH BÁO GIẢNG & THỜI KHÓA BIỂU CHI TIẾT</h3>
+      <p class="text-secondary small fst-italic">Tuần: <b class="text-dark fs-5" id="printWeekText">...</b> | Giáo viên: <b class="text-dark fs-5" id="printTeacherText">Võ Tâm Long</b></p>
+    </div>
+
+    <!-- BẢNG THỜI KHÓA BIỂU CHÍNH -->
+    <div class="panel-card p-0 overflow-hidden mb-4">
+      <div class="table-responsive">
+        <table class="table table-bordered tkb-table mb-0 text-center align-middle" id="tkbTable">
+          <thead>
+            <tr>
+              <th style="width: 80px;">BUỔI</th>
+              <th style="width: 60px;">TIẾT</th>
+              <th style="width: 115px;">GIỜ</th>
+              <th>THỨ HAI</th>
+              <th>THỨ BA</th>
+              <th>THỨ TƯ</th>
+              <th>THỨ NĂM</th>
+              <th>THỨ SÁU</th>
+              <th>THỨ BẢY</th>
+            </tr>
+          </thead>
+          <tbody id="tkbTableBody">
+            <tr><td colspan="9" class="p-5 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu từ Sheet TKB...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHÚ THÍCH & HƯỚNG DẪN DƯỚI BẢNG -->
+    <div class="row align-items-center no-print">
+      <div class="col-md-8 text-muted small">
+        <i class="fas fa-lightbulb text-warning me-1"></i>
+        <b>Mẹo:</b> Thầy có thể gõ trực tiếp tên lớp (Ví dụ: <code>98QT</code>, <code>67.GDDP</code>, <code>9A13</code>) vào từng ô. Hệ thống tự động phân loại màu sắc và cập nhật đầy đủ 11 cột vào Google Sheets.
+      </div>
+      <div class="col-md-4 text-end">
+        <span class="badge bg-warning bg-opacity-25 text-dark border border-warning px-2 py-1 me-1">■ Lớp Quốc Tế (QT)</span>
+        <span class="badge bg-success bg-opacity-25 text-dark border border-success px-2 py-1">■ Giáo Dục Địa Phương (GDDP)</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // URL Web App Apps Script mới của thầy
+    const API_URL = "https://script.google.com/macros/s/AKfycbx5s1P7LWwTj7wEpqe55QJuI06oCXpDIZadcamciaO_O8-bMmVcdU_auIEzHonZ-2EjZg/exec";
+    const TEACHER_DEFAULT = "Võ Tâm Long";
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      await loadWeeksList();
+    };
+
+    // 1. NẠP DANH SÁCH TUẦN
+    async function loadWeeksList() {
+      try {
+        const weeks = await callApi('getTKB2627Weeks');
+        const selWeek = document.getElementById('selWeek');
+        let html = '';
+        (weeks || [1, 2, 3]).forEach(w => {
+          html += `<option value="${w}">Tuần ${w}</option>`;
+        });
+        selWeek.innerHTML = html;
+
+        if (weeks && weeks.length > 0) {
+          selWeek.value = weeks[0];
+          await loadTKBData();
+        }
+      } catch (err) {
+        console.error("Lỗi nạp tuần:", err);
+      }
+    }
+
+    // 2. NẠP DỮ LIỆU TKB CỦA TUẦN ĐÃ CHỌN
+    async function loadTKBData() {
+      const week = document.getElementById('selWeek').value;
+      const body = document.getElementById('tkbTableBody');
+      if (!week) return;
+
+      document.getElementById('printWeekText').innerText = week;
+      body.innerHTML = '<tr><td colspan="9" class="p-5 text-center text-muted"><i class="fas fa-sync fa-spin me-2"></i>Đang tải dữ liệu Tuần ' + week + '...</td></tr>';
+
+      try {
+        const data = await callApi('getTKB2627Data', week);
+        const times = [
+          "", 
+          "7h15-8h00", "8h05-8h50", "9h25-10h10", "10h15-11h00", "11h05-11h50",
+          "13h30-14h15", "14h20-15h05", "15h25-16h10", "16h15-17h00", "17h05-17h50"
+        ];
+
+        let html = '';
+        for (let t = 1; t <= 10; t++) {
+          const isMorn = t <= 5;
+          const tNum = isMorn ? t : t - 5;
+
+          // Tìm dữ liệu tương ứng từ Sheet
+          const rowData = (data || []).find(r => {
+            const buoi = String(r[0]).toUpperCase();
+            const isChieu = buoi.includes("CHIỀU");
+            return Number(r[1]) === tNum && (isChieu === !isMorn);
+          }) || ["", "", ""];
+
+          html += `<tr>
+            ${tNum === 1 ? `<td rowspan="5" class="fw-bold bg-light align-middle text-uppercase">${isMorn ? 'SÁNG' : 'CHIỀU'}</td>` : ''}
+            <td class="fw-bold bg-light align-middle">${tNum}</td>
+            <td class="text-muted small align-middle">${times[t]}</td>
+            ${[4, 5, 6, 7, 8, 9].map(colIdx => {
+              let val = rowData[colIdx - 1] || "";
+              let highlightClass = "";
+              if (val.toUpperCase().includes("QT")) highlightClass = "cell-qt";
+              else if (val.toUpperCase().includes("GDDP")) highlightClass = "cell-gddp";
+
+              return `<td>
+                <input type="text" class="form-control tkb-input-cell ${highlightClass}" 
+                       data-tiet="${t}" data-col="${colIdx}" 
+                       value="${val}" oninput="checkHighlight(this)">
+              </td>`;
+            }).join('')}
+          </tr>`;
+        }
+
+        body.innerHTML = html;
+      } catch (err) {
+        body.innerHTML = `<tr><td colspan="9" class="p-4 text-danger">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    // Tự đổi màu ô khi gõ QT hoặc GDDP
+    function checkHighlight(input) {
+      const val = input.value.trim().toUpperCase();
+      input.classList.remove('cell-qt', 'cell-gddp');
+      if (val.includes("QT")) input.classList.add('cell-qt');
+      else if (val.includes("GDDP")) input.classList.add('cell-gddp');
+    }
+
+    // 3. LƯU DỮ LIỆU VÀO SHEET TKB
+    async function saveTKBData() {
+      const week = document.getElementById('selWeek').value;
+      if (!week) return alert("Vui lòng chọn tuần!");
+
+      const cells = [];
+      document.querySelectorAll('.tkb-input-cell').forEach(inp => {
+        cells.push({
+          t: inp.dataset.tiet,
+          c: inp.dataset.col,
+          v: inp.value.trim()
+        });
+      });
+
+      const btn = document.getElementById('btnSave');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      try {
+        const msg = await callApi('saveTKB2627Data', week, cells, TEACHER_DEFAULT);
+        alert(msg);
+        await loadTKBData();
+      } catch (err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    // Thêm tuần mới vào danh sách
+    function addNewWeekPrompt() {
+      const w = prompt("Nhập số tuần mới muốn thêm (Ví dụ: 4, 5, 6...):");
+      if (!w || isNaN(w)) return;
+      const selWeek = document.getElementById('selWeek');
+      
+      // Kiểm tra nếu tuần đã có
+      let exists = false;
+      for (let i = 0; i < selWeek.options.length; i++) {
+        if (selWeek.options[i].value == w) { exists = true; break; }
+      }
+      if (!exists) {
+        const opt = document.createElement('option');
+        opt.value = w;
+        opt.innerText = "Tuần " + w;
+        selWeek.appendChild(opt);
+      }
+      selWeek.value = w;
+      loadTKBData();
+    }
+  </script>
+</body>
+</html>
