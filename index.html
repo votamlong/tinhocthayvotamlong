@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EduClass Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+<style>
+:root{--ink:#1f2a37;--board:#24493e;--chalk:#f4f6f3;--line:#d9dfd8;--warn:#b42318;--ok:#157f4b}
+body{font-family:'Be Vietnam Pro',system-ui,sans-serif;background:var(--chalk);color:var(--ink);padding-top:env(safe-area-inset-top)}
+#login{min-height:100vh;display:grid;place-items:center;background:var(--board)}
+#login .box{background:#fff;width:min(400px,92vw);padding:2rem;border-radius:6px}
+#app{display:none;min-height:100vh}
+#side{width:260px;background:var(--board);color:#e6eee9;flex-shrink:0;display:flex;flex-direction:column}
+#side .brand{padding:1.2rem 1.2rem .8rem;font-weight:700;font-size:1.15rem}
+#menu{flex:1;overflow:auto;padding:.4rem}
+#menu a{display:block;padding:.65rem .9rem;color:#cfdcd5;text-decoration:none;border-radius:4px;cursor:pointer;margin-bottom:2px}
+#menu a:hover{background:rgba(255,255,255,.08)}
+#menu a.on{background:var(--chalk);color:var(--board);font-weight:700}
+#main{flex:1;min-width:0;padding:1.4rem}
+.panel{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1.1rem}
+.num{font-size:2.6rem;font-weight:700;line-height:1}
+.tbl-wrap{overflow:auto;max-height:70vh}
+.tbl-wrap th{position:sticky;top:0;background:#eef2ee;white-space:nowrap}
+.warn{color:var(--warn)}.ok{color:var(--ok)}
+:focus-visible{outline:3px solid #f2b705;outline-offset:2px}
+@media(max-width:768px){#side{position:fixed;left:-270px;top:0;bottom:0;z-index:50;transition:left .25s}#side.open{left:0}#main{padding:.9rem}}
+@media(prefers-reduced-motion:reduce){#side{transition:none}}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="box">
+    <h1 class="h4 fw-bold mb-1">EduClass Pro</h1>
+    <p class="text-muted small mb-4">Đăng nhập để quản lý lớp học</p>
+    <label class="small fw-bold" for="em">Email</label>
+    <input id="em" class="form-control mb-3" autocomplete="username">
+    <label class="small fw-bold" for="pw">Mật khẩu</label>
+    <input id="pw" type="password" class="form-control mb-3" autocomplete="current-password">
+    <div id="lerr" class="warn small mb-2"></div>
+    <button id="lbtn" class="btn btn-success w-100 fw-bold">Đăng nhập</button>
+  </div>
+</div>
+
+<div id="app" class="d-flex">
+  <nav id="side">
+    <div class="brand"><i class="fas fa-graduation-cap me-2"></i>EduClass Pro</div>
+    <div id="menu"></div>
+    <div class="p-3 border-top border-secondary small">
+      <div id="uname" class="fw-bold text-truncate"></div>
+      <div id="urole" class="opacity-75 mb-2"></div>
+      <button id="logout" class="btn btn-sm btn-outline-light w-100">Đăng xuất</button>
+    </div>
+  </nav>
+  <main id="main">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <button id="burger" class="btn btn-outline-secondary d-md-none" aria-label="Mở menu"><i class="fas fa-bars"></i></button>
+      <h2 id="title" class="h5 fw-bold m-0"></h2>
+    </div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<script>
+/* ===== CẤU HÌNH: dán link Web app Apps Script (kết thúc bằng /exec) ===== */
+const API_URL = "DAN_LINK_EXEC_VAO_DAY";
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const vnd = n => Number(n || 0).toLocaleString('vi-VN') + ' đ';
+const today = () => new Date().toISOString().slice(0, 10);
+let user = null, chart = null;
+
+async function api(fn, ...args) {
+  const r = await fetch(API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args }) });
+  const j = await r.json();
+  if (j.error) throw new Error(j.error);
+  return j.result;
+}
+const fail = e => alert('Lỗi: ' + e.message);
+const opts = (list, first) => `<option value="">${first}</option>` + list.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+const isStaff = () => ['ADMIN', 'GVCN', 'GVBM'].includes(String(user.role).toUpperCase());
+
+/* ===== Đăng nhập ===== */
+async function login() {
+  $('lerr').textContent = ''; $('lbtn').disabled = true; $('lbtn').textContent = 'Đang kiểm tra…';
+  try {
+    const res = await api('loginUser', $('em').value, $('pw').value);
+    if (!res.success) throw new Error(res.message);
+    sessionStorage.setItem('edu', JSON.stringify(res)); start(res);
+  } catch (e) { $('lerr').textContent = e.message; }
+  $('lbtn').disabled = false; $('lbtn').textContent = 'Đăng nhập';
+}
+function start(res) {
+  user = res;
+  $('login').style.display = 'none'; $('app').style.display = 'flex';
+  $('uname').textContent = res.name; $('urole').textContent = res.role;
+  const items = (res.menu || []).filter((m, i, a) => VIEWS[m.id] && a.findIndex(x => x.id === m.id) === i);
+  $('menu').innerHTML = items.map(m => `<a data-id="${m.id}">${esc(VIEWS[m.id].t)}</a>`).join('');
+  $('menu').onclick = e => { const a = e.target.closest('a'); if (a) go(a.dataset.id); };
+  go(items.length ? items[0].id : 'dashboard');
+}
+function go(id) {
+  document.querySelectorAll('#menu a').forEach(a => a.classList.toggle('on', a.dataset.id === id));
+  $('title').textContent = VIEWS[id].t; $('side').classList.remove('open');
+  $('view').innerHTML = '<div class="text-muted p-4">Đang tải…</div>';
+  VIEWS[id].f().catch(fail);
+}
+$('lbtn').onclick = login;
+$('pw').onkeydown = e => { if (e.key === 'Enter') login(); };
+$('burger').onclick = () => $('side').classList.toggle('open');
+$('logout').onclick = () => { sessionStorage.removeItem('edu'); location.reload(); };
+
+/* ===== Tổng quan ===== */
+async function vDash() {
+  const classes = await api('getAllClasses');
+  $('view').innerHTML = `<select id="dc" class="form-select w-auto mb-3">${opts(classes, 'Toàn trường')}</select>
+  <div class="row g-3"><div class="col-6 col-md-3"><div class="panel"><div class="num" id="d1">0</div>Sĩ số</div></div>
+  <div class="col-6 col-md-3"><div class="panel"><div class="num" id="d2">0%</div>Tỷ lệ học lực giỏi</div></div></div>
+  <div class="panel mt-3" style="height:340px"><canvas id="ch"></canvas></div>`;
+  const load = async () => {
+    const d = await api('getDashboardData', $('dc').value);
+    $('d1').textContent = d.siso; $('d2').textContent = d.tile + '%';
+    if (chart) chart.destroy();
+    chart = new Chart($('ch'), { type: 'bar', data: { labels: ['Giỏi', 'Khá', 'Trung bình'], datasets: [{ label: 'Số học sinh', data: d.chart, backgroundColor: ['#157f4b', '#24493e', '#8a948d'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+  };
+  $('dc').onchange = () => load().catch(fail); load();
+}
+
+/* ===== Điểm danh ===== */
+async function vAtt() {
+  const classes = await api('getAllClasses');
+  $('view').innerHTML = `<div class="panel"><div class="d-flex flex-wrap gap-2 mb-3">
+  <select id="ac" class="form-select w-auto">${opts(classes, 'Chọn lớp')}</select>
+  <span id="agv" class="align-self-center text-muted small"></span>
+  <button id="asave" class="btn btn-success ms-auto">Lưu điểm danh</button></div>
+  <div class="tbl-wrap"><table class="table align-middle"><tbody id="ab"><tr><td class="text-muted">Chọn lớp để hiện danh sách học sinh.</td></tr></tbody></table></div></div>`;
+  $('ac').onchange = async () => {
+    const c = $('ac').value; if (!c) return;
+    api('getTeacherByClass', c).then(n => $('agv').textContent = 'GVCN: ' + n);
+    const l = await api('getStudentList', c);
+    $('ab').innerHTML = l.map(s => `<tr data-id="${esc(s.id)}" data-name="${esc(s.name)}"><td class="fw-bold">${esc(s.name)}</td><td class="text-end">
+    <div class="btn-group btn-group-sm"><input type="radio" class="btn-check" name="a_${esc(s.id)}" id="c_${esc(s.id)}" value="C" checked><label class="btn btn-outline-success" for="c_${esc(s.id)}">Có mặt</label>
+    <input type="radio" class="btn-check" name="a_${esc(s.id)}" id="v_${esc(s.id)}" value="V"><label class="btn btn-outline-danger" for="v_${esc(s.id)}">Vắng</label></div></td></tr>`).join('') || '<tr><td>Lớp chưa có học sinh.</td></tr>';
+  };
+  $('asave').onclick = async () => {
+    const c = $('ac').value; if (!c) return alert('Chọn lớp trước.');
+    const d = [...$('ab').querySelectorAll('tr[data-id]')].map(r => ({ id: r.dataset.id, name: r.dataset.name, class: c, status: r.querySelector('input:checked').value }));
+    if (!d.length) return;
+    alert(await api('saveAttendance', d));
+  };
+}
+
+/* ===== Ghi nhận vi phạm ===== */
+async function vDisc() {
+  const [classes, types] = await Promise.all([api('getAllClasses'), api('getViolationTypes')]);
+  $('view').innerHTML = `<div class="row g-3"><div class="col-lg-5"><div class="panel">
+  <label class="small fw-bold">Lớp</label><select id="dc" class="form-select mb-2">${opts(classes, 'Chọn lớp')}</select>
+  <label class="small fw-bold">Học sinh</label><select id="ds" class="form-select mb-2"></select>
+  <label class="small fw-bold">Loại lỗi</label><select id="dt" class="form-select mb-2">${opts(types, 'Chọn lỗi')}</select>
+  <label class="small fw-bold">Ghi chú</label><textarea id="dn" class="form-control mb-3" rows="3"></textarea>
+  <button id="dsave" class="btn btn-danger w-100">Ghi nhận vi phạm</button></div></div>
+  <div class="col-lg-7"><div class="panel"><h3 class="h6 fw-bold">Vi phạm gần đây của lớp</h3><div id="dh" class="text-muted">Chọn lớp để xem.</div></div></div></div>`;
+  const hist = async c => { const l = await api('getDisciplineHistory', c); $('dh').innerHTML = l.map(i => `<div class="border-bottom py-2"><b>${esc(i.name)}</b> <span class="warn">${esc(i.type)}</span><div class="small text-muted">${esc(i.date)} ${esc(i.note)}</div></div>`).join('') || 'Chưa có vi phạm.'; };
+  $('dc').onchange = async () => {
+    const c = $('dc').value; if (!c) return;
+    const l = await api('getStudentList', c);
+    $('ds').innerHTML = '<option value="">Chọn học sinh</option>' + l.map(s => `<option value="${esc(s.id)}" data-n="${esc(s.name)}">${esc(s.name)}</option>`).join('');
+    hist(c);
+  };
+  $('dsave').onclick = async () => {
+    const o = $('ds').selectedOptions[0], c = $('dc').value;
+    if (!o || !o.value || !$('dt').value) return alert('Chọn học sinh và loại lỗi.');
+    alert(await api('saveDiscipline', o.value, o.dataset.n, c, $('dt').value, $('dn').value));
+    $('dn').value = ''; hist(c);
+  };
+}
+
+/* ===== Bảng điểm trừ khối ===== */
+async function vGrid() {
+  $('view').innerHTML = `<div class="panel"><div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+  <input type="date" id="gs" class="form-control w-auto" value="${today()}"> đến <input type="date" id="ge" class="form-control w-auto" value="${today()}">
+  <button id="gl" class="btn btn-success">Xem kết quả</button></div>
+  <div class="tbl-wrap"><table class="table table-bordered table-sm text-center align-middle" id="gt"></table></div>
+  <p class="small text-muted mt-2 mb-0">Điểm thi đua bắt đầu từ 100. Mức trừ lấy từ sheet DS_LOI.</p></div>`;
+  $('gl').onclick = async () => {
+    const res = await api('getViolationGridData', $('gs').value, $('ge').value);
+    if (res.error) return alert(res.error);
+    const hs = res.headers.filter(h => res.rows.some(r => (r.violations[h.name] || 0) > 0));
+    const rows = res.rows.map(r => { const t = hs.reduce((s, h) => s + (r.violations[h.name] || 0) * h.points, 0); return { ...r, t, left: 100 - t }; }).sort((a, b) => b.left - a.left);
+    $('gt').innerHTML = `<thead><tr><th class="text-start">Lớp</th>${hs.map(h => `<th title="${esc(h.name)}">${esc(h.code)}</th>`).join('')}<th>Tổng trừ</th><th>Còn lại</th><th>Hạng</th></tr></thead><tbody>` +
+      rows.map((r, i) => `<tr><td class="text-start fw-bold">${esc(r.className)}<div class="small text-muted fw-normal">${esc(r.teacher)}</div></td>${hs.map(h => { const v = r.violations[h.name] || 0; return `<td>${v ? `<b class="warn">${v}</b>` : '-'}</td>`; }).join('')}<td class="warn fw-bold">${r.t}</td><td class="fw-bold ${r.left < 80 ? 'warn' : 'ok'}">${r.left}</td><td>${i + 1}</td></tr>`).join('') + '</tbody>' +
+      (hs.length ? `<caption class="small text-start">${hs.map(h => `<b>${esc(h.code)}</b>: ${esc(h.name)} (−${h.points}đ)`).join(' &nbsp; ')}</caption>` : '');
+  };
+  $('gl').click();
+}
+
+/* ===== Quỹ lớp ===== */
+async function vFund() {
+  const classes = await api('getAllClasses');
+  $('view').innerHTML = `<select id="fc" class="form-select w-auto mb-3">${opts(classes, 'Chọn lớp')}</select>
+  <div class="row g-3 mb-3"><div class="col-4"><div class="panel"><div class="num ok h3" id="ft">0 đ</div>Tổng thu</div></div>
+  <div class="col-4"><div class="panel"><div class="num warn h3" id="fx">0 đ</div>Tổng chi</div></div>
+  <div class="col-4"><div class="panel"><div class="num h3" id="fb">0 đ</div>Tồn quỹ</div></div></div>
+  ${['ADMIN', 'GVCN'].includes(String(user.role).toUpperCase()) ? `<div class="panel mb-3"><div class="row g-2"><div class="col-md-5"><input id="fn" class="form-control" placeholder="Nội dung"></div>
+  <div class="col-md-2"><select id="fy" class="form-select"><option>Thu</option><option>Chi</option></select></div>
+  <div class="col-md-3"><input id="fa" type="number" class="form-control" placeholder="Số tiền (đ)"></div>
+  <div class="col-md-2"><button id="fs" class="btn btn-success w-100">Lưu phiếu</button></div></div></div>` : ''}
+  <div class="panel tbl-wrap"><table class="table align-middle mb-0"><thead><tr><th>Ngày</th><th>Nội dung</th><th>Người lập</th><th class="text-end">Số tiền</th><th></th></tr></thead><tbody id="fl"></tbody></table></div>`;
+  const load = async () => {
+    const c = $('fc').value; if (!c) return;
+    const r = await api('getClassFundData', c);
+    $('ft').textContent = vnd(r.summary.thu); $('fx').textContent = vnd(r.summary.chi); $('fb').textContent = vnd(r.summary.du);
+    $('fl').innerHTML = r.items.map(i => `<tr><td class="small">${esc(i.date)}</td><td>${esc(i.content)}</td><td>${esc(i.creator)}</td><td class="text-end fw-bold ${i.type === 'Thu' ? 'ok' : 'warn'}">${vnd(i.amount)}</td>
+    <td>${['ADMIN', 'GVCN'].includes(String(user.role).toUpperCase()) ? `<button class="btn btn-sm text-danger" data-del="${esc(i.id)}" aria-label="Xóa phiếu"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`).join('') || '<tr><td colspan="5" class="text-muted">Chưa có phiếu thu chi.</td></tr>';
+  };
+  $('fc').onchange = () => load().catch(fail);
+  $('fl').onclick = async e => { const b = e.target.closest('[data-del]'); if (b && confirm('Xóa phiếu này?')) { alert(await api('deleteFundTransaction', b.dataset.del)); load(); } };
+  if ($('fs')) $('fs').onclick = async () => {
+    const t = { className: $('fc').value, content: $('fn').value.trim(), type: $('fy').value, amount: $('fa').value, creator: user.name };
+    if (!t.className || !t.content || !t.amount) return alert('Chọn lớp và điền đủ nội dung, số tiền.');
+    alert(await api('saveFundTransaction', t)); $('fn').value = ''; $('fa').value = ''; load();
+  };
+}
+
+/* ===== Thông báo ===== */
+async function vNotif() {
+  $('view').innerHTML = `${isStaff() ? `<div class="panel mb-3"><input id="nt" class="form-control mb-2" placeholder="Tiêu đề"><textarea id="nc" class="form-control mb-2" rows="3" placeholder="Nội dung"></textarea><button id="ns" class="btn btn-success">Gửi thông báo</button></div>` : ''}<div id="nl"></div>`;
+  const load = async () => {
+    const l = await api('getNotifications');
+    $('nl').innerHTML = l.map(i => `<div class="panel mb-2"><div class="d-flex justify-content-between"><b>${esc(i.title)}</b><span class="small text-muted">${esc(i.date)}</span></div><p class="mb-1" style="white-space:pre-wrap">${esc(i.content)}</p><div class="small text-muted">Người gửi: ${esc(i.sender)}</div></div>`).join('') || '<div class="text-muted">Chưa có thông báo nào.</div>';
+  };
+  if ($('ns')) $('ns').onclick = async () => {
+    if (!$('nt').value.trim() || !$('nc').value.trim()) return alert('Nhập tiêu đề và nội dung.');
+    alert(await api('sendNotification', $('nt').value.trim(), $('nc').value.trim(), user.name)); $('nt').value = ''; $('nc').value = ''; load();
+  };
+  load();
+}
+
+const VIEWS = {
+  dashboard: { t: 'Tổng quan', f: vDash },
+  attendance: { t: 'Điểm danh', f: vAtt },
+  discipline: { t: 'Ghi nhận vi phạm', f: vDisc },
+  violation_grid: { t: 'Bảng điểm trừ khối', f: vGrid },
+  class_fund: { t: 'Quỹ lớp', f: vFund },
+  notifications: { t: 'Thông báo', f: vNotif }
+};
+
+try { const s = sessionStorage.getItem('edu'); if (s) start(JSON.parse(s)); } catch (e) { sessionStorage.removeItem('edu'); }
+</script>
+</body>
+</html>
