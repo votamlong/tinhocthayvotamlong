@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UFO Gọi Tên Học Sinh 2627 - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #030712;
+      color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 16px;
+      overflow-x: hidden;
+      user-select: none;
+    }
+    .space-stage {
+      background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #030712 75%);
+      border-radius: 24px;
+      border: 1px solid #312e81;
+      padding: 24px;
+      position: relative;
+      min-height: 580px;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(99, 102, 241, 0.15);
+    }
+    /* Đồ họa Đĩa bay UFO */
+    .ufo-wrapper {
+      position: relative;
+      z-index: 10;
+      animation: ufo-hover 3s ease-in-out infinite alternate;
+    }
+    @keyframes ufo-hover {
+      0% { transform: translateY(0px) rotate(-1deg); }
+      100% { transform: translateY(12px) rotate(1deg); }
+    }
+    .ufo-disk {
+      width: 220px;
+      height: 70px;
+      background: linear-gradient(180deg, #64748b 0%, #334155 60%, #0f172a 100%);
+      border-radius: 50%;
+      margin: 0 auto;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+      border: 2px solid #94a3b8;
+    }
+    .ufo-dome {
+      width: 100px;
+      height: 55px;
+      background: radial-gradient(circle at 50% 30%, #38bdf8 0%, #0284c7 70%, #0369a1 100%);
+      border-radius: 50% 50% 0 0;
+      margin: 0 auto -20px auto;
+      border: 2px solid #7dd3fc;
+      opacity: 0.9;
+    }
+    .ufo-lights {
+      display: flex;
+      justify-content: space-around;
+      padding: 0 25px;
+      position: absolute;
+      width: 100%;
+      bottom: 12px;
+    }
+    .ufo-light {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #facc15;
+      animation: light-blink 0.6s infinite alternate;
+    }
+    .ufo-light:nth-child(2) { animation-delay: 0.2s; background: #38bdf8; }
+    .ufo-light:nth-child(3) { animation-delay: 0.4s; background: #4ade80; }
+    .ufo-light:nth-child(4) { animation-delay: 0.6s; background: #f43f5e; }
+    @keyframes light-blink {
+      from { opacity: 0.3; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1.3); box-shadow: 0 0 10px #fff; }
+    }
+
+    /* Tia sáng hút người (Tractor Beam) */
+    .tractor-beam {
+      width: 320px;
+      height: 340px;
+      margin: -15px auto 0 auto;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.65) 0%, rgba(99, 102, 241, 0.15) 75%, transparent 100%);
+      clip-path: polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%);
+      transition: all 0.3s ease;
+      opacity: 0.25;
+      filter: blur(1px);
+    }
+    .tractor-beam.active {
+      opacity: 0.9;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.95) 0%, rgba(34, 197, 94, 0.5) 60%, rgba(99, 102, 241, 0.2) 100%);
+      animation: beam-pulse 0.25s infinite alternate;
+    }
+    @keyframes beam-pulse {
+      from { filter: drop-shadow(0 0 15px #38bdf8); }
+      to { filter: drop-shadow(0 0 35px #22c55e); }
+    }
+
+    /* Khung học sinh được chiếu hút */
+    .student-display-box {
+      margin-top: -190px;
+      position: relative;
+      z-index: 20;
+      min-height: 140px;
+    }
+    .student-name-text {
+      font-size: 3.2rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-shadow: 0 0 25px rgba(56, 189, 248, 0.8), 0 0 50px rgba(99, 102, 241, 0.6);
+      transition: transform 0.2s;
+    }
+    .student-id-text {
+      color: #38bdf8;
+      font-weight: 700;
+      letter-spacing: 2px;
+      font-size: 1.2rem;
+    }
+
+    /* Danh sách đã gọi */
+    .pool-card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 18px;
+      padding: 16px;
+      height: 100%;
+    }
+    .called-tag {
+      background: #1f2937;
+      color: #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 12px;
+      border: 1px solid #374151;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1300px;">
+    
+    <!-- THANH ĐIỀU HƯỚNG VÀ BỘ CHỌN LỚP -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4 bg-dark bg-opacity-50 p-3 rounded-4 border border-secondary border-opacity-25">
+      <div>
+        <h4 class="fw-bold text-info mb-1">
+          <i class="fas fa-satellite-dish me-2"></i>UFO GỌI TÊN HỌC SINH 2627
+        </h4>
+        <small class="text-secondary">Chiếu tia lượng tử chọn ngẫu nhiên học sinh lên bảng phát biểu</small>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <span class="small fw-bold text-secondary ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm bg-dark text-info border-secondary fw-bold" style="width: 130px;" onchange="onClassChange()">
+          <option value="">-- Nạp lớp... --</option>
+        </select>
+        
+        <div class="form-check form-switch m-0 ms-2">
+          <input class="form-check-input" type="checkbox" id="chkNoRepeat" checked style="cursor: pointer;">
+          <label class="form-check-label small text-light" for="chkNoRepeat">Chống trùng</label>
+        </div>
+
+        <button onclick="resetCalledList()" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="Đặt lại danh sách">
+          <i class="fas fa-redo me-1"></i> Làm mới
+        </button>
+      </div>
+    </div>
+
+    <!-- KHU VỰC SÂN KHẤU UFO VŨ TRỤ -->
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="space-stage text-center">
+          
+          <!-- HÌNH ĐĨA BAY UFO -->
+          <div class="ufo-wrapper">
+            <div class="ufo-dome"></div>
+            <div class="ufo-disk">
+              <div class="ufo-lights">
+                <span class="ufo-light"></span>
+                <span class="ufo-light"></span>
+                <span class="ufo-light"></span>
+                <span class="ufo-light"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- TIA SÁNG HÚT (TRACTOR BEAM) -->
+          <div class="tractor-beam" id="tractorBeam"></div>
+
+          <!-- VÙNG HIỂN THỊ TÊN HỌC SINH BỊ HÚT LÊN -->
+          <div class="student-display-box">
+            <div class="student-id-text" id="displayId">SẴN SÀNG QUÉT HỌC SINH</div>
+            <div class="student-name-text my-1" id="displayName">🛸🛸🛸</div>
+            <div id="subStatus" class="small text-secondary mt-1">Bấm nút "PHÁT TIA HÚT" bên dưới để gọi tên</div>
+          </div>
+
+          <!-- NÚT KÍCH HOẠT QUÉT TIA SÁNG -->
+          <div class="mt-4 pt-3 position-relative" style="z-index: 30;">
+            <button onclick="startUfoScan()" id="btnScan" class="btn btn-info btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg text-dark fs-5">
+              <i class="fas fa-meteor me-2"></i> PHÁT TIA HÚT GỌI TÊN
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CỘT DANH SÁCH HỌC SINH & LỊCH SỬ ĐÃ GỌI -->
+      <div class="col-lg-4">
+        <div class="pool-card d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary">
+            <h6 class="fw-bold text-info m-0"><i class="fas fa-list-ul me-2"></i>DANH SÁCH LỚP</h6>
+            <span class="badge bg-primary bg-opacity-25 text-info px-2 py-1" id="countStatus">0 / 0 em</span>
+          </div>
+
+          <!-- DANH SÁCH ĐÃ ĐƯỢC UFO HÚT -->
+          <div class="small fw-bold text-secondary mb-2 text-uppercase" style="font-size: 11px;">
+            Đã gọi trong tiết (<span id="calledCount">0</span> em):
+          </div>
+          <div class="flex-grow-1 overflow-auto mb-3" style="max-height: 380px;" id="calledContainer">
+            <div class="text-secondary small fst-italic py-3 text-center" id="emptyCalledText">Chưa có học sinh nào được gọi.</div>
+          </div>
+
+          <!-- GỢI Ý ĐIỂM CỘNG -->
+          <div class="p-2 bg-dark bg-opacity-50 rounded-3 border border-secondary small text-secondary">
+            <i class="fas fa-info-circle text-info me-1"></i>
+            Học sinh trả lời đúng có thể ghi nhận vào sổ điểm hoặc cộng điểm thi đua nề nếp.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzpQCTDsWmwl1A0jo2UBdzo6Fxco22Rd0McBVq9YE9YfIprW9y7qvbCl39oK9O-28pQGg/exec";
+
+    let studentList = [];
+    let calledIds = [];
+    let isScanning = false;
+    let audioCtx = null;
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    // ÂM THANH LASER QUÉT TIA (WEB AUDIO API)
+    function playLaserHum() {
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(250 + Math.random() * 400, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.1);
+      } catch(e) {}
+    }
+
+    // ÂM THANH KHI CHỐT HỌC SINH (FANFARE SCI-FI)
+    function playBeamingVictory() {
+      try {
+        const ctx = getAudioContext();
+        const notes = [440, 554, 659, 880];
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime + idx * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + idx * 0.1 + 0.4);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + idx * 0.1);
+          osc.stop(ctx.currentTime + idx * 0.1 + 0.45);
+        });
+      } catch(e) {}
+    }
+
+    window.onload = async function() {
+      try {
+        const classes = await callApi('getAllClasses');
+        const sel = document.getElementById('selClass');
+        let html = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => html += `<option value="${c}">${c}</option>`);
+        sel.innerHTML = html;
+
+        if (classes && classes.length > 0) {
+          sel.value = classes[0];
+          await onClassChange();
+        }
+      } catch (err) {
+        console.error("Lỗi nạp danh sách lớp:", err);
+      }
+    };
+
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      calledIds = [];
+      renderCalledList();
+
+      document.getElementById('displayId').innerText = "ĐANG TẢI HỌC SINH...";
+      document.getElementById('displayName').innerText = className;
+
+      try {
+        studentList = await callApi('getStudentList', className) || [];
+        updatePoolCount();
+        document.getElementById('displayId').innerText = "LỚP: " + className;
+        document.getElementById('displayName').innerText = "🛸 SẴN SÀNG";
+      } catch (e) {
+        studentList = [];
+        document.getElementById('displayId').innerText = "LỖI";
+        document.getElementById('displayName').innerText = "Không có HS";
+      }
+    }
+
+    function updatePoolCount() {
+      const remaining = studentList.length - calledIds.length;
+      document.getElementById('countStatus').innerText = `${remaining} / ${studentList.length} em`;
+      document.getElementById('calledCount').innerText = calledIds.length;
+    }
+
+    // BẮT ĐẦU PHÁT TIA HÚT VÀ QUÉT TÊN
+    function startUfoScan() {
+      if (isScanning) return;
+      if (!studentList || studentList.length === 0) return alert("Lớp chưa có học sinh!");
+
+      const noRepeat = document.getElementById('chkNoRepeat').checked;
+      let availableStudents = noRepeat 
+        ? studentList.filter(s => !calledIds.includes(s.id))
+        : studentList;
+
+      if (availableStudents.length === 0) {
+        if (confirm("Tất cả học sinh trong lớp đã được gọi hết! Thầy có muốn đặt lại vòng gọi mới?")) {
+          calledIds = [];
+          renderCalledList();
+          updatePoolCount();
+          availableStudents = studentList;
+        } else {
+          return;
+        }
+      }
+
+      isScanning = true;
+      const btn = document.getElementById('btnScan');
+      const beam = document.getElementById('tractorBeam');
+      const nameEl = document.getElementById('displayName');
+      const idEl = document.getElementById('displayId');
+      const statusEl = document.getElementById('subStatus');
+
+      btn.disabled = true;
+      beam.classList.add('active');
+      statusEl.innerText = "⚡ UFO ĐANG QUÉT TẦN SỐ TÂM LÝ...";
+
+      let duration = 3200; // 3.2 giây quét
+      let intervalSpeed = 50;
+      let startTime = Date.now();
+
+      const scanTimer = setInterval(() => {
+        const rand = availableStudents[Math.floor(Math.random() * availableStudents.length)];
+        nameEl.innerText = rand.name;
+        idEl.innerText = `${rand.id} • ${rand.gender || 'HS'}`;
+        playLaserHum();
+
+        if (Date.now() - startTime > duration) {
+          clearInterval(scanTimer);
+
+          // CHỌN RA HỌC SINH CUỐI CÙNG
+          const winner = availableStudents[Math.floor(Math.random() * availableStudents.length)];
+          nameEl.innerText = winner.name;
+          idEl.innerText = `⭐ ĐÃ KHÓA MỤC TIÊU: ${winner.id}`;
+          statusEl.innerText = "🎯 MỜI EM LÊN BẢNG PHÁT BIỂU / TRẢ LỜI CÂU HỎI";
+
+          playBeamingVictory();
+
+          if (noRepeat) {
+            calledIds.push(winner.id);
+            renderCalledList();
+          }
+
+          updatePoolCount();
+          beam.classList.remove('active');
+          btn.disabled = false;
+          isScanning = false;
+        }
+      }, intervalSpeed);
+    }
+
+    function renderCalledList() {
+      const container = document.getElementById('calledContainer');
+      if (calledIds.length === 0) {
+        container.innerHTML = '<div class="text-secondary small fst-italic py-3 text-center" id="emptyCalledText">Chưa có học sinh nào được gọi.</div>';
+        return;
+      }
+
+      let html = '';
+      calledIds.slice().reverse().forEach(id => {
+        const s = studentList.find(item => item.id === id);
+        const name = s ? s.name : id;
+        html += `<span class="called-tag"><i class="fas fa-user-check text-success"></i>${name}</span>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function resetCalledList() {
+      calledIds = [];
+      renderCalledList();
+      updatePoolCount();
+      document.getElementById('subStatus').innerText = "Đã làm mới vòng gọi tên học sinh.";
+    }
+  </script>
+</body>
+</html>
