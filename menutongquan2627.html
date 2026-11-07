@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Tổng Quan 2627 - EduClass Pro Launcher</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 18px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 24px 28px;
+      box-shadow: 0 4px 15px rgba(30, 64, 175, 0.15);
+    }
+    .stat-badge {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
+      padding: 12px 18px;
+      color: white;
+    }
+    .search-box {
+      border-radius: 50px;
+      padding: 12px 24px;
+      font-size: 15px;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: all 0.2s;
+    }
+    .search-box:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+      outline: none;
+    }
+    .filter-pill {
+      cursor: pointer;
+      padding: 8px 18px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+    }
+    .filter-pill:hover, .filter-pill.active {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+    /* Thẻ Ứng dụng kiểu Launchpad */
+    .app-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px;
+      height: 100%;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .app-card:hover {
+      transform: translateY(-4px);
+      border-color: #3b82f6;
+      box-shadow: 0 12px 24px -4px rgba(59, 130, 246, 0.12);
+    }
+    .app-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 14px;
+    }
+    .group-title {
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      margin: 24px 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1350px;">
+    
+    <!-- BANNER TỔNG QUAN -->
+    <div class="header-banner mb-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1">PHIÊN BẢN 2627</span>
+          <span class="opacity-75 small">Hệ thống Quản lý Sư phạm EduClass Pro</span>
+        </div>
+        <h4 class="fw-bold mb-1">TRUNG TÂM ĐIỀU HÀNH & LAUNCHER TỔNG QUAN</h4>
+        <small class="opacity-75">Khởi chạy nhanh toàn bộ 44 phân hệ quản trị, giảng dạy và tiện ích số</small>
+      </div>
+
+      <!-- 4 THẺ THỐNG KÊ NHANH -->
+      <div class="d-flex flex-wrap gap-2">
+        <div class="stat-badge text-center">
+          <small class="d-block opacity-75" style="font-size: 11px;">TỔNG SỐ LỚP</small>
+          <b class="fs-5" id="sumClasses">...</b>
+        </div>
+        <div class="stat-badge text-center">
+          <small class="d-block opacity-75" style="font-size: 11px;">BÁN TRÚ HÔM NAY</small>
+          <b class="fs-5 text-warning" id="sumLunch">...</b>
+        </div>
+        <div class="stat-badge text-center">
+          <small class="d-block opacity-75" style="font-size: 11px;">VI PHẠM TRONG NGÀY</small>
+          <b class="fs-5 text-danger" id="sumViolations">...</b>
+        </div>
+        <div class="stat-badge text-center">
+          <small class="d-block opacity-75" style="font-size: 11px;">TRẠNG THÁI MÁY CHỦ</small>
+          <b class="fs-5 text-success"><i class="fas fa-check-circle me-1"></i>Sẵn sàng</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- THANH TÌM KIẾM & BỘ LỌC DANH MỤC -->
+    <div class="row g-3 align-items-center mb-4">
+      <div class="col-md-5">
+        <div class="position-relative">
+          <input type="text" id="searchApp" class="form-control search-box ps-5" placeholder="Gõ tên ứng dụng, chức năng cần tìm..." oninput="filterApps()">
+          <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
+        </div>
+      </div>
+      <div class="col-md-7">
+        <div class="d-flex flex-wrap gap-2 justify-content-md-end" id="filterContainer">
+          <span class="filter-pill active" onclick="setCategory('ALL', this)">Tất cả (44)</span>
+          <span class="filter-pill" onclick="setCategory('TEACHING', this)">Giáo vụ & Giảng dạy</span>
+          <span class="filter-pill" onclick="setCategory('DISCIPLINE', this)">Nề nếp & Kỷ luật</span>
+          <span class="filter-pill" onclick="setCategory('OPERATIONS', this)">Bán trú & Hậu cần</span>
+          <span class="filter-pill" onclick="setCategory('TOOLS', this)">Tiện ích & Trò chơi</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LƯỚI KHỞI CHẠY ỨNG DỤNG -->
+    <div id="appGridContainer">
+      <!-- Tự động sinh danh sách ứng dụng -->
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwEfYYAGdJd08ltbHRXYz4LBJmn3ayWBxHMpR7wixdgWCo1KMuke_O-8kJQ8YT1Fg68ig/exec";
+
+    // DANH SÁCH TOÀN BỘ CÁC PHÂN HỆ
+    const APPS_LIST = [
+      // NHÓM 1: GIÁO VỤ & GIẢNG DẠY
+      { id: 'dashboard', name: 'Tổng quan Dashboard', cat: 'TEACHING', icon: 'fa-chart-pie', color: '#3b82f6', bg: '#eff6ff', desc: 'Thống kê tổng hợp sĩ số, tỷ lệ học lực giỏi và chỉ số chung.' },
+      { id: 'attendance', name: 'Điểm danh hàng ngày', cat: 'TEACHING', icon: 'fa-user-check', color: '#0ea5e9', bg: '#f0f9ff', desc: 'Ghi nhận hiện diện, vắng có phép và không phép từng tiết.' },
+      { id: 'scores', name: 'Sổ nhập điểm môn', cat: 'TEACHING', icon: 'fa-book-open', color: '#10b981', bg: '#ecfdf5', desc: 'Nhập điểm trực tiếp theo từng môn học và lớp giảng dạy.' },
+      { id: 'detailed_scores', name: 'Sổ điểm chi tiết (vnEdu)', cat: 'TEACHING', icon: 'fa-file-excel', color: '#059669', bg: '#ecfdf5', desc: 'Quản lý điểm thường xuyên TX1-TX4, giữa kỳ, cuối kỳ chuẩn vnEdu.' },
+      { id: 'tkb_sodo_2627', name: 'TKB - Sơ Đồ 2627', cat: 'TEACHING', icon: 'fa-calendar-alt', color: '#0284c7', bg: '#f0f9ff', desc: 'Lịch báo giảng 10 tiết/ngày, đồng bộ 11 cột với Sheet TKB.' },
+      { id: 'ppct_manager', name: 'Phân phối chương trình', cat: 'TEACHING', icon: 'fa-book-reader', color: '#6366f1', bg: '#eef2ff', desc: 'Theo dõi tiến độ bài học, ghi chú cộng dồn tiết dạy các lớp.' },
+      { id: 'sodb_manager', name: 'Sổ Đầu Bài điện tử', cat: 'TEACHING', icon: 'fa-book', color: '#f59e0b', bg: '#fffbeb', desc: 'Ghi nhận 15 cột A-O chuẩn sư phạm: tiết, môn, vắng, nhận xét, xếp loại.' },
+      { id: 'vsmap_feature', name: 'Sơ đồ lớp học 6 cột', cat: 'TEACHING', icon: 'fa-chalkboard', color: '#14b8a6', bg: '#f0fdfa', desc: 'Thiết lập chỗ ngồi học sinh, lưu vị trí hàng/cột và hoán đổi chỗ.' },
+      { id: 'work_planner', name: 'Lịch công việc cá nhân', cat: 'TEACHING', icon: 'fa-calendar-check', color: '#8b5cf6', bg: '#f5f3ff', desc: 'Nhật ký công tác sư phạm và lịch công việc tháng.' },
+      { id: 'salary_manager', name: 'Quản lý Thu nhập & Lương', cat: 'TEACHING', icon: 'fa-wallet', color: '#16a34a', bg: '#f0fdf4', desc: 'Theo dõi các khoản lương, phụ cấp, thu chi cá nhân.' },
+
+      // NHÓM 2: NỀ NẾP & KỶ LUẬT
+      { id: 'discipline', name: 'Ghi nhận Vi phạm', cat: 'DISCIPLINE', icon: 'fa-exclamation-triangle', color: '#ef4444', bg: '#fef2f2', desc: 'Lập phiếu trừ điểm thi đua học sinh theo danh mục lỗi.' },
+      { id: 'positive_discipline_2627', name: 'Kỷ luật tích cực 2627', cat: 'DISCIPLINE', icon: 'fa-heart', color: '#22c55e', bg: '#f0fdf4', desc: 'Phân tích tâm lý gốc rễ (Cột D) & Hướng xử lý tích cực (Cột E).' },
+      { id: 'weekly_emulation', name: 'Thi đua tuần toàn trường', cat: 'DISCIPLINE', icon: 'fa-trophy', color: '#f59e0b', bg: '#fffbeb', desc: 'Bảng xếp hạng thi đua tuần tự động trừ điểm theo mã L01-L60.' },
+      { id: 'violation_grid', name: 'Bảng điểm trừ khối', cat: 'DISCIPLINE', icon: 'fa-table', color: '#dc2626', bg: '#fef2f2', desc: 'Ma trận tổng hợp lỗi vi phạm toàn bộ các lớp trong khối.' },
+      { id: 'class_violation_matrix', name: 'Bảng điểm trừ chi tiết lớp', cat: 'DISCIPLINE', icon: 'fa-user-minus', color: '#ea580c', bg: '#fff7ed', desc: 'Ma trận trừ điểm chi tiết từng học sinh trong một lớp.' },
+      { id: 'violation_trends', name: 'Xu hướng nề nếp', cat: 'DISCIPLINE', icon: 'fa-chart-line', color: '#e11d48', bg: '#fff1f2', desc: 'Biểu đồ kết hợp Bar-Line so sánh biến động lỗi lớp với toàn trường.' },
+      { id: 'violation_detail_trends', name: 'Chi tiết xu hướng lỗi', cat: 'DISCIPLINE', icon: 'fa-chart-area', color: '#c026d3', bg: '#fdf4ff', desc: 'Biểu đồ đa đường phân tích diễn biến từng loại lỗi theo tháng.' },
+      { id: 'violation_processing_page', name: 'Xử lý vi phạm', cat: 'DISCIPLINE', icon: 'fa-gavel', color: '#475569', bg: '#f8fafc', desc: 'Quyết định kỷ luật, biện pháp giáo dục và kết quả chuyển biến.' },
+      { id: 'noise_monitor_2627', name: 'Cảnh Báo Ồn & Hú Còi', cat: 'DISCIPLINE', icon: 'fa-volume-up', color: '#dc2626', bg: '#fef2f2', desc: 'Cảm biến đo độ ồn mic thời gian thực và tự động hú còi nhắc trật tự.' },
+
+      // NHÓM 3: HẬU CẦN & BÁN TRÚ
+      { id: 'boarding_kitchen_2627', name: 'Suất Ăn Bán Trú 2627', cat: 'OPERATIONS', icon: 'fa-utensils', color: '#16a34a', bg: '#f0fdf4', desc: 'Đối soát sĩ số vắng, tính suất nấu thực tế và in phiếu bàn giao nhà bếp.' },
+      { id: 'quy_lop_moi_2627', name: 'Thu Chi Quỹ Lớp 2627', cat: 'OPERATIONS', icon: 'fa-coins', color: '#059669', bg: '#ecfdf5', desc: 'Sổ quỹ lớp học 10 cột, tự sinh mã THU/CHI, kiểm soát thu chi.' },
+      { id: 'class_clean_2627', name: 'Bảng Trực Nhật 2627', cat: 'OPERATIONS', icon: 'fa-broom', color: '#d97706', bg: '#fffbeb', desc: 'Tự động phân công trực nhật cả tuần T2-T7 và in ấn dán lớp.' },
+      { id: 'parent_meeting_2627', name: 'Thư Mời Họp Phụ Huynh', cat: 'OPERATIONS', icon: 'fa-envelope-open-text', color: '#b45309', bg: '#fffbeb', desc: 'Soạn và in giấy mời họp phụ huynh hàng loạt xếp gọn khổ A4.' },
+      { id: 'csvc_manager', name: 'Quản lý Cơ sở vật chất', cat: 'OPERATIONS', icon: 'fa-tools', color: '#64748b', bg: '#f8fafc', desc: 'Ghi nhận thiết bị hư hỏng tại các phòng học để bảo trì.' },
+      { id: 'birthday_manager', name: 'Lịch Sinh Nhật học sinh', cat: 'OPERATIONS', icon: 'fa-birthday-cake', color: '#ec4899', bg: '#fdf2f8', desc: 'Theo dõi ngày sinh nhật học sinh theo tháng và thông báo.' },
+
+      // NHÓM 4: TIỆN ÍCH & TRÒ CHƠI LỚP HỌC
+      { id: 'match_control_live', name: 'Điều Hành Giải Đấu', cat: 'TOOLS', icon: 'fa-trophy', color: '#eab308', bg: '#fefce8', desc: 'Bảng điểm điện tử LED, đồng hồ bấm giờ trận đấu, còi trọng tài.' },
+      { id: 'lucky_wheel', name: 'Vòng Quay Gọi Tên', cat: 'TOOLS', icon: 'fa-dharmachakra', color: '#ef4444', bg: '#fef2f2', desc: 'Vòng quay ngẫu nhiên học sinh trả lời câu hỏi và nhận quà.' },
+      { id: 'group_maker', name: 'Chia Nhóm Học Sinh', cat: 'TOOLS', icon: 'fa-users-cog', color: '#3b82f6', bg: '#eff6ff', desc: 'Thuật toán chia nhóm ngẫu nhiên hoặc cân bằng lực học.' },
+      { id: 'clock_timer_2627', name: 'Đồng Hồ & Đếm Ngược', cat: 'TOOLS', icon: 'fa-stopwatch', color: '#f43f5e', bg: '#fff1f2', desc: 'Đồng hồ bấm giờ làm bài tập, thảo luận nhóm có chuông báo.' },
+      { id: 'random_num_2627', name: 'Quay Số Ngẫu Nhiên', cat: 'TOOLS', icon: 'fa-dice', color: '#8b5cf6', bg: '#f5f3ff', desc: 'Quay số thứ tự học sinh ngẫu nhiên trên lớp học.' },
+      { id: 'word_guess_2627', name: 'Game Đoán Chữ', cat: 'TOOLS', icon: 'fa-gamepad', color: '#10b981', bg: '#ecfdf5', desc: 'Trò chơi đoán chữ khởi động tiết học sinh động.' }
+    ];
+
+    let currentCategory = 'ALL';
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = function() {
+      renderApps();
+      loadLiveStatistics();
+    };
+
+    // LẤY DỮ LIỆU THỐNG KÊ NHANH TỪ SERVER
+    async function loadLiveStatistics() {
+      try {
+        const classes = await callApi('getAllClasses');
+        if (classes) document.getElementById('sumClasses').innerText = classes.length + " Lớp";
+      } catch(e) { document.getElementById('sumClasses').innerText = "--"; }
+
+      try {
+        const lunch = await callApi('getLunchReport');
+        if (lunch) document.getElementById('sumLunch').innerText = (lunch.actualLunch || 0) + " Suất";
+      } catch(e) { document.getElementById('sumLunch').innerText = "--"; }
+
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const v = await callApi('getGlobalViolationsInRange', today, today);
+        if (v) document.getElementById('sumViolations').innerText = (v.length || 0) + " Vụ";
+      } catch(e) { document.getElementById('sumViolations').innerText = "--"; }
+    }
+
+    // LỌC THEO DANH MỤC
+    function setCategory(cat, el) {
+      currentCategory = cat;
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      renderApps();
+    }
+
+    // TÌM KIẾM THEO TÊN
+    function filterApps() {
+      renderApps();
+    }
+
+    // VẼ LƯỚI ỨNG DỤNG
+    function renderApps() {
+      const searchKey = document.getElementById('searchApp').value.trim().toLowerCase();
+      const container = document.getElementById('appGridContainer');
+
+      let filtered = APPS_LIST.filter(app => {
+        let matchCat = (currentCategory === 'ALL' || app.cat === currentCategory);
+        let matchSearch = (!searchKey || app.name.toLowerCase().includes(searchKey) || app.desc.toLowerCase().includes(searchKey));
+        return matchCat && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="text-center text-muted p-5 bg-white rounded-4 border"><i class="fas fa-search fa-2x mb-2 text-secondary"></i><br>Không tìm thấy ứng dụng phù hợp.</div>';
+        return;
+      }
+
+      let html = '<div class="row g-3">';
+      filtered.forEach(app => {
+        html += `
+          <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+            <div class="app-card" onclick="openApp('${app.id}')">
+              <div>
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="app-icon shadow-sm" style="background-color: ${app.bg}; color: ${app.color};">
+                    <i class="fas ${app.icon}"></i>
+                  </div>
+                  <span class="badge bg-light text-muted border small" style="font-size: 10px;">#${app.id}</span>
+                </div>
+                <h6 class="fw-bold mb-1 text-dark">${app.name}</h6>
+                <p class="text-secondary small mb-3" style="font-size: 12px; line-height: 1.4;">${app.desc}</p>
+              </div>
+              <div class="d-flex justify-content-between align-items-center pt-2 border-top border-light">
+                <span class="small fw-bold text-primary" style="font-size: 11px;">Mở phân hệ <i class="fas fa-arrow-right ms-1"></i></span>
+                <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1" style="font-size: 10px;">2627</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+
+      container.innerHTML = html;
+    }
+
+    // HÀM MỞ PHÂN HỆ (NẾU ĐANG CHẠY TRONG IFRAME CỦA INDEX THÌ CHUYỂN TAB)
+    function openApp(appId) {
+      if (window.parent && window.parent.switchTab) {
+        window.parent.switchTab(appId);
+      } else {
+        alert("Khởi chạy phân hệ: " + appId);
+      }
+    }
+  </script>
+</body>
+</html>
