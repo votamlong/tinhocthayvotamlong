@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chia Nhóm Học Sinh - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #1e293b;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 16px;
+      user-select: none;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 20px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+    }
+    /* THẺ NHÓM */
+    .group-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s;
+    }
+    .group-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    .group-header {
+      padding: 12px 16px;
+      font-weight: 800;
+      font-size: 14px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .group-body {
+      padding: 14px;
+      flex-grow: 1;
+      background: #fdfdfd;
+    }
+    .member-item {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .member-item:hover {
+      background: #e2e8f0;
+    }
+    .member-leader {
+      background: #fef08a !important;
+      border-color: #facc15 !important;
+      font-weight: 700;
+    }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .group-card { border: 1px solid #000 !important; box-shadow: none !important; page-break-inside: avoid; }
+      .member-item { border: 1px solid #ccc !important; }
+      @page { size: landscape; margin: 10mm; }
+    }
+    .print-header { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1350px;">
+    
+    <!-- THANH TIÊU ĐỀ & ĐIỀU HƯỚNG (ẨN KHI IN) -->
+    <div class="header-banner mb-3 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-users-cog me-1"></i>GROUP MAKER 2627</span>
+          <span class="opacity-75 small">Lưu dữ liệu vào Sheet: <b>CHIA_NHOM_2627</b></span>
+        </div>
+        <h4 class="fw-bold mb-0">THUẬT TOÁN PHÂN CHIA NHÓM HỌC SINH</h4>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <button onclick="saveGroupsToSheet()" id="btnSave" class="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-sm">
+          <i class="fas fa-save me-1"></i> Lưu Vào Sheet
+        </button>
+        <button onclick="window.print()" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In danh sách A4
+        </button>
+      </div>
+    </div>
+
+    <!-- KHUNG ĐIỀU KHIỂN & BỘ LỌC CẤU HÌNH (ẨN KHI IN) -->
+    <div class="panel-box mb-4 no-print border-start border-4 border-primary">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">1. Lớp học</label>
+          <select id="selClass" class="form-select form-select-sm fw-bold border-primary" onchange="onClassChange()">
+            <option value="">-- Chọn lớp --</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">2. Cách thức chia</label>
+          <select id="selMode" class="form-select form-select-sm fw-bold">
+            <option value="GROUPS">Chia theo Số Nhóm</option>
+            <option value="SIZE">Chia theo Sĩ Số / Nhóm</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1" id="lblNumber">3. Số lượng nhóm</label>
+          <input type="number" id="inpNumber" class="form-control form-control-sm text-center fw-bold text-primary" value="4" min="2" max="15">
+        </div>
+
+        <div class="col-md-3">
+          <label class="small fw-bold text-secondary mb-1">4. Tên hoạt động / Nhiệm vụ</label>
+          <input type="text" id="inpTopic" class="form-control form-control-sm" value="Thảo luận bài tập nhóm" placeholder="Vd: Thảo luận bài 2, Dự án...">
+        </div>
+
+        <div class="col-md-3 d-flex gap-2">
+          <button onclick="generateGroups()" class="btn btn-primary btn-sm flex-grow-1 fw-bold rounded-pill shadow-sm">
+            <i class="fas fa-random me-1"></i> CHIA NGẪU NHIÊN
+          </button>
+          <button onclick="loadSavedBatch()" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="Tải đợt chia gần nhất từ Sheet">
+            <i class="fas fa-history"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header text-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">Lớp: <b class="text-dark fs-5" id="printClassName">...</b></div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+          <div class="small fst-italic">Bảng phân chia nhóm học tập</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1" id="printTopicTitle">DANH SÁCH CÁC NHÓM THẢO LUẬN</h3>
+      <p class="text-secondary small fst-italic">Cập nhật ngày: <b class="text-dark" id="printTodayDate">...</b> | GV: <b>Võ Tâm Long</b></p>
+      <hr>
+    </div>
+
+    <!-- VÙNG HIỂN THỊ CÁC THẺ NHÓM -->
+    <div class="row g-3" id="groupsContainer">
+      <div class="col-12 text-center text-muted p-5">
+        <i class="fas fa-info-circle fa-2x mb-2 text-primary"></i><br>
+        Vui lòng chọn lớp và nhấn nút <b>"CHIA NGẪU NHIÊN"</b> để phân nhóm.
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbyKEc0CSNPr7Cdp1YvWtZop_FrQMlxxyytSPiGmSRNXHC8G77XCpIZfotCqGRAC0z735A/exec";
+
+    let studentList = [];
+    let currentGroups = [];
+    const GROUP_COLORS = [
+      '#3b82f6', '#10b981', '#f59e0b', '#ef4444', 
+      '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6', 
+      '#f97316', '#6366f1', '#84cc16', '#e11d48'
+    ];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('vi-VN');
+
+      document.getElementById('selMode').onchange = function() {
+        document.getElementById('lblNumber').innerText = this.value === 'GROUPS' ? '3. Số lượng nhóm' : '3. Sĩ số / nhóm';
+      };
+
+      try {
+        const classes = await callApi('getAllClasses');
+        const sel = document.getElementById('selClass');
+        let html = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => html += `<option value="${c}">${c}</option>`);
+        sel.innerHTML = html;
+
+        if (classes && classes.length > 0) {
+          sel.value = classes[0];
+          await onClassChange();
+        }
+      } catch (err) {
+        console.error("Lỗi nạp lớp:", err);
+      }
+    };
+
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      document.getElementById('printClassName').innerText = className;
+      try {
+        studentList = await callApi('getStudentList', className) || [];
+      } catch (e) {
+        studentList = [];
+      }
+    }
+
+    // THUẬT TOÁN CHIA NHÓM NGẪU NHIÊN
+    function generateGroups() {
+      if (!studentList || studentList.length === 0) return alert("Lớp chưa có học sinh!");
+
+      const mode = document.getElementById('selMode').value;
+      const numVal = parseInt(document.getElementById('inpNumber').value) || 4;
+
+      // Xáo trộn mảng học sinh ngẫu nhiên (Fisher-Yates)
+      let shuffled = [...studentList];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      let totalGroups = numVal;
+      if (mode === 'SIZE') {
+        totalGroups = Math.ceil(shuffled.length / numVal);
+      }
+
+      currentGroups = [];
+      for (let g = 0; g < totalGroups; g++) {
+        currentGroups.push({
+          groupId: g + 1,
+          groupName: "Nhóm " + (g + 1),
+          members: []
+        });
+      }
+
+      // Chia đều học sinh vào từng nhóm
+      shuffled.forEach((s, idx) => {
+        let gIndex = idx % totalGroups;
+        currentGroups[gIndex].members.push({
+          id: s.id,
+          name: s.name,
+          isLeader: currentGroups[gIndex].members.length === 0 // Người đầu tiên mặc định là nhóm trưởng
+        });
+      });
+
+      renderGroupsUI();
+    }
+
+    function renderGroupsUI() {
+      const container = document.getElementById('groupsContainer');
+      const topic = document.getElementById('inpTopic').value.trim() || "Thảo luận nhóm";
+      document.getElementById('printTopicTitle').innerText = topic.toUpperCase();
+
+      if (currentGroups.length === 0) return;
+
+      let html = '';
+      currentGroups.forEach((g, gIdx) => {
+        let color = GROUP_COLORS[gIdx % GROUP_COLORS.length];
+        html += `
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="group-card">
+              <div class="group-header" style="background-color: ${color};">
+                <span><i class="fas fa-users me-2"></i>${g.groupName}</span>
+                <span class="badge bg-white text-dark small">${g.members.length} em</span>
+              </div>
+              <div class="group-body">
+                ${g.members.map((m, mIdx) => `
+                  <div class="member-item ${m.isLeader ? 'member-leader' : ''}" 
+                       onclick="toggleLeader(${gIdx}, ${mIdx})" 
+                       title="Bấm để đặt / hủy Nhóm trưởng">
+                    <span>
+                      ${m.isLeader ? '<i class="fas fa-crown text-warning me-1"></i>' : '<i class="far fa-user text-muted me-1"></i>'}
+                      <b>${m.name}</b>
+                    </span>
+                    <span class="text-muted small">${m.id}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // ĐỔI VAI TRÒ NHÓM TRƯỞNG KHI CLICK VÀO HỌC SINH
+    function toggleLeader(gIdx, mIdx) {
+      const g = currentGroups[gIdx];
+      g.members.forEach((m, i) => m.isLeader = (i === mIdx));
+      renderGroupsUI();
+    }
+
+    // LƯU DANH SÁCH VÀO SHEET CHIA_NHOM_2627
+    async function saveGroupsToSheet() {
+      const className = document.getElementById('selClass').value;
+      const topic = document.getElementById('inpTopic').value.trim();
+
+      if (!className) return alert("Vui lòng chọn lớp!");
+      if (currentGroups.length === 0) return alert("Chưa có dữ liệu nhóm nào để lưu!");
+
+      const btn = document.getElementById('btnSave');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      try {
+        const msg = await callApi('saveGroupMakerData2627', className, currentGroups, topic);
+        alert(msg);
+      } catch (err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    // TẢI ĐỢT CHIA GẦN NHẤT TỪ SHEET
+    async function loadSavedBatch() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return alert("Vui lòng chọn lớp!");
+
+      try {
+        const history = await callApi('getGroupMakerSavedData2627', className);
+        if (!history || history.length === 0) {
+          return alert("Lớp này chưa có đợt chia nhóm nào được lưu trong Sheet!");
+        }
+
+        const latest = history[0];
+        document.getElementById('inpTopic').value = latest.topic || "Thảo luận nhóm";
+
+        currentGroups = [];
+        let gId = 1;
+        for (let gName in latest.groups) {
+          currentGroups.push({
+            groupId: gId++,
+            groupName: gName,
+            members: latest.groups[gName].map(m => ({
+              id: m.id,
+              name: m.name,
+              isLeader: (m.role === 'Nhóm trưởng')
+            }))
+          });
+        }
+
+        renderGroupsUI();
+        alert("✅ Đã nạp đợt chia ngày: " + latest.time);
+      } catch (err) {
+        alert("Lỗi tải: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
