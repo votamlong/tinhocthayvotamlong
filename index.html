@@ -297,14 +297,11 @@
         <div id="tab-pocket_calc_2627" class="content-tab d-none" style="height: 85vh;">
           <iframe id="iframe-calc" src="maytinhbotui2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #0f172a;" class="shadow-sm"></iframe>
         </div>
-        <!-- TAB SỔ TAY HỌP TỔ 2627 (NHÚNG sotayhopto2627.html) -->
-        <div id="tab-meeting_notebook_2627" class="content-tab d-none" style="height: 85vh;">
-          <iframe id="iframe-meetingnotebook" src="sotayhopto2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: white;" class="shadow-sm"></iframe>
+        <!-- TAB UFO GỌI TÊN HỌC SINH (NHÚNG ufogoiten.html) -->
+        <div id="tab-ufogoiten" class="content-tab d-none" style="height: 85vh;">
+          <iframe id="iframe-ufo" src="ufogoiten.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #030712;" class="shadow-sm"></iframe>
         </div>
-        <!-- TAB UFO GỌI TÊN HỌC SINH 2627 (NHÚNG ufogoiten2627.html) -->
-        <div id="tab-ufo_picker_2627" class="content-tab d-none" style="height: 85vh;">
-          <iframe id="iframe-ufo" src="ufogoiten2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #030712;" class="shadow-sm"></iframe>
-        </div>
+        
 
 
 
@@ -1170,6 +1167,16 @@
           });
         }
       }
+      //
+      // TỰ ĐỘNG THÊM MENU UFO GỌI TÊN CHO MỌI TÀI KHOẢN
+      var hasUfo = dataMenu.some(function(m) { return m.id === 'ufogoiten'; });
+      if (!hasUfo) {
+        dataMenu.push({
+          id: 'ufogoiten',
+          text: 'UFO Gọi Tên Học Sinh',
+          icon: 'fa-satellite-dish text-info'
+        });
+      }
 
       dataMenu.forEach(function(m, i) {
         menuHtml += `<div onclick="switchTab('${m.id}', this)" class="list-group-item rounded mb-2 ${i==0?'active':''}">
@@ -1334,8 +1341,8 @@
       else if (id === 'meeting_notebook_2627') {
         // Tự động mở tab hiển thị Sổ Tay Họp Tổ 2627
       }
-      else if (id === 'ufo_picker_2627') {
-        // Tự động mở tab hiển thị UFO Gọi Tên Học Sinh 2627
+      else if (id === 'ufogoiten') {
+        // Tự động mở tab hiển thị UFO Gọi Tên Học Sinh
       }
       
     }
