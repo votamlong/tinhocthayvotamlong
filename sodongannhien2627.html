@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sơ Đồ Ngẫu Nhiên & Gọi HS 2627 - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      color: #1e293b;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 18px;
+      user-select: none;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 22px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: white;
+      border-radius: 18px;
+      padding: 20px 24px;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+    }
+    /* KHUNG SƠ ĐỒ LỚP HỌC */
+    .classroom-stage {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 2px dashed #cbd5e1;
+      padding: 30px;
+      min-height: 540px;
+    }
+    .teacher-desk {
+      width: 260px;
+      margin: 0 auto 35px auto;
+      background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    /* LƯỚI BÀN HỌC SINH 6 CỘT */
+    .seats-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .seat-card {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 8px;
+      text-align: center;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+    }
+    .seat-card:hover {
+      transform: translateY(-4px);
+      border-color: #10b981;
+      box-shadow: 0 8px 16px rgba(16, 185, 129, 0.15);
+    }
+    .seat-num-tag {
+      font-size: 10px;
+      font-weight: 800;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+    .seat-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.25;
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .seat-id {
+      font-size: 11px;
+      color: #059669;
+      font-weight: 700;
+    }
+    .seat-badge-call {
+      position: absolute;
+      top: -8px;
+      right: -6px;
+      background: #ef4444;
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #fff;
+    }
+    /* HIỆU ỨNG QUÉT RADAR GỌI TÊN */
+    .seat-scanning {
+      background: #fef08a !important;
+      border-color: #eab308 !important;
+      transform: scale(1.1);
+      box-shadow: 0 0 15px #facc15;
+      z-index: 10;
+    }
+    .seat-winner {
+      background: #dcfce7 !important;
+      border-color: #22c55e !important;
+      color: #15803d !important;
+      transform: scale(1.18) !important;
+      box-shadow: 0 0 25px #22c55e !important;
+      z-index: 20;
+      animation: pulse-winner 0.6s infinite alternate;
+    }
+    @keyframes pulse-winner {
+      from { box-shadow: 0 0 15px #22c55e; }
+      to { box-shadow: 0 0 35px #15803d; }
+    }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .classroom-stage { border: 1px solid #000 !important; padding: 10px !important; }
+      .seat-card { border: 1px solid #000 !important; box-shadow: none !important; }
+      @page { size: landscape; margin: 10mm; }
+    }
+    .print-header { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1350px;">
+    
+    <!-- THANH ĐIỀU HƯỚNG BỘ LỌC (ẨN KHI IN) -->
+    <div class="header-banner mb-3 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-th me-1"></i>SMART SEATING RADAR 2627</span>
+          <span class="opacity-75 small">Đồng bộ Sheet: <b>SO_DO_NGAU_NHIEN_2627</b></span>
+        </div>
+        <h4 class="fw-bold mb-0">SƠ ĐỒ LỚP HỌC NGẪU NHIÊN & GỌI TÊN THÔNG MINH</h4>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-success" style="width: 120px;" onchange="loadSeatingData()">
+          <option value="">-- Chọn lớp --</option>
+        </select>
+
+        <button onclick="shuffleSeatsRandomly()" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark shadow-sm" title="Đảo ngẫu nhiên vị trí học sinh cả lớp">
+          <i class="fas fa-random me-1"></i> Trộn Chỗ Ngồi
+        </button>
+
+        <button onclick="startSeatingPicker()" id="btnPick" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold shadow-sm" title="Quét radar gọi 1 em ngẫu nhiên từ sơ đồ">
+          <i class="fas fa-crosshairs me-1"></i> Bốc Thăm Gọi HS
+        </button>
+
+        <button onclick="saveSeatingToSheet()" id="btnSave" class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm">
+          <i class="fas fa-save me-1"></i> Lưu Vào Sheet
+        </button>
+
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In sơ đồ
+        </button>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header text-center mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">Lớp: <b class="text-dark fs-5" id="printClassName">...</b></div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">SƠ ĐỒ CHỖ NGỒI HỌC SINH</h3>
+      <p class="text-secondary small fst-italic">Cập nhật ngày: <b class="text-dark" id="printTodayDate">...</b> | GVCN: <b class="text-dark" id="printTeacherName">Thầy Võ Tâm Long</b></p>
+      <hr>
+    </div>
+
+    <!-- KHUNG SƠ ĐỒ LỚP HỌC 6 CỘT -->
+    <div class="classroom-stage">
+      <!-- BỤC GIẢNG -->
+      <div class="teacher-desk text-center">
+        <i class="fas fa-chalkboard-teacher me-2"></i>BỤC GIẢNG & BÀN GIÁO VIÊN
+      </div>
+
+      <!-- LƯỚI BÀN HỌC SINH -->
+      <div class="seats-grid" id="seatsContainer">
+        <div class="col-12 text-center text-muted p-5"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu lớp học...</div>
+      </div>
+    </div>
+
+    <!-- THÔNG BÁO KẾT QUẢ GỌI TÊN DƯỚI ĐÁY MÀN HÌNH -->
+    <div class="text-center mt-3 no-print">
+      <h5 class="fw-bold text-success mb-0" id="announcementText">
+        <i class="fas fa-info-circle me-1 text-primary"></i>Nhấn nút <b>"Trộn Chỗ Ngồi"</b> để đổi chỗ hoặc <b>"Bốc Thăm Gọi HS"</b> để gọi học sinh phát biểu.
+      </h5>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwOUdzoYc7g13aEO3NchBalkI5q6eIgXTjJuINSK_CEzZnAIh80bxy2lfa2qsviXmZiVw/exec";
+
+    let studentsInSeats = [];
+    let isPicking = false;
+    let audioCtx = null;
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    // ÂM THANH RADAR QUÉT QUA TỪNG BÀN (TÍCH TẮC NHANH)
+    function playBeepTick() {
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600 + Math.random() * 200, ctx.currentTime);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.06);
+      } catch(e) {}
+    }
+
+    // ÂM THANH CHỐT HỌC SINH TRÚNG THƯỞNG (VICTORY CHIME)
+    function playChimeVictory() {
+      try {
+        const ctx = getAudioContext();
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.08);
+          gain.gain.setValueAtTime(0.25, ctx.currentTime + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + idx * 0.08 + 0.4);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + idx * 0.08);
+          osc.stop(ctx.currentTime + idx * 0.08 + 0.45);
+        });
+      } catch(e) {}
+    }
+
+    window.onload = async function() {
+      document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('vi-VN');
+      try {
+        const classes = await callApi('getAllClasses');
+        const sel = document.getElementById('selClass');
+        let html = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => html += `<option value="${c}">${c}</option>`);
+        sel.innerHTML = html;
+
+        if (classes && classes.length > 0) {
+          sel.value = classes[0];
+          await loadSeatingData();
+        }
+      } catch(e) {
+        console.error("Lỗi nạp lớp:", e);
+      }
+    };
+
+    // TẢI DỮ LIỆU SƠ ĐỒ LỚP HỌC
+    async function loadSeatingData() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      document.getElementById('printClassName').innerText = className;
+      document.getElementById('seatsContainer').innerHTML = '<div class="col-12 text-center text-muted p-5"><i class="fas fa-sync fa-spin me-2"></i>Đang tải sơ đồ lớp ' + className + '...</div>';
+
+      try {
+        studentsInSeats = await callApi('getSeatingPicker2627Data', className) || [];
+        renderSeatsGrid();
+      } catch(err) {
+        document.getElementById('seatsContainer').innerHTML = `<div class="col-12 text-danger p-4 text-center">Lỗi: ${err.message}</div>`;
+      }
+    }
+
+    // VẼ LƯỚI BÀN HỌC SINH 6 CỘT
+    function renderSeatsGrid() {
+      const container = document.getElementById('seatsContainer');
+      if (!studentsInSeats || studentsInSeats.length === 0) {
+        container.innerHTML = '<div class="col-12 text-center text-muted p-5">Chưa có học sinh nào trong lớp này.</div>';
+        return;
+      }
+
+      // Sắp xếp theo hàng và cột
+      studentsInSeats.sort((a, b) => (a.row - b.row) || (a.col - b.col));
+
+      let html = '';
+      studentsInSeats.forEach((s, idx) => {
+        let badgeCall = s.calledCount > 0 ? `<span class="seat-badge-call" title="Đã gọi ${s.calledCount} lần">${s.calledCount}</span>` : '';
+        html += `
+          <div class="seat-card" id="seatCard_${s.id}">
+            ${badgeCall}
+            <div class="seat-num-tag">HÀNG ${s.row} - DÃY ${s.col}</div>
+            <div class="seat-name">${s.name}</div>
+            <div class="seat-id">${s.id}</div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // 1. TRỘN CHỖ NGỒI NGẪU NHIÊN (FISHER-YATES SHUFFLE)
+    function shuffleSeatsRandomly() {
+      if (!studentsInSeats || studentsInSeats.length === 0) return alert("Không có học sinh để xáo trộn!");
+      if (!confirm("Thầy có chắc chắn muốn tráo đổi ngẫu nhiên toàn bộ chỗ ngồi của lớp?")) return;
+
+      // Lấy danh sách tọa độ (Hàng, Cột) hiện có
+      let coords = studentsInSeats.map(s => ({ row: s.row, col: s.col }));
+
+      // Xáo trộn mảng tọa độ
+      for (let i = coords.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [coords[i], coords[j]] = [coords[j], coords[i]];
+      }
+
+      // Gán tọa độ mới cho học sinh
+      studentsInSeats.forEach((s, idx) => {
+        s.row = coords[idx].row;
+        s.col = coords[idx].col;
+      });
+
+      renderSeatsGrid();
+      document.getElementById('announcementText').innerHTML = '🎲 <b>Đã xáo trộn chỗ ngồi ngẫu nhiên!</b> Hãy bấm <b>"Lưu Vào Sheet"</b> nếu muốn lưu lại sơ đồ này.';
+    }
+
+    // 2. BỐC THĂM GỌI TÊN TỪ SƠ ĐỒ (QUÉT RADAR CHẠY XUNG QUANH LỚP)
+    function startSeatingPicker() {
+      if (isPicking) return;
+      if (!studentsInSeats || studentsInSeats.length === 0) return alert("Không có học sinh trong sơ đồ!");
+
+      isPicking = true;
+      const btn = document.getElementById('btnPick');
+      btn.disabled = true;
+
+      // Xóa các hiệu ứng cũ
+      document.querySelectorAll('.seat-card').forEach(el => el.classList.remove('seat-scanning', 'seat-winner'));
+
+      let totalSteps = 30 + Math.floor(Math.random() * 15); // Số bước nhảy radar
+      let currentStep = 0;
+      let delay = 60;
+      let lastCard = null;
+
+      function stepScan() {
+        if (lastCard) lastCard.classList.remove('seat-scanning');
+
+        const randStudent = studentsInSeats[Math.floor(Math.random() * studentsInSeats.length)];
+        const card = document.getElementById('seatCard_' + randStudent.id);
+        if (card) {
+          card.classList.add('seat-scanning');
+          lastCard = card;
+        }
+
+        playBeepTick();
+        currentStep++;
+
+        if (currentStep < totalSteps) {
+          // Tăng dần độ trễ để tạo cảm giác chậm dần trước khi dừng hẳn
+          if (currentStep > totalSteps - 10) delay += 35;
+          setTimeout(stepScan, delay);
+        } else {
+          // CHỐT HỌC SINH CUỐI CÙNG
+          if (lastCard) lastCard.classList.remove('seat-scanning');
+          const winner = studentsInSeats[Math.floor(Math.random() * studentsInSeats.length)];
+          const winCard = document.getElementById('seatCard_' + winner.id);
+          
+          if (winCard) {
+            winCard.classList.add('seat-winner');
+          }
+
+          playChimeVictory();
+          winner.calledCount = (winner.calledCount || 0) + 1;
+
+          document.getElementById('announcementText').innerHTML = `🎯 <b>MỤC TIÊU ĐÃ KHÓA:</b> Mời em <span class="badge bg-danger fs-6 px-3 py-1">${winner.name} (${winner.id})</span> tại [Hàng ${winner.row} - Dãy ${winner.col}] lên bảng phát biểu!`;
+
+          // Ghi nhận lượt gọi vào Google Sheet
+          const className = document.getElementById('selClass').value;
+          callApi('logSeatingStudentCall2627', className, winner.id);
+
+          renderSeatsGrid();
+          btn.disabled = false;
+          isPicking = false;
+        }
+      }
+
+      stepScan();
+    }
+
+    // 3. LƯU BẢN SẮP XẾP SƠ ĐỒ VÀO SHEET
+    async function saveSeatingToSheet() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return alert("Vui lòng chọn lớp!");
+
+      const btn = document.getElementById('btnSave');
+      const oldText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      try {
+        const msg = await callApi('saveSeatingPicker2627Data', className, studentsInSeats);
+        alert(msg);
+        await loadSeatingData();
+      } catch(err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldText;
+      }
+    }
+  </script>
+</body>
+</html>
