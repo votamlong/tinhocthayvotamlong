@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UFO Gọi Tên Học Sinh 2627</title>
+  <title>Đĩa Bay Gọi Tên 2627 - EduClass Pro</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -141,9 +141,9 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4 bg-dark bg-opacity-50 p-3 rounded-4 border border-secondary border-opacity-25">
       <div>
         <h4 class="fw-bold text-info mb-1">
-          <i class="fas fa-satellite-dish me-2"></i>UFO GỌI TÊN HỌC SINH 2627
+          <i class="fas fa-satellite-dish me-2"></i>ĐĨA BAY GỌI TÊN HỌC SINH 2627
         </h4>
-        <small class="text-secondary">Dữ liệu tự động lưu trữ vào Google Sheet: <b>UFO_GOI_TEN_2627</b></small>
+        <small class="text-secondary">Dữ liệu tự động lưu trữ vào Google Sheet: <b>DIA_BAY_2627</b></small>
       </div>
 
       <div class="d-flex flex-wrap align-items-center gap-2">
@@ -154,7 +154,7 @@
         
         <div class="form-check form-switch m-0 ms-2">
           <input class="form-check-input" type="checkbox" id="chkNoRepeat" checked style="cursor: pointer;">
-          <label class="form-check-label small text-light" for="chkNoRepeat">Chống gọi trùng</label>
+          <label class="form-check-label small text-light" for="chkNoRepeat">Chống trùng</label>
         </div>
 
         <button onclick="resetCalledList()" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
@@ -197,7 +197,7 @@
         </div>
       </div>
 
-      <!-- CỘT GHI VẾT LỊCH SỬ SHEET -->
+      <!-- CỘT NHẬT KÝ ĐÃ GỌI TỪ SHEET -->
       <div class="col-lg-4">
         <div class="panel-card d-flex flex-column">
           <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary">
@@ -213,7 +213,7 @@
 
           <div class="p-2 bg-dark bg-opacity-50 rounded-3 border border-secondary small text-secondary">
             <i class="fas fa-database text-warning me-1"></i>
-            Tự động lưu lượt gọi vào sheet <b>UFO_GOI_TEN_2627</b>.
+            Tự động lưu lượt gọi vào sheet <b>DIA_BAY_2627</b>.
           </div>
         </div>
       </div>
@@ -222,7 +222,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbx7CIwSPjv3PM9s7fdi1xLJOb18rkYG9upg9UgWOk8gdie_29e_uZrJZFOwQltYrLUxcw/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzRxOm1QTe6ZWjCQTOvvMt9xnKuKT_qaA9zsrvpcDx5DTVIezbCf4WsxO9xvPgyeJIKHw/exec";
 
     let studentList = [];
     let calledIds = [];
@@ -319,7 +319,7 @@
       const className = document.getElementById('selClass').value;
       const container = document.getElementById('historyContainer');
       try {
-        const list = await callApi('getUfoCallHistory2627', className);
+        const list = await callApi('getDiaBayHistory', className);
         if (!list || list.length === 0) {
           container.innerHTML = '<div class="text-secondary small fst-italic py-3 text-center">Chưa có lượt gọi nào của lớp này trong Sheet.</div>';
           return;
@@ -395,17 +395,14 @@
           if (noRepeat) calledIds.push(winner.id);
 
           const currentClass = document.getElementById('selClass').value;
-          callApi('saveUfoCallRecord2627', {
-            className: currentClass,
-            studentId: winner.id,
-            studentName: winner.name,
-            note: "Trả lời câu hỏi"
-          }).then(() => {
-            statusEl.innerText = "✅ ĐÃ LƯU VÀO SHEET UFO_GOI_TEN_2627!";
-            loadHistoryFromSheet();
-          }).catch(err => {
-            statusEl.innerText = "❌ Lỗi lưu sheet: " + err.message;
-          });
+          callApi('saveDiaBayRecord', currentClass, winner.id, winner.name, "Trả lời câu hỏi")
+            .then(() => {
+              statusEl.innerText = "✅ ĐÃ LƯU VÀO SHEET DIA_BAY_2627!";
+              loadHistoryFromSheet();
+            })
+            .catch(err => {
+              statusEl.innerText = "❌ Lỗi lưu sheet: " + err.message;
+            });
 
           beam.classList.remove('active');
           btn.disabled = false;
