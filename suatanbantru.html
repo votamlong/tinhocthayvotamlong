@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Suất Ăn Bán Trú - Nhà Bếp</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .header-box {
+      background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+      color: white;
+      padding: 20px 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(21, 128, 61, 0.15);
+    }
+    .stat-card {
+      border-radius: 12px;
+      border: none;
+      padding: 16px;
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .table-container {
+      background: white;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #475569;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      vertical-align: middle;
+      border-bottom: 2px solid #cbd5e1;
+    }
+    @media print {
+      body { background: white; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .table-container { border: 1px solid #cbd5e1; box-shadow: none; }
+      .print-header { display: block !important; }
+      .print-footer { display: flex !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid p-0">
+    
+    <!-- THANH ĐIỀU HƯỚNG VÀ BỘ LỌC -->
+    <div class="header-box mb-4 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <h5 class="fw-bold mb-1"><i class="fas fa-utensils me-2"></i>BÁO CÁO SUẤT ĂN BÁN TRÚ CHO NHÀ BẾP</h5>
+        <small class="opacity-75">Tự động tính toán suất ăn dựa trên điểm danh vắng hàng ngày</small>
+      </div>
+      <div class="d-flex align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2"><i class="far fa-calendar-alt text-success me-1"></i>Ngày:</span>
+        <input type="date" id="reportDate" class="form-control form-control-sm border-0 fw-bold text-success" style="width: 140px;" onchange="loadData()">
+        <button onclick="loadData()" class="btn btn-success btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-sync-alt me-1"></i> Làm mới
+        </button>
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In phiếu
+        </button>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN PHIẾU BÀN GIAO CHO NHÀ BẾP -->
+    <div class="print-header d-none text-center mb-4">
+      <h3 class="fw-bold text-uppercase mb-1">BẢNG BÀN GIAO SỐ LƯỢNG SUẤT ĂN BÁN TRÚ</h3>
+      <p class="text-muted mb-1">Ngày phục vụ: <b class="text-dark" id="printDateText">...</b></p>
+      <h4 class="text-success fw-bold mt-2">TỔNG SỐ SUẤT CẦN NẤU: <span id="printTotalSuat">0</span> SUẤT</h4>
+      <hr>
+    </div>
+
+    <!-- 3 Ô THỐNG KÊ TỔNG QUAN -->
+    <div class="row g-3 mb-4 text-center">
+      <div class="col-md-4">
+        <div class="stat-card bg-primary">
+          <small class="fw-bold text-uppercase opacity-75 d-block">1. Tổng ĐK Bán Trú</small>
+          <h2 class="fw-bold my-1" id="statDK">0</h2>
+          <small class="opacity-75">Học sinh diện bán trú</small>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card bg-danger">
+          <small class="fw-bold text-uppercase opacity-75 d-block">2. Báo Vắng Ăn Trưa</small>
+          <h2 class="fw-bold my-1" id="statVang">0</h2>
+          <small class="opacity-75">Học sinh vắng học hôm nay</small>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card bg-success">
+          <small class="fw-bold text-uppercase opacity-75 d-block">3. Thực Tế Cần Nấu</small>
+          <h2 class="fw-bold my-1" id="statThucTe">0</h2>
+          <small class="opacity-75">Số suất giao nhà bếp nấu</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- BẢNG CHI TIẾT TỪNG LỚP -->
+    <div class="table-container mb-4">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle mb-0 text-center" id="mainTable">
+          <thead>
+            <tr>
+              <th style="width: 100px;">Lớp</th>
+              <th>Giáo Viên Chủ Nhiệm</th>
+              <th style="width: 80px;">Sĩ Số</th>
+              <th style="width: 130px;">ĐK Bán Trú</th>
+              <th style="min-width: 280px;" class="text-start ps-3">Học Sinh Bán Trú Vắng Hôm Nay</th>
+              <th style="width: 160px;" class="text-success fw-bold">Suất Nấu Thực Tế</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="6" class="p-5 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu...</td></tr>
+          </tbody>
+          <tfoot id="tableFoot" class="table-light fw-bold text-danger d-none"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHỮ KÝ BÀN GIAO KHI IN -->
+    <div class="row mt-5 pt-4 text-center print-footer d-none">
+      <div class="col-6">
+        <p class="fw-bold mb-1">ĐẠI DIỆN BỘ PHẬN BÁN TRÚ</p>
+        <small class="text-muted">(Ký và ghi rõ họ tên)</small>
+      </div>
+      <div class="col-6">
+        <p class="fw-bold mb-1">BẾP TRƯỞNG TIẾP NHẬN</p>
+        <small class="text-muted">(Ký và ghi rõ họ tên)</small>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbyfOxTehbN-mYeYLyLRXQNrCmoWt5ECas57_bqMT731frTn-pF9sUAirvWG2q8RLQvw4g/exec";
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = function() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('reportDate').value = today;
+      loadData();
+    };
+
+    async function loadData() {
+      const dateVal = document.getElementById('reportDate').value;
+      const tbody = document.getElementById('tableBody');
+      const tfoot = document.getElementById('tableFoot');
+
+      document.getElementById('printDateText').innerText = dateVal;
+      tbody.innerHTML = `<tr><td colspan="6" class="p-5 text-muted"><i class="fas fa-sync fa-spin fa-2x text-success mb-2"></i><br>Đang đối soát danh sách ngày <b>${dateVal}</b>...</td></tr>`;
+
+      try {
+        const matrixData = await callApi('getAttendanceMatrixData', dateVal, dateVal);
+
+        if (!matrixData || matrixData.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-muted">Không tìm thấy dữ liệu.</td></tr>';
+          return;
+        }
+
+        let totalSiso = 0, totalDK = 0, totalVang = 0, totalThucTe = 0;
+        let html = '';
+
+        matrixData.forEach(row => {
+          const actual = Math.max(0, row.boarding || 0);
+          const absentNames = (row.absentNames && row.absentNames.length > 0) ? row.absentNames.join(', ') : '—';
+          const dkGoc = actual + (row.absent > 0 ? row.absent : 0);
+
+          totalSiso += (row.siso || 0);
+          totalDK += dkGoc;
+          totalVang += (row.absent || 0);
+          totalThucTe += actual;
+
+          html += `<tr>
+            <td class="fw-bold text-primary">${row.className}</td>
+            <td>${row.teacher || '—'}</td>
+            <td>${row.siso}</td>
+            <td class="fw-bold">${dkGoc}</td>
+            <td class="text-danger small text-start ps-3">${absentNames}</td>
+            <td class="fw-bold text-success bg-success bg-opacity-10">${actual}</td>
+          </tr>`;
+        });
+
+        tbody.innerHTML = html;
+
+        tfoot.classList.remove('d-none');
+        tfoot.innerHTML = `<tr>
+          <td colspan="2" class="text-uppercase text-danger text-center">TỔNG CỘNG TOÀN TRƯỜNG</td>
+          <td>${totalSiso}</td>
+          <td>${totalDK}</td>
+          <td class="text-danger">${totalVang} vắng</td>
+          <td class="text-success fs-5">${totalThucTe} suất</td>
+        </tr>`;
+
+        document.getElementById('statDK').innerText = totalDK;
+        document.getElementById('statVang').innerText = totalVang;
+        document.getElementById('statThucTe').innerText = totalThucTe;
+        document.getElementById('printTotalSuat').innerText = totalThucTe;
+
+        try {
+          const rep = await callApi('getLunchReport');
+          if (rep && rep.totalBT) {
+            document.getElementById('statDK').innerText = rep.totalBT;
+            document.getElementById('statVang').innerText = rep.absentBT;
+            document.getElementById('statThucTe').innerText = rep.actualLunch;
+            document.getElementById('printTotalSuat').innerText = rep.actualLunch;
+          }
+        } catch(e) {}
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-danger">Lỗi kết nối: ${err.message}</td></tr>`;
+      }
+    }
+  </script>
+</body>
+</html>
