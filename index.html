@@ -1184,13 +1184,16 @@
           });
         }
         // 2. Thêm UFO Gọi Tên Học Sinh 2627
-        if (!dataMenu.some(function(m) { return m.id === 'ufo_picker_2627'; })) {
-          dataMenu.splice(2, 0, {
-            id: 'ufo_picker_2627',
-            text: 'UFO Gọi Tên Học Sinh 2627',
-            icon: 'fa-satellite-dish text-info'
-          });
-        }
+        // ĐƯA MENU UFO LÊN THẲNG VỊ TRÍ SỐ 2 (NGAY DƯỚI TỔNG QUAN)
+      var ufoIdx = dataMenu.findIndex(function(m) { return m.id === 'ufo_picker_2627'; });
+      if (ufoIdx !== -1) {
+        dataMenu.splice(ufoIdx, 1); // Xóa vị trí cũ ở cuối
+      }
+      dataMenu.splice(1, 0, {
+        id: 'ufo_picker_2627',
+        text: '🛸 UFO Gọi Tên Học Sinh 2627',
+        icon: 'fa-satellite-dish text-danger'
+      });
       }
       //
     
@@ -1359,7 +1362,11 @@
         // Tự động mở tab hiển thị Sổ Tay Họp Tổ 2627
       }
       else if (id === 'ufo_picker_2627') {
-        // Tự động mở tab hiển thị UFO Gọi Tên Học Sinh 2627
+        // Tự động mở và làm mới tab UFO Gọi Tên Học Sinh
+        var ifrUfo = document.getElementById('iframe-ufo');
+        if (ifrUfo && ifrUfo.contentWindow && ifrUfo.contentWindow.loadHistoryFromSheet) {
+          ifrUfo.contentWindow.loadHistoryFromSheet();
+        }
       }
      
       
