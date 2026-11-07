@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sổ Tay Họp Tổ Chuyên Môn 2627 - THCS Bình Tân</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 18px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      padding: 22px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #0d9488 0%, #115e59 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 22px 28px;
+      box-shadow: 0 4px 15px rgba(13, 148, 136, 0.2);
+    }
+    .stat-card {
+      border-radius: 14px;
+      border: none;
+      padding: 16px;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .table thead th {
+      background-color: #f0fdfa;
+      color: #115e59;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      vertical-align: middle;
+      border-bottom: 2px solid #ccfbf1;
+    }
+    .content-preview {
+      white-space: pre-wrap;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+    .status-done {
+      color: #059669 !important;
+      font-weight: 700;
+    }
+    .status-pending {
+      color: #dc2626 !important;
+      font-weight: 700;
+    }
+    .status-running {
+      color: #d97706 !important;
+      font-weight: 700;
+    }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .print-footer { display: flex !important; }
+      .panel-box { border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; font-size: 11px; }
+      @page { size: landscape; margin: 10mm; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1400px;">
+    
+    <!-- BANNER TIÊU ĐỀ & ĐIỀU HƯỚNG -->
+    <div class="header-banner mb-4 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-book-open me-1"></i>TỔ TIN HỌC - CÔNG NGHỆ</span>
+          <span class="opacity-75 small">Đồng bộ Sheet: WORK_LOG</span>
+        </div>
+        <h4 class="fw-bold mb-1">SỔ TAY NGHỊ QUYẾT & LỊCH CÔNG TÁC HỌP TỔ 2627</h4>
+        <small class="opacity-75">Quản lý nội dung sinh hoạt chuyên môn, kế hoạch tuần/tháng và phân công nhiệm vụ</small>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button onclick="loadNotebookData()" class="btn btn-outline-light rounded-pill px-3 fw-bold">
+          <i class="fas fa-sync-alt me-1"></i> Làm mới
+        </button>
+        <button onclick="window.print()" class="btn btn-warning rounded-pill px-4 fw-bold text-dark">
+          <i class="fas fa-print me-1"></i> In sổ họp A4
+        </button>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ KHI IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header d-none text-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">TỔ: TIN HỌC - CÔNG NGHỆ</div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+          <div class="small fst-italic">Độc lập - Tự do - Hạnh phúc</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">SỔ TAY NGHỊ QUYẾT & LỊCH CÔNG TÁC HỌP TỔ CHUYÊN MÔN</h3>
+      <p class="text-secondary small fst-italic">Năm học: 2026 - 2027 | Trích xuất ngày: <b class="text-dark" id="printTodayDate">...</b></p>
+      <hr>
+    </div>
+
+    <!-- 4 THẺ THỐNG KÊ TIẾN ĐỘ CÔNG VIỆC -->
+    <div class="row g-3 mb-4 text-center">
+      <div class="col-md-3">
+        <div class="stat-card bg-primary">
+          <small class="fw-bold text-uppercase opacity-75 d-block">1. Tổng Số Đầu Việc</small>
+          <h2 class="fw-bold my-1" id="statTotal">0</h2>
+          <small class="opacity-75">Nội dung họp & kế hoạch</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card bg-danger">
+          <small class="fw-bold text-uppercase opacity-75 d-block">2. Chưa Hoàn Thành</small>
+          <h2 class="fw-bold my-1" id="statPending">0</h2>
+          <small class="opacity-75">Cần đôn đốc thực hiện</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card bg-warning text-dark">
+          <small class="fw-bold text-uppercase opacity-75 d-block">3. Đang Thực Hiện</small>
+          <h2 class="fw-bold my-1" id="statRunning">0</h2>
+          <small class="opacity-75">Đang triển khai trong tuần</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card bg-success">
+          <small class="fw-bold text-uppercase opacity-75 d-block">4. Đã Hoàn Thành</small>
+          <h2 class="fw-bold my-1" id="statDone">0</h2>
+          <small class="opacity-75">Nhiệm vụ đã báo cáo xong</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- KHUNG GHI NHẬP NỘI DUNG HỌP MỚI (ẨN KHI IN) -->
+    <div class="panel-box mb-4 no-print border-start border-4 border-teal" style="border-left-color: #0d9488 !important;">
+      <h6 class="fw-bold text-uppercase mb-3" style="color: #0d9488;">
+        <i class="fas fa-edit me-1"></i> Ghi Nhận Nội Dung Họp / Kế Hoạch Mới (Ghi vào Sheet: WORK_LOG)
+      </h6>
+
+      <div class="row g-2 align-items-end">
+        <div class="col-md-4">
+          <label class="small fw-bold text-secondary mb-1">1. Tiêu đề / Tên công việc họp (Cột C)</label>
+          <input type="text" id="inpTitle" class="form-control form-control-sm" placeholder="Vd: Lịch công tác tuần 2, Họp tổ chuyên môn tháng 9...">
+        </div>
+        <div class="col-md-3">
+          <label class="small fw-bold text-secondary mb-1">2. Thành phần thực hiện (Cột E)</label>
+          <input type="text" id="inpAssignee" class="form-control form-control-sm" value="Toàn thể thành viên tổ" placeholder="Vd: Toàn thể thành viên tổ, Nhóm Tin học...">
+        </div>
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">3. Hạn chót / Ngày họp (Cột F)</label>
+          <input type="date" id="inpDeadline" class="form-control form-control-sm">
+        </div>
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">4. Trạng thái (Cột G)</label>
+          <select id="selStatus" class="form-select form-select-sm fw-bold">
+            <option value="Chưa hoàn thành" class="text-danger">Chưa hoàn thành</option>
+            <option value="Đang thực hiện" class="text-warning">Đang thực hiện</option>
+            <option value="Hoàn thành" class="text-success">Hoàn thành</option>
+          </select>
+        </div>
+        <div class="col-md-1">
+          <button onclick="submitNewMeetingRecord()" id="btnSubmit" class="btn btn-sm w-100 fw-bold rounded-pill text-white" style="background-color: #0d9488;">
+            <i class="fas fa-save me-1"></i> LƯU
+          </button>
+        </div>
+
+        <div class="col-md-8 mt-2">
+          <label class="small fw-bold text-secondary mb-1">5. Nội dung chi tiết / Biên bản họp / Đường link tài liệu (Cột D)</label>
+          <textarea id="inpContent" class="form-control form-control-sm" rows="3" placeholder="Nhập các đầu việc cụ thể trong phiên họp, đường dẫn Google Docs..."></textarea>
+        </div>
+        <div class="col-md-4 mt-2">
+          <label class="small fw-bold text-secondary mb-1">6. Ghi chú thêm (Cột H)</label>
+          <textarea id="inpNote" class="form-control form-control-sm" rows="3" placeholder="Ghi chú người báo cáo, hạn bổ sung..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- BẢNG THEO DÕI NỘI DUNG SỔ TAY HỌP TỔ -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle mb-0 text-center small" id="notebookTable">
+          <thead>
+            <tr>
+              <th style="width: 120px;">MÃ ĐẦU VIỆC</th>
+              <th style="width: 130px;">NGÀY TẠO</th>
+              <th style="width: 220px;" class="text-start ps-3">TIÊU ĐỀ CUỘC HỌP</th>
+              <th class="text-start ps-3">NỘI DUNG CHI TIẾT / NGHỊ QUYẾT</th>
+              <th style="width: 160px;">THÀNH PHẦN</th>
+              <th style="width: 110px;">HẠN CHÓT</th>
+              <th style="width: 155px;">TRẠNG THÁI</th>
+              <th style="width: 120px;">GHI CHÚ</th>
+              <th style="width: 45px;" class="no-print">XÓA</th>
+            </tr>
+          </thead>
+          <tbody id="notebookTableBody">
+            <tr><td colspan="9" class="p-5 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu từ Sheet WORK_LOG...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHỮ KÝ BÀN GIAO KHI IN BIÊN BẢN (CHỈ HIỆN KHI IN) -->
+    <div class="row mt-5 pt-4 text-center print-footer d-none">
+      <div class="col-6">
+        <p class="fw-bold mb-1">THƯ KÝ CUỘC HỌP</p>
+        <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+      </div>
+      <div class="col-6">
+        <p class="fw-bold mb-1">TỔ TRƯỞNG CHUYÊN MÔN</p>
+        <small class="text-muted">(Ký và ghi rõ họ tên)</small>
+        <div class="mt-5 fw-bold">Cô Võ Thị Hồng Nga</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // URL Web App Google Apps Script
+    const API_URL = "https://script.google.com/macros/s/AKfycbwVY-JY7JfCb8nByN3xy9BDKBC7tfpQtMzc_6TFGa9ofvsSxqf4mJyKDMXHPDemIawZAA/exec";
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = function() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      document.getElementById('inpDeadline').value = todayStr;
+      document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('vi-VN');
+      loadNotebookData();
+    };
+
+    // TẢI DỮ LIỆU TỪ SHEET WORK_LOG
+    async function loadNotebookData() {
+      const body = document.getElementById('notebookTableBody');
+      body.innerHTML = '<tr><td colspan="9" class="p-5 text-muted"><i class="fas fa-sync fa-spin me-2"></i>Đang nạp dữ liệu họp tổ từ Sheet WORK_LOG...</td></tr>';
+
+      try {
+        const list = await callApi('getMeetingNotebook2627Data');
+
+        if (!list || list.length === 0) {
+          body.innerHTML = '<tr><td colspan="9" class="p-5 text-muted">Chưa có nội dung họp nào trong sheet WORK_LOG.</td></tr>';
+          updateStats(0, 0, 0, 0);
+          return;
+        }
+
+        let total = list.length;
+        let pending = 0;
+        let running = 0;
+        let done = 0;
+        let html = '';
+
+        list.forEach(item => {
+          let st = String(item.status || '').trim();
+          let stClass = 'status-pending';
+
+          if (st === 'Hoàn thành') {
+            done++;
+            stClass = 'status-done';
+          } else if (st === 'Đang thực hiện') {
+            running++;
+            stClass = 'status-running';
+          } else {
+            pending++;
+          }
+
+          html += `
+            <tr>
+              <td class="text-secondary fw-bold">${item.id}</td>
+              <td class="small text-muted">${item.createdAt}</td>
+              <td class="text-start ps-3 fw-bold text-dark">${item.title}</td>
+              <td class="text-start ps-3 content-preview text-secondary">${item.content}</td>
+              <td><span class="badge bg-light text-dark border">${item.assignee}</span></td>
+              <td class="fw-bold text-danger">${item.deadline}</td>
+              <td>
+                <select onchange="updateStatus('${item.id}', this.value)" class="form-select form-select-sm border-0 bg-light fw-bold ${stClass}">
+                  <option value="Chưa hoàn thành" ${st === 'Chưa hoàn thành' ? 'selected' : ''} class="text-danger">❌ Chưa xong</option>
+                  <option value="Đang thực hiện" ${st === 'Đang thực hiện' ? 'selected' : ''} class="text-warning">⏳ Đang làm</option>
+                  <option value="Hoàn thành" ${st === 'Hoàn thành' ? 'selected' : ''} class="text-success">✅ Đã xong</option>
+                </select>
+              </td>
+              <td class="small text-muted">${item.note}</td>
+              <td class="no-print">
+                <button onclick="deleteRecord('${item.id}')" class="btn btn-sm btn-link text-danger p-0" title="Xóa nội dung này">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+
+        body.innerHTML = html;
+        updateStats(total, pending, running, done);
+      } catch (err) {
+        body.innerHTML = `<tr><td colspan="9" class="p-4 text-danger">Lỗi kết nối máy chủ: ${err.message}</td></tr>`;
+      }
+    }
+
+    function updateStats(total, pending, running, done) {
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statPending').innerText = pending;
+      document.getElementById('statRunning').innerText = running;
+      document.getElementById('statDone').innerText = done;
+    }
+
+    // GHI NHẬN NỘI DUNG MỚI VÀO SHEET
+    async function submitNewMeetingRecord() {
+      const title = document.getElementById('inpTitle').value.trim();
+      const content = document.getElementById('inpContent').value.trim();
+      const assignee = document.getElementById('inpAssignee').value.trim();
+      const deadline = document.getElementById('inpDeadline').value;
+      const status = document.getElementById('selStatus').value;
+      const note = document.getElementById('inpNote').value.trim();
+
+      if (!title) return alert("Thầy vui lòng nhập Tiêu đề / Tên công việc họp!");
+
+      const btn = document.getElementById('btnSubmit');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      const item = {
+        title: title,
+        content: content,
+        assignee: assignee,
+        deadline: deadline,
+        status: status,
+        note: note
+      };
+
+      try {
+        const msg = await callApi('saveMeetingNotebook2627Record', item);
+        alert(msg);
+        document.getElementById('inpTitle').value = "";
+        document.getElementById('inpContent').value = "";
+        document.getElementById('inpNote').value = "";
+        await loadNotebookData();
+      } catch (err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    // CẬP NHẬT TRẠNG THÁI TIẾN ĐỘ
+    async function updateStatus(cvId, newStatus) {
+      try {
+        await callApi('updateMeetingNotebookStatus2627', cvId, newStatus);
+        await loadNotebookData();
+      } catch (err) {
+        alert("Lỗi cập nhật trạng thái: " + err.message);
+      }
+    }
+
+    // XÓA BẢN GHI
+    async function deleteRecord(cvId) {
+      if (!confirm("Thầy có chắc chắn muốn xóa bản ghi họp tổ [" + cvId + "] khỏi Sheet WORK_LOG?")) return;
+      try {
+        const msg = await callApi('deleteMeetingNotebook2627Record', cvId);
+        alert(msg);
+        await loadNotebookData();
+      } catch (err) {
+        alert("Lỗi khi xóa: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
