@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thể Chất & Sức Khỏe Học Sinh 2627</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 18px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      padding: 22px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 22px 28px;
+      box-shadow: 0 4px 15px rgba(5, 150, 105, 0.2);
+    }
+    .stat-card {
+      border-radius: 14px;
+      border: none;
+      padding: 16px;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      vertical-align: middle;
+      border-bottom: 2px solid #cbd5e1;
+    }
+    .bmi-badge {
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 11px;
+    }
+    .bmi-normal { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .bmi-under { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+    .bmi-over { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .bmi-obese { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+
+    .rating-tot { background: #ecfdf5; color: #047857; font-weight: 800; border: 1px solid #a7f3d0; }
+    .rating-dat { background: #eff6ff; color: #1d4ed8; font-weight: 800; border: 1px solid #bfdbfe; }
+    .rating-chua { background: #fef2f2; color: #b91c1c; font-weight: 800; border: 1px solid #fecaca; }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .print-footer { display: flex !important; }
+      .panel-box { border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; font-size: 11px; }
+      @page { size: landscape; margin: 10mm; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1400px;">
+    
+    <!-- BANNER & ĐIỀU HƯỚNG -->
+    <div class="header-banner mb-4 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-heartbeat me-1"></i>SỨC KHỎE SƯ PHẠM 2627</span>
+          <span class="opacity-75 small">Sheet: THE_CHAT_HS_2627</span>
+        </div>
+        <h4 class="fw-bold mb-1">THEO DÕI THỂ CHẤT, CHỈ SỐ BMI & KIỂM TRA THỂ LỰC</h4>
+        <small class="opacity-75">Tự động tính BMI, đánh giá thể trạng và quản lý kết quả kiểm tra thể dục</small>
+      </div>
+
+      <div class="d-flex align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-success" style="width: 130px;" onchange="onClassChange()">
+          <option value="">-- Chọn lớp --</option>
+        </select>
+        <button onclick="loadFitnessData()" class="btn btn-success btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-sync-alt me-1"></i> Làm mới
+        </button>
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In danh sách A4
+        </button>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA GIẤY CHO GIÁO VIÊN THỂ DỤC / Y TẾ (CHỈ HIỆN KHI IN) -->
+    <div class="print-header d-none text-center mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">TỔ THỂ DỤC - Y TẾ HỌC ĐƯỜNG</div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">BẢNG TỔNG HỢP THEO DÕI THỂ CHẤT & KIỂM TRA THỂ LỰC</h3>
+      <p class="text-secondary small fst-italic">Lớp: <b class="text-dark fs-5" id="printClassName">...</b> | Ngày in: <b class="text-dark" id="printTodayDate">...</b></p>
+      <hr>
+    </div>
+
+    <!-- 4 THẺ TỔNG HỢP NHANH SỐ LIỆU -->
+    <div class="row g-3 mb-4 text-center">
+      <div class="col-md-3">
+        <div class="stat-card bg-primary">
+          <small class="fw-bold text-uppercase opacity-75 d-block">1. Tổng Lượt Kiểm Tra</small>
+          <h2 class="fw-bold my-1" id="statTotal">0</h2>
+          <small class="opacity-75">Bản ghi thể lực của lớp</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card bg-success">
+          <small class="fw-bold text-uppercase opacity-75 d-block">2. Xếp Loại Đạt / Tốt</small>
+          <h2 class="fw-bold my-1" id="statPass">0</h2>
+          <small class="opacity-75">Đạt yêu cầu chuẩn thể lực</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card bg-info text-dark">
+          <small class="fw-bold text-uppercase opacity-75 d-block">3. Thể Trạng Bình Thường</small>
+          <h2 class="fw-bold my-1" id="statNormalBmi">0</h2>
+          <small class="opacity-75">Chỉ số BMI chuẩn (18.5 - 22.9)</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card bg-warning text-dark">
+          <small class="fw-bold text-uppercase opacity-75 d-block">4. Cảnh Báo Thể Trạng</small>
+          <h2 class="fw-bold my-1 text-danger" id="statWarningBmi">0</h2>
+          <small class="opacity-75">Học sinh nhẹ cân / Thừa cân</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- KHUNG NHẬP BẢN GHI THỂ LỰC MỚI (ẨN KHI IN) -->
+    <div class="panel-box mb-4 no-print border-start border-4 border-success">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold text-success m-0 text-uppercase">
+          <i class="fas fa-running me-2"></i>Nhập Kết Quả Kiểm Tra & Đo Thể Lực (Ghi Vào Sheet)
+        </h6>
+        <span class="badge bg-light text-secondary border small">Tính BMI tự động</span>
+      </div>
+
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="small fw-bold text-secondary mb-1">1. Học sinh</label>
+          <select id="selStudent" class="form-select form-select-sm" onchange="onStudentSelect()">
+            <option value="">-- Chọn học sinh --</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">2. Chiều cao (cm)</label>
+          <input type="number" id="inpHeight" class="form-control form-control-sm" placeholder="Vd: 160" oninput="calculatePreviewBMI()">
+        </div>
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">3. Cân nặng (kg)</label>
+          <input type="number" id="inpWeight" class="form-control form-control-sm" placeholder="Vd: 54" oninput="calculatePreviewBMI()">
+        </div>
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">4. BMI & Thể trạng</label>
+          <input type="text" id="previewBMI" class="form-control form-control-sm bg-light fw-bold text-primary" value="—" readonly>
+        </div>
+        <div class="col-md-3">
+          <label class="small fw-bold text-secondary mb-1">5. Tên môn kiểm tra</label>
+          <select id="selSubject" class="form-select form-select-sm fw-bold"></select>
+        </div>
+
+        <div class="col-md-2 mt-2">
+          <label class="small fw-bold text-secondary mb-1">6. Thành tích</label>
+          <input type="text" id="inpScore" class="form-control form-control-sm" placeholder="Vd: 160 (cm) / 9.2 (giây)">
+        </div>
+        <div class="col-md-2 mt-2">
+          <label class="small fw-bold text-secondary mb-1">7. Xếp loại</label>
+          <select id="selRating" class="form-select form-select-sm fw-bold">
+            <option value="TỐT" class="text-success">⭐ TỐT</option>
+            <option value="ĐẠT" class="text-primary" selected>✔️ ĐẠT</option>
+            <option value="CHƯA ĐẠT" class="text-danger">❌ CHƯA ĐẠT</option>
+          </select>
+        </div>
+        <div class="col-md-3 mt-2">
+          <label class="small fw-bold text-secondary mb-1">8. Sức khỏe / Tiền sử bệnh</label>
+          <input type="text" id="inpHealth" class="form-control form-control-sm" value="Không" placeholder="Vd: Tim mạch, Hen suyễn, Cận thị...">
+        </div>
+        <div class="col-md-2 mt-2">
+          <label class="small fw-bold text-secondary mb-1">9. Ngày kiểm tra</label>
+          <input type="date" id="inpDate" class="form-control form-control-sm">
+        </div>
+        <div class="col-md-3 mt-2">
+          <button onclick="submitFitnessRecord()" id="btnSubmit" class="btn btn-success btn-sm w-100 fw-bold rounded-pill">
+            <i class="fas fa-save me-1"></i> LƯU KẾT QUẢ VÀO SHEET
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BẢNG THEO DÕI THỂ CHẤT 14 CỘT -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle mb-0 text-center small" id="fitnessTable">
+          <thead>
+            <tr>
+              <th style="width: 100px;">MÃ BẢN GHI</th>
+              <th style="width: 65px;">LỚP</th>
+              <th style="width: 75px;">MÃ HS</th>
+              <th class="text-start ps-3">HỌ VÀ TÊN</th>
+              <th style="width: 70px;">CAO (cm)</th>
+              <th style="width: 70px;">NẶNG (kg)</th>
+              <th style="width: 75px;">BMI</th>
+              <th style="width: 110px;">THỂ TRẠNG</th>
+              <th style="width: 140px;">MÔN KIỂM TRA</th>
+              <th style="width: 90px;">THÀNH TÍCH</th>
+              <th style="width: 90px;">XẾP LOẠI</th>
+              <th>TIỀN SỬ BỆNH</th>
+              <th style="width: 95px;">NGÀY GHI</th>
+              <th style="width: 45px;" class="no-print">XÓA</th>
+            </tr>
+          </thead>
+          <tbody id="fitnessTableBody">
+            <tr><td colspan="14" class="p-5 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu thể chất từ Sheet...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHỮ KÝ BÀN GIAO KHI IN BIÊN BẢN (CHỈ HIỆN KHI IN) -->
+    <div class="row mt-5 pt-4 text-center print-footer d-none">
+      <div class="col-6">
+        <p class="fw-bold mb-1">CÁN BỘ Y TẾ HỌC ĐƯỜNG</p>
+        <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+      </div>
+      <div class="col-6">
+        <p class="fw-bold mb-1">GIÁO VIÊN BỘ MÔN THỂ DỤC</p>
+        <small class="text-muted">(Ký và ghi rõ họ tên)</small>
+        <div class="mt-5 fw-bold">Thầy Võ Tâm Long</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwaF_FOQo7JcevPD1Q_HBo6Jc5L6QkxqKBQ84wmXMi5PBgqY2MPKUNgjnqhYhgEKuJ8Sg/exec";
+
+    let currentStudentList = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      document.getElementById('inpDate').value = todayStr;
+      document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('vi-VN');
+
+      // 1. Tải danh mục môn kiểm tra thể chất
+      try {
+        const subjects = await callApi('getPhysicalFitnessSubjects2627');
+        const selSub = document.getElementById('selSubject');
+        let hSub = '';
+        (subjects || []).forEach(s => hSub += `<option value="${s}">${s}</option>`);
+        selSub.innerHTML = hSub;
+      } catch (e) {}
+
+      // 2. Tải danh sách lớp
+      try {
+        const classes = await callApi('getAllClasses');
+        const selClass = document.getElementById('selClass');
+        let html = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => html += `<option value="${c}">${c}</option>`);
+        selClass.innerHTML = html;
+
+        if (classes && classes.length > 0) {
+          selClass.value = classes[0];
+          await onClassChange();
+        }
+      } catch (err) {
+        console.error("Lỗi nạp lớp:", err);
+      }
+    };
+
+    // Khi chọn lớp
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      document.getElementById('printClassName').innerText = className;
+
+      // Nạp danh sách học sinh của lớp
+      try {
+        currentStudentList = await callApi('getStudentList', className);
+        const selStd = document.getElementById('selStudent');
+        let h = '<option value="">-- Chọn học sinh --</option>';
+        (currentStudentList || []).forEach(s => {
+          h += `<option value="${s.id}" data-name="${s.name}">${s.name} (${s.id})</option>`;
+        });
+        selStd.innerHTML = h;
+      } catch(e) {}
+
+      await loadFitnessData();
+    }
+
+    function onStudentSelect() {
+      // Có thể đặt lại chiều cao / cân nặng mặc định nếu cần
+    }
+
+    // TÍNH TOÁN BMI TRỰC TIẾP KHI GÕ
+    function calculatePreviewBMI() {
+      const h = Number(document.getElementById('inpHeight').value);
+      const w = Number(document.getElementById('inpWeight').value);
+      const out = document.getElementById('previewBMI');
+
+      if (h > 50 && w > 10) {
+        const hM = h / 100;
+        const bmi = (w / (hM * hM)).toFixed(1);
+        let tt = "Bình thường";
+        if (bmi < 18.5) tt = "Gầy";
+        else if (bmi < 23) tt = "Bình thường";
+        else if (bmi < 25) tt = "Tiền béo phì";
+        else tt = "Béo phì";
+
+        out.value = `${bmi} (${tt})`;
+      } else {
+        out.value = "—";
+      }
+    }
+
+    // TẢI DỮ LIỆU TỪ SHEET THE_CHAT_HS_2627
+    async function loadFitnessData() {
+      const className = document.getElementById('selClass').value;
+      const body = document.getElementById('fitnessTableBody');
+      if (!className) return;
+
+      body.innerHTML = '<tr><td colspan="14" class="p-5 text-muted"><i class="fas fa-sync fa-spin me-2"></i>Đang tải dữ liệu thể chất lớp ' + className + '...</td></tr>';
+
+      try {
+        const res = await callApi('getPhysicalFitness2627Data', className);
+
+        if (!res || !res.records) {
+          body.innerHTML = '<tr><td colspan="14" class="p-4 text-muted">Chưa có bản ghi kiểm tra nào cho lớp này.</td></tr>';
+          updateStats(0, 0, 0, 0);
+          return;
+        }
+
+        updateStats(res.stats.total, res.stats.pass, res.stats.normalBmi, res.stats.warningBmi);
+
+        let html = '';
+        res.records.forEach(r => {
+          let bmiClass = 'bmi-normal';
+          let st = (r.status || '').toLowerCase();
+          if (st.includes('gầy')) bmiClass = 'bmi-under';
+          else if (st.includes('tiền')) bmiClass = 'bmi-over';
+          else if (st.includes('béo phì')) bmiClass = 'bmi-obese';
+
+          let ratingClass = 'rating-dat';
+          let rat = (r.rating || '').toUpperCase();
+          if (rat === 'TỐT') ratingClass = 'rating-tot';
+          else if (rat === 'CHƯA ĐẠT') ratingClass = 'rating-chua';
+
+          html += `<tr>
+            <td class="text-muted fw-bold">${r.id}</td>
+            <td class="fw-bold text-primary">${r.class}</td>
+            <td class="small text-muted">${r.studentId}</td>
+            <td class="text-start ps-3 fw-bold">${r.name}</td>
+            <td>${r.height || '—'}</td>
+            <td>${r.weight || '—'}</td>
+            <td class="fw-bold">${r.bmi || '—'}</td>
+            <td><span class="bmi-badge ${bmiClass}">${r.status || '—'}</span></td>
+            <td class="fw-bold text-secondary">${r.subject}</td>
+            <td class="fw-bold text-dark">${r.score}</td>
+            <td><span class="badge ${ratingClass} px-2 py-1">${r.rating}</span></td>
+            <td class="small text-muted">${r.health || 'Không'}</td>
+            <td class="text-muted small">${r.date}</td>
+            <td class="no-print">
+              <button onclick="deleteRecord('${r.id}')" class="btn btn-sm btn-link text-danger p-0" title="Xóa kết quả này">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>`;
+        });
+
+        body.innerHTML = html || '<tr><td colspan="14" class="p-4 text-muted">Lớp này chưa có bản ghi thể chất.</td></tr>';
+      } catch (err) {
+        body.innerHTML = `<tr><td colspan="14" class="p-4 text-danger">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    function updateStats(total, pass, normal, warning) {
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statPass').innerText = pass;
+      document.getElementById('statNormalBmi').innerText = normal;
+      document.getElementById('statWarningBmi').innerText = warning;
+    }
+
+    // LƯU BẢN GHI MỚI VÀO SHEET
+    async function submitFitnessRecord() {
+      const className = document.getElementById('selClass').value;
+      const selStd = document.getElementById('selStudent');
+      const studentId = selStd.value;
+      const opt = selStd.selectedOptions[0];
+      const studentName = opt ? opt.getAttribute('data-name') : "";
+
+      const height = document.getElementById('inpHeight').value;
+      const weight = document.getElementById('inpWeight').value;
+      const subject = document.getElementById('selSubject').value;
+      const score = document.getElementById('inpScore').value.trim();
+      const rating = document.getElementById('selRating').value;
+      const health = document.getElementById('inpHealth').value.trim();
+      const dateInp = document.getElementById('inpDate').value;
+
+      if (!className) return alert("Vui lòng chọn lớp!");
+      if (!studentId) return alert("Vui lòng chọn học sinh!");
+      if (!score) return alert("Vui lòng nhập thành tích kiểm tra!");
+
+      let formattedDate = "";
+      if (dateInp) {
+        const parts = dateInp.split('-');
+        formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+
+      const item = {
+        class: className,
+        studentId: studentId,
+        name: studentName,
+        height: height,
+        weight: weight,
+        subject: subject,
+        score: score,
+        rating: rating,
+        health: health || "Không",
+        date: formattedDate
+      };
+
+      const btn = document.getElementById('btnSubmit');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      try {
+        const msg = await callApi('savePhysicalFitness2627Record', item);
+        alert(msg);
+        document.getElementById('inpScore').value = "";
+        await loadFitnessData();
+      } catch (err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    // XÓA BẢN GHI KHỎI SHEET
+    async function deleteRecord(recId) {
+      if (!confirm("Thầy có chắc chắn muốn xóa bản ghi thể lực [" + recId + "] khỏi Google Sheets?")) return;
+
+      try {
+        const msg = await callApi('deletePhysicalFitness2627Record', recId);
+        alert(msg);
+        await loadFitnessData();
+      } catch (err) {
+        alert("Lỗi khi xóa: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
