@@ -302,9 +302,9 @@
           <iframe id="iframe-meetingnotebook" src="sotayhopto2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: white;" class="shadow-sm"></iframe>
         </div>
 
-        <!-- TAB UFO GỌI TÊN HỌC SINH 2627 (NHÚNG ufo_picker_2627.html) -->
-        <div id="tab-ufo_picker_2627" class="content-tab d-none" style="height: 85vh;">
-          <iframe id="iframe-ufo" src="ufo_picker_2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #030712;" class="shadow-sm"></iframe>
+        <!-- TAB ĐĨA BAY GỌI TÊN 2627 (NHÚNG diabay2627.html) -->
+        <div id="tab-diabay2627" class="content-tab d-none" style="height: 85vh;">
+          <iframe id="iframe-diabay" src="diabay2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #030712;" class="shadow-sm"></iframe>
         </div>
         
 
@@ -1160,6 +1160,16 @@
 
       var menuHtml = '';
       var dataMenu = res.menu || res.menus || [];
+      // ÉP THẲNG MENU ĐĨA BAY & SỔ TAY VÀO ĐẦU DANH SÁCH CHO ADMIN
+      if (res.role === 'ADMIN') {
+        dataMenu = dataMenu.filter(function(m) { 
+          return m.id !== 'diabay2627' && m.id !== 'meeting_notebook_2627'; 
+        });
+        dataMenu.splice(1, 0, 
+          { id: 'diabay2627', text: '🛸 Đĩa Bay Gọi Tên 2627', icon: 'fa-satellite-dish text-info' },
+          { id: 'meeting_notebook_2627', text: '📖 Sổ Tay Họp Tổ 2627', icon: 'fa-book-open text-success' }
+        );
+      }
 
       // NẾU LÀ HỌC SINH (HS), TỰ ĐỘNG BỔ SUNG MENU CHUÔNG TRỐNG NẾU CHƯA CÓ
       if (res.role === 'HS') {
@@ -1173,28 +1183,7 @@
         }
       }
       //
-      // TỰ ĐỘNG THÊM SỔ TAY HỌP TỔ & UFO VÀO NGAY ĐẦU MENU CHO ADMIN
-      if (res.role === 'ADMIN') {
-        // 1. Thêm Sổ Tay Họp Tổ 2627
-        if (!dataMenu.some(function(m) { return m.id === 'meeting_notebook_2627'; })) {
-          dataMenu.splice(1, 0, {
-            id: 'meeting_notebook_2627',
-            text: 'Sổ Tay Họp Tổ 2627',
-            icon: 'fa-book-open text-success'
-          });
-        }
-        // 2. Thêm UFO Gọi Tên Học Sinh 2627
-        // ĐƯA MENU UFO LÊN THẲNG VỊ TRÍ SỐ 2 (NGAY DƯỚI TỔNG QUAN)
-      var ufoIdx = dataMenu.findIndex(function(m) { return m.id === 'ufo_picker_2627'; });
-      if (ufoIdx !== -1) {
-        dataMenu.splice(ufoIdx, 1); // Xóa vị trí cũ ở cuối
-      }
-      dataMenu.splice(1, 0, {
-        id: 'ufo_picker_2627',
-        text: '🛸 UFO Gọi Tên Học Sinh 2627',
-        icon: 'fa-satellite-dish text-danger'
-      });
-      }
+     
       //
     
 
@@ -1361,12 +1350,8 @@
       else if (id === 'meeting_notebook_2627') {
         // Tự động mở tab hiển thị Sổ Tay Họp Tổ 2627
       }
-      else if (id === 'ufo_picker_2627') {
-        // Tự động mở và làm mới tab UFO Gọi Tên Học Sinh
-        var ifrUfo = document.getElementById('iframe-ufo');
-        if (ifrUfo && ifrUfo.contentWindow && ifrUfo.contentWindow.loadHistoryFromSheet) {
-          ifrUfo.contentWindow.loadHistoryFromSheet();
-        }
+      else if (id === 'diabay2627') {
+        // Tự động mở tab hiển thị Đĩa Bay Gọi Tên 2627
       }
      
       
