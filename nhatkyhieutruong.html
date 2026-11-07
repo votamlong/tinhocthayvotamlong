@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhật Ký Điều Hành Hiệu Trưởng - THCS Bình Tân</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 18px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      padding: 22px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 24px 28px;
+      box-shadow: 0 4px 15px rgba(15, 23, 42, 0.2);
+    }
+    .stat-card {
+      border-radius: 14px;
+      border: none;
+      padding: 18px;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #475569;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      vertical-align: middle;
+      border-bottom: 2px solid #cbd5e1;
+    }
+    .priority-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 50px;
+    }
+    .priority-urgent { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+    .priority-high { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
+    .priority-normal { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .print-footer { display: flex !important; }
+      .panel-box { border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; }
+      @page { size: landscape; margin: 12mm; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1350px;">
+    
+    <!-- BANNER CHỈ ĐẠO -->
+    <div class="header-banner mb-4 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-danger text-white fw-bold px-2 py-1"><i class="fas fa-shield-alt me-1"></i>BAN GIÁM HIỆU</span>
+          <span class="opacity-75 small">Trường THCS Bình Tân - Năm học 2026-2027</span>
+        </div>
+        <h4 class="fw-bold mb-1">SỔ TAY & NHẬT KÝ ĐIỀU HÀNH CỦA HIỆU TRƯỞNG</h4>
+        <small class="opacity-75">Ghi nhận chỉ đạo điều hành, phân công nhiệm vụ và theo dõi tiến độ xử lý toàn trường</small>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button onclick="loadLogsData()" class="btn btn-outline-light rounded-pill px-3 fw-bold">
+          <i class="fas fa-sync-alt me-1"></i> Làm mới
+        </button>
+        <button onclick="window.print()" class="btn btn-warning rounded-pill px-4 fw-bold text-dark">
+          <i class="fas fa-print me-1"></i> In báo cáo
+        </button>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header d-none text-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">VĂN PHÒNG BAN GIÁM HIỆU</div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+          <div class="small fst-italic">Độc lập - Tự do - Hạnh phúc</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">NHẬT KÝ THEO DÕI & CHỈ ĐẠO ĐIỀU HÀNH CỦA HIỆU TRƯỞNG</h3>
+      <p class="text-secondary small fst-italic">Trích xuất ngày: <b class="text-dark" id="printTodayDate">...</b></p>
+      <hr>
+    </div>
+
+    <!-- 4 THẺ THỐNG KÊ TIẾN ĐỘ -->
+    <div class="row g-3 mb-4 text-center">
+      <div class="col-md-3">
+        <div class="stat-card bg-primary">
+          <small class="fw-bold text-uppercase opacity-75 d-block">1. Tổng Số Chỉ Đạo</small>
+          <h2 class="fw-bold my-1" id="statTotal">0</h2>
+          <small class="opacity-75">Nhiệm vụ đã ban hành</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card bg-danger">
+          <small class="fw-bold text-uppercase opacity-75 d-block">2. Hỏa Tốc / Khẩn Cấp</small>
+          <h2 class="fw-bold my-1" id="statUrgent">0</h2>
+          <small class="opacity-75">Ưu tiên xử lý ngay</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card bg-warning text-dark">
+          <small class="fw-bold text-uppercase opacity-75 d-block">3. Đang Thực Hiện</small>
+          <h2 class="fw-bold my-1" id="statProcessing">0</h2>
+          <small class="opacity-75">Đang kiểm tra tiến độ</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card bg-success">
+          <small class="fw-bold text-uppercase opacity-75 d-block">4. Đã Hoàn Thành</small>
+          <h2 class="fw-bold my-1" id="statDone">0</h2>
+          <small class="opacity-75">Nhiệm vụ đã báo cáo xong</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM NHẬP LỆNH CHỈ ĐẠO MỚI (ẨN KHI IN) -->
+    <div class="panel-box mb-4 no-print border-start border-4 border-primary">
+      <h6 class="fw-bold text-primary mb-3 text-uppercase">
+        <i class="fas fa-edit me-1"></i> Ban Hành Lệnh Chỉ Đạo Mới (Ghi vào Sheet: NHAT_KY_HIEU_TRUONG_2627)
+      </h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-4">
+          <label class="small fw-bold text-secondary mb-1">1. Nội dung chỉ đạo / Kết luận cuộc họp</label>
+          <input type="text" id="inpContent" class="form-control form-control-sm" placeholder="Vd: Tăng cường rà soát an ninh cổng trường, nhắc nhở nề nếp khối 9...">
+        </div>
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">2. Lĩnh vực công tác</label>
+          <select id="selCategory" class="form-select form-select-sm">
+            <option value="Nề nếp & Kỷ luật">Nề nếp & Kỷ luật</option>
+            <option value="Chuyên môn giảng dạy">Chuyên môn giảng dạy</option>
+            <option value="Bán trú & Nhà bếp">Bán trú & Nhà bếp</option>
+            <option value="Cơ sở vật chất">Cơ sở vật chất</option>
+            <option value="An ninh trật tự">An ninh trật tự</option>
+            <option value="Tài chính & Quỹ">Tài chính & Quỹ</option>
+            <option value="Công tác Đội - Phong trào">Công tác Đội - Phong trào</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">3. Bộ phận thực hiện</label>
+          <select id="selAssignee" class="form-select form-select-sm">
+            <option value="Toàn trường">Toàn trường</option>
+            <option value="Khối Giáo viên Chủ nhiệm">Khối GVCN</option>
+            <option value="Tổ Chuyên môn">Tổ Chuyên môn</option>
+            <option value="Tổ Giám thị">Tổ Giám thị</option>
+            <option value="Tổ Bảo vệ">Tổ Bảo vệ</option>
+            <option value="Bộ phận Bán trú - Bếp">Bán trú - Nhà bếp</option>
+            <option value="Tổng phụ trách Đội">Tổng phụ trách Đội</option>
+            <option value="Văn thư - Giáo vụ">Văn thư - Giáo vụ</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">4. Mức độ ưu tiên</label>
+          <select id="selPriority" class="form-select form-select-sm fw-bold">
+            <option value="Bình thường" class="text-primary">Bình thường</option>
+            <option value="Khẩn" class="text-warning">⚡ Khẩn</option>
+            <option value="Hỏa tốc" class="text-danger">🔥 Hỏa tốc</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button onclick="submitNewLog()" id="btnSubmit" class="btn btn-primary btn-sm w-100 fw-bold rounded-pill">
+            <i class="fas fa-paper-plane me-1"></i> BAN HÀNH
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BẢNG THEO DÕI TIẾN ĐỘ CHỈ ĐẠO -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle mb-0 text-center small" id="logTable">
+          <thead>
+            <tr>
+              <th style="width: 130px;">MÃ LỆNH</th>
+              <th style="width: 140px;">THỜI GIAN</th>
+              <th style="width: 150px;">LĨNH VỰC</th>
+              <th class="text-start ps-3">NỘI DUNG CHỈ ĐẠO / KẾT LUẬN</th>
+              <th style="width: 160px;">BỘ PHẬN THỰC HIỆN</th>
+              <th style="width: 110px;">MỨC ĐỘ</th>
+              <th style="width: 150px;">TIẾN ĐỘ / TRẠNG THÁI</th>
+              <th style="width: 50px;" class="no-print">XÓA</th>
+            </tr>
+          </thead>
+          <tbody id="logTableBody">
+            <tr><td colspan="8" class="p-5 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu nhật ký điều hành...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHỮ KÝ BAN GIÁM HIỆU KHI IN BÁO CÁO -->
+    <div class="row mt-5 pt-4 text-center print-footer d-none">
+      <div class="col-6">
+        <p class="fw-bold mb-1">THƯ KÝ TỔNG HỢP</p>
+        <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+      </div>
+      <div class="col-6">
+        <p class="fw-bold mb-1">HIỆU TRƯỞNG PHÊ DUYỆT</p>
+        <small class="text-muted">(Ký và đóng dấu)</small>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // URL Web App Google Apps Script của thầy
+    const API_URL = "https://script.google.com/macros/s/AKfycbzvPJt9tTaP10xvMSa97Sw7EP5ia1pj7zxSpmNgqdx61MuqsoBf5xCPgrLZypbEq5df2g/exec";
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = function() {
+      document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('vi-VN');
+      loadLogsData();
+    };
+
+    // TẢI DỮ LIỆU NHẬT KÝ TỪ SHEET
+    async function loadLogsData() {
+      const body = document.getElementById('logTableBody');
+      body.innerHTML = '<tr><td colspan="8" class="p-5 text-muted"><i class="fas fa-sync fa-spin me-2"></i>Đang nạp dữ liệu điều hành từ Sheet...</td></tr>';
+
+      try {
+        const list = await callApi('getPrincipalLogs2627');
+
+        if (!list || list.length === 0) {
+          body.innerHTML = '<tr><td colspan="8" class="p-5 text-muted">Chưa có chỉ đạo nào trong sổ tay điều hành.</td></tr>';
+          updateStats(0, 0, 0, 0);
+          return;
+        }
+
+        let total = list.length;
+        let urgent = 0;
+        let processing = 0;
+        let done = 0;
+        let html = '';
+
+        list.forEach(item => {
+          if (item.priority === 'Hỏa tốc' || item.priority === 'Khẩn') urgent++;
+          if (item.status === 'Đang thực hiện') processing++;
+          if (item.status === 'Đã hoàn thành') done++;
+
+          let pClass = 'priority-normal';
+          if (item.priority === 'Hỏa tốc') pClass = 'priority-urgent';
+          else if (item.priority === 'Khẩn') pClass = 'priority-high';
+
+          let statusClass = 'text-primary';
+          if (item.status === 'Đã hoàn thành') statusClass = 'text-success';
+          else if (item.status === 'Chờ phê duyệt') statusClass = 'text-danger';
+
+          html += `<tr>
+            <td class="text-muted fw-bold">${item.id}</td>
+            <td class="small text-muted">${item.date}</td>
+            <td><span class="badge bg-light text-dark border">${item.category}</span></td>
+            <td class="text-start ps-3 fw-bold">${item.content}</td>
+            <td><span class="badge bg-secondary bg-opacity-10 text-secondary">${item.assignee}</span></td>
+            <td><span class="priority-pill ${pClass}">${item.priority}</span></td>
+            <td>
+              <select onchange="updateStatus('${item.id}', this.value)" class="form-select form-select-sm border-0 bg-light fw-bold ${statusClass}">
+                <option value="Đang thực hiện" ${item.status === 'Đang thực hiện' ? 'selected' : ''}>⏳ Đang thực hiện</option>
+                <option value="Đã hoàn thành" ${item.status === 'Đã hoàn thành' ? 'selected' : ''}>✅ Đã hoàn thành</option>
+                <option value="Cần theo dõi thêm" ${item.status === 'Cần theo dõi thêm' ? 'selected' : ''}>👁️ Cần theo dõi</option>
+                <option value="Chờ phê duyệt" ${item.status === 'Chờ phê duyệt' ? 'selected' : ''}>❌ Chờ phê duyệt</option>
+              </select>
+            </td>
+            <td class="no-print">
+              <button onclick="deleteLog('${item.id}')" class="btn btn-sm btn-link text-danger p-0" title="Xóa lệnh này">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>`;
+        });
+
+        body.innerHTML = html;
+        updateStats(total, urgent, processing, done);
+      } catch (err) {
+        body.innerHTML = `<tr><td colspan="8" class="p-4 text-danger">Lỗi kết nối máy chủ: ${err.message}</td></tr>`;
+      }
+    }
+
+    function updateStats(total, urgent, processing, done) {
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statUrgent').innerText = urgent;
+      document.getElementById('statProcessing').innerText = processing;
+      document.getElementById('statDone').innerText = done;
+    }
+
+    // BAN HÀNH CHỈ ĐẠO MỚI
+    async function submitNewLog() {
+      const content = document.getElementById('inpContent').value.trim();
+      const category = document.getElementById('selCategory').value;
+      const assignee = document.getElementById('selAssignee').value;
+      const priority = document.getElementById('selPriority').value;
+
+      if (!content) return alert("Thầy vui lòng nhập nội dung chỉ đạo điều hành!");
+
+      const btn = document.getElementById('btnSubmit');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      const item = {
+        content: content,
+        category: category,
+        assignee: assignee,
+        priority: priority,
+        status: "Đang thực hiện"
+      };
+
+      try {
+        const msg = await callApi('savePrincipalLog2627', item);
+        alert(msg);
+        document.getElementById('inpContent').value = "";
+        await loadLogsData();
+      } catch (err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    // CẬP NHẬT TRẠNG THÁI TIẾN ĐỘ
+    async function updateStatus(logId, newStatus) {
+      try {
+        await callApi('updatePrincipalLogStatus2627', logId, newStatus);
+        await loadLogsData();
+      } catch (err) {
+        alert("Lỗi cập nhật trạng thái: " + err.message);
+      }
+    }
+
+    // XÓA BẢN GHI
+    async function deleteLog(logId) {
+      if (!confirm("Thầy có chắc chắn muốn xóa bản ghi chỉ đạo [" + logId + "] khỏi Google Sheets?")) return;
+      try {
+        const msg = await callApi('deletePrincipalLog2627', logId);
+        alert(msg);
+        await loadLogsData();
+      } catch (err) {
+        alert("Lỗi khi xóa: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
