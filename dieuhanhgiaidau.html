@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Điều Hành Giải Đấu & Trận Đấu Trực Tiếp</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 16px;
+      user-select: none;
+    }
+    .panel-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    /* Bảng điểm LED điện tử */
+    .scoreboard {
+      background: #020617;
+      border: 2px solid #38bdf8;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
+    }
+    .score-num {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 5.5rem;
+      font-weight: 900;
+      line-height: 1;
+      color: #facc15;
+      text-shadow: 0 0 20px rgba(250, 204, 21, 0.6);
+    }
+    .match-timer {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: 2px;
+      text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+    }
+    .team-badge {
+      background: #334155;
+      color: #38bdf8;
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .event-log-box {
+      background: #090d16;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+      max-height: 280px;
+      overflow-y: auto;
+      padding: 12px;
+    }
+    /* Chế độ in biên bản ra giấy A4 */
+    @media print {
+      body { background: white !important; color: black !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-report { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1250px;">
+    
+    <!-- THANH CẤU HÌNH TRẬN ĐẤU (ẨN KHI IN) -->
+    <div class="panel-card mb-4 no-print">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 border-bottom border-secondary pb-3 mb-3">
+        <div>
+          <h4 class="fw-bold text-warning mb-1 m-0">
+            <i class="fas fa-trophy me-2"></i>BẢNG ĐIỀU HÀNH GIẢI ĐẤU & TRẬN ĐẤU
+          </h4>
+          <small class="text-secondary">Theo dõi điểm số, đồng hồ bấm giờ, còi trọng tài và in biên bản thi đấu</small>
+        </div>
+        <div class="d-flex gap-2">
+          <button onclick="playWhistle()" class="btn btn-warning rounded-pill px-3 fw-bold text-dark shadow-sm">
+            <i class="fas fa-bullhorn me-1"></i> CÒI TRỌNG TÀI
+          </button>
+          <button onclick="window.print()" class="btn btn-outline-light rounded-pill px-3 fw-bold shadow-sm">
+            <i class="fas fa-print me-1"></i> In biên bản
+          </button>
+        </div>
+      </div>
+
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="small text-secondary fw-bold mb-1">Môn thi đấu / Giải:</label>
+          <input type="text" id="tournamentName" class="form-control form-control-sm bg-dark text-white border-secondary" value="GIẢI BÓNG ĐÁ HỌC SINH 2026-2027">
+        </div>
+        <div class="col-md-3">
+          <label class="small text-secondary fw-bold mb-1">Đội / Lớp A:</label>
+          <div class="input-group input-group-sm">
+            <select id="selTeamA" class="form-select bg-dark text-white border-secondary" onchange="updateTeamNames()"></select>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label class="small text-secondary fw-bold mb-1">Đội / Lớp B:</label>
+          <div class="input-group input-group-sm">
+            <select id="selTeamB" class="form-select bg-dark text-white border-secondary" onchange="updateTeamNames()"></select>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label class="small text-secondary fw-bold mb-1">Trọng tài điều hành:</label>
+          <input type="text" id="refereeName" class="form-control form-control-sm bg-dark text-white border-secondary" value="Thầy Võ Tâm Long">
+        </div>
+      </div>
+    </div>
+
+    <!-- KHUNG ĐIỀU HÀNH TRẬN ĐẤU CHÍNH -->
+    <div class="row g-4 no-print">
+      <!-- CỘT BẢNG ĐIỂM -->
+      <div class="col-lg-8">
+        <div class="scoreboard text-center">
+          
+          <!-- HÀNG HIỂN THỊ ĐỒNG HỒ & HIỆP ĐẤU -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill" id="matchPeriodText">HIỆP 1</span>
+            <div class="match-timer" id="timerDisplay">00:00</div>
+            <span class="badge bg-info text-dark fs-6 px-3 py-2 rounded-pill" id="matchStatusText">CHƯA BẮT ĐẦU</span>
+          </div>
+
+          <!-- NÚT ĐIỀU KHIỂN ĐỒNG HỒ -->
+          <div class="d-flex justify-content-center gap-2 mb-4">
+            <button onclick="startTimer()" id="btnStart" class="btn btn-success btn-sm rounded-pill px-4 fw-bold">
+              <i class="fas fa-play me-1"></i> BẮT ĐẦU
+            </button>
+            <button onclick="pauseTimer()" class="btn btn-secondary btn-sm rounded-pill px-3 fw-bold">
+              <i class="fas fa-pause me-1"></i> TẠM DỪNG
+            </button>
+            <button onclick="addMinute(1)" class="btn btn-outline-info btn-sm rounded-pill px-3">
+              +1 Phút
+            </button>
+            <button onclick="switchPeriod()" class="btn btn-outline-warning btn-sm rounded-pill px-3">
+              Đổi Hiệp
+            </button>
+            <button onclick="resetMatch()" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+              Đặt lại
+            </button>
+          </div>
+
+          <!-- TỈ SỐ 2 ĐỘI -->
+          <div class="row align-items-center my-3">
+            <!-- ĐỘI A -->
+            <div class="col-5">
+              <div class="team-badge d-inline-block mb-2" id="labelTeamA">ĐỘI A</div>
+              <div class="score-num my-2" id="scoreA">0</div>
+              <div class="d-flex justify-content-center gap-2 mt-2">
+                <button onclick="changeScore('A', 1)" class="btn btn-success btn-lg rounded-circle px-3 py-2 fw-bold shadow">
+                  +1
+                </button>
+                <button onclick="changeScore('A', -1)" class="btn btn-outline-secondary rounded-circle px-3 py-2">
+                  -1
+                </button>
+              </div>
+            </div>
+
+            <!-- VS -->
+            <div class="col-2">
+              <div class="fs-4 text-secondary fw-bold">VS</div>
+            </div>
+
+            <!-- ĐỘI B -->
+            <div class="col-5">
+              <div class="team-badge d-inline-block mb-2" id="labelTeamB">ĐỘI B</div>
+              <div class="score-num my-2" id="scoreB">0</div>
+              <div class="d-flex justify-content-center gap-2 mt-2">
+                <button onclick="changeScore('B', 1)" class="btn btn-success btn-lg rounded-circle px-3 py-2 fw-bold shadow">
+                  +1
+                </button>
+                <button onclick="changeScore('B', -1)" class="btn btn-outline-secondary rounded-circle px-3 py-2">
+                  -1
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CỘT NHẬT KÝ DIỄN BIẾN TRẬN ĐẤU -->
+      <div class="col-lg-4">
+        <div class="panel-card h-100 d-flex flex-column">
+          <h6 class="fw-bold text-info mb-3"><i class="fas fa-list-alt me-2"></i>NHẬT KÝ DIỄN BIẾN TRẬN ĐẤU</h6>
+          
+          <!-- NÚT GHI SỰ KIỆN NHANH -->
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <button onclick="addEvent('⚽ Bàn thắng', 'A')" class="btn btn-outline-success btn-sm flex-fill">⚽ Bàn thắng (A)</button>
+            <button onclick="addEvent('⚽ Bàn thắng', 'B')" class="btn btn-outline-success btn-sm flex-fill">⚽ Bàn thắng (B)</button>
+            <button onclick="addEvent('🟨 Thẻ vàng', 'A')" class="btn btn-outline-warning btn-sm flex-fill">🟨 Thẻ vàng (A)</button>
+            <button onclick="addEvent('🟨 Thẻ vàng', 'B')" class="btn btn-outline-warning btn-sm flex-fill">🟨 Thẻ vàng (B)</button>
+            <button onclick="addEvent('🟥 Thẻ đỏ', 'A')" class="btn btn-outline-danger btn-sm flex-fill">🟥 Thẻ đỏ (A)</button>
+            <button onclick="addEvent('🟥 Thẻ đỏ', 'B')" class="btn btn-outline-danger btn-sm flex-fill">🟥 Thẻ đỏ (B)</button>
+          </div>
+
+          <!-- HỘP HIỂN THỊ DANH SÁCH DIỄN BIẾN -->
+          <div class="event-log-box flex-grow-1 mb-3" id="eventLogContainer">
+            <div class="text-secondary small fst-italic text-center py-4" id="emptyLogText">Chưa có sự kiện nào được ghi nhận.</div>
+          </div>
+
+          <div class="input-group input-group-sm">
+            <input type="text" id="customEventNote" class="form-control bg-dark text-white border-secondary" placeholder="Ghi chú thêm (Vd: Cầu thủ số 7 ghi bàn...)">
+            <button onclick="addCustomEvent()" class="btn btn-primary">Ghi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MẪU BIÊN BẢN TRẬN ĐẤU ĐỂ IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-report d-none text-dark p-4">
+      <div class="row align-items-center mb-3">
+        <div class="col-6">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">TỔ THỂ DỤC - TIN HỌC</div>
+        </div>
+        <div class="col-6 text-end">
+          <div class="fw-bold small text-uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+          <div class="small fst-italic">Độc lập - Tự do - Hạnh phúc</div>
+        </div>
+      </div>
+
+      <div class="text-center my-4">
+        <h4 class="fw-bold text-uppercase m-0">BIÊN BẢN THI ĐẤU THỂ DỤC THỂ THAO</h4>
+        <div class="small fst-italic" id="printTournamentText">...</div>
+      </div>
+
+      <div class="border p-3 rounded mb-3 text-center bg-light">
+        <div class="row align-items-center">
+          <div class="col-5 text-end"><h3 class="fw-bold m-0" id="printNameA">...</h3></div>
+          <div class="col-2"><h2 class="fw-bold text-danger m-0" id="printFinalScore">0 - 0</h2></div>
+          <div class="col-5 text-start"><h3 class="fw-bold m-0" id="printNameB">...</h3></div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h6 class="fw-bold text-uppercase mb-2">I. DIỄN BIẾN TRẬN ĐẤU:</h6>
+        <div class="border p-3 rounded" id="printEventsList" style="min-height: 120px;">
+          (Không có sự kiện đặc biệt)
+        </div>
+      </div>
+
+      <div class="row text-center mt-5 pt-4">
+        <div class="col-4">
+          <p class="fw-bold mb-1">ĐẠI DIỆN ĐỘI A</p>
+          <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+        </div>
+        <div class="col-4">
+          <p class="fw-bold mb-1">ĐẠI DIỆN ĐỘI B</p>
+          <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+        </div>
+        <div class="col-4">
+          <p class="fw-bold mb-1">TRỌNG TÀI CHÍNH</p>
+          <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+          <div class="mt-5 fw-bold" id="printRefereeName">...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbyfOxTehbN-mYeYLyLRXQNrCmoWt5ECas57_bqMT731frTn-pF9sUAirvWG2q8RLQvw4g/exec";
+
+    // Trạng thái trận đấu
+    let scoreA = 0, scoreB = 0;
+    let timerSeconds = 0;
+    let timerInterval = null;
+    let isTimerRunning = false;
+    let currentPeriod = 1;
+    let eventsList = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      try {
+        const classes = await callApi('getAllClasses');
+        const selA = document.getElementById('selTeamA');
+        const selB = document.getElementById('selTeamB');
+        
+        let html = '';
+        (classes || []).forEach(c => html += `<option value="${c}">${c}</option>`);
+        selA.innerHTML = html;
+        selB.innerHTML = html;
+
+        if (classes && classes.length > 1) {
+          selA.value = classes[0];
+          selB.value = classes[1];
+        }
+        updateTeamNames();
+      } catch (err) {
+        console.error("Lỗi nạp lớp:", err);
+      }
+    };
+
+    function updateTeamNames() {
+      const nameA = document.getElementById('selTeamA').value || 'ĐỘI A';
+      const nameB = document.getElementById('selTeamB').value || 'ĐỘI B';
+      document.getElementById('labelTeamA').innerText = nameA;
+      document.getElementById('labelTeamB').innerText = nameB;
+      syncPrintData();
+    }
+
+    // ĐIỀU KHIỂN TỈ SỐ
+    function changeScore(team, val) {
+      if (team === 'A') {
+        scoreA = Math.max(0, scoreA + val);
+        document.getElementById('scoreA').innerText = scoreA;
+      } else {
+        scoreB = Math.max(0, scoreB + val);
+        document.getElementById('scoreB').innerText = scoreB;
+      }
+      syncPrintData();
+    }
+
+    // ĐIỀU KHIỂN ĐỒNG HỒ
+    function formatTime(totalSec) {
+      const m = Math.floor(totalSec / 60).toString().padStart(2, '0');
+      const s = (totalSec % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function startTimer() {
+      if (isTimerRunning) return;
+      isTimerRunning = true;
+      document.getElementById('matchStatusText').className = "badge bg-success fs-6 px-3 py-2 rounded-pill";
+      document.getElementById('matchStatusText').innerText = "ĐANG THI ĐẤU";
+
+      playWhistle();
+
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        document.getElementById('timerDisplay').innerText = formatTime(timerSeconds);
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      isTimerRunning = false;
+      clearInterval(timerInterval);
+      document.getElementById('matchStatusText').className = "badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill";
+      document.getElementById('matchStatusText').innerText = "TẠM DỪNG";
+    }
+
+    function addMinute(mins) {
+      timerSeconds += mins * 60;
+      document.getElementById('timerDisplay').innerText = formatTime(timerSeconds);
+    }
+
+    function switchPeriod() {
+      pauseTimer();
+      playWhistle();
+      currentPeriod = (currentPeriod === 1) ? 2 : 1;
+      document.getElementById('matchPeriodText').innerText = "HIỆP " + currentPeriod;
+      document.getElementById('matchStatusText').innerText = "BẮT ĐẦU HIỆP " + currentPeriod;
+    }
+
+    function resetMatch() {
+      if (!confirm("Thầy có chắc chắn muốn đặt lại điểm số và đồng hồ trận đấu?")) return;
+      pauseTimer();
+      timerSeconds = 0;
+      scoreA = 0;
+      scoreB = 0;
+      currentPeriod = 1;
+      eventsList = [];
+      document.getElementById('timerDisplay').innerText = "00:00";
+      document.getElementById('scoreA').innerText = "0";
+      document.getElementById('scoreB').innerText = "0";
+      document.getElementById('matchPeriodText').innerText = "HIỆP 1";
+      document.getElementById('matchStatusText').className = "badge bg-info text-dark fs-6 px-3 py-2 rounded-pill";
+      document.getElementById('matchStatusText').innerText = "CHƯA BẮT ĐẦU";
+      document.getElementById('eventLogContainer').innerHTML = '<div class="text-secondary small fst-italic text-center py-4" id="emptyLogText">Chưa có sự kiện nào.</div>';
+      syncPrintData();
+    }
+
+    // NHẬT KÝ SỰ KIỆN
+    function addEvent(action, team) {
+      const timeStr = formatTime(timerSeconds);
+      const teamName = team === 'A' ? document.getElementById('selTeamA').value : document.getElementById('selTeamB').value;
+      const text = `[${timeStr}] (Hiệp ${currentPeriod}) ${action} - Lớp ${teamName}`;
+      
+      eventsList.push(text);
+      renderEvents();
+
+      // Nếu là bàn thắng thì tự động cộng điểm
+      if (action.includes('Bàn thắng')) {
+        changeScore(team, 1);
+      }
+    }
+
+    function addCustomEvent() {
+      const input = document.getElementById('customEventNote');
+      const val = input.value.trim();
+      if (!val) return;
+      const timeStr = formatTime(timerSeconds);
+      eventsList.push(`[${timeStr}] ${val}`);
+      input.value = "";
+      renderEvents();
+    }
+
+    function renderEvents() {
+      const container = document.getElementById('eventLogContainer');
+      if (eventsList.length === 0) {
+        container.innerHTML = '<div class="text-secondary small fst-italic text-center py-4">Chưa có sự kiện nào.</div>';
+        return;
+      }
+      let html = '';
+      eventsList.slice().reverse().forEach(ev => {
+        html += `<div class="small text-light py-1 border-bottom border-dark">${ev}</div>`;
+      });
+      container.innerHTML = html;
+      syncPrintData();
+    }
+
+    // ĐỒNG BỘ DỮ LIỆU ĐỂ IN RA GIẤY
+    function syncPrintData() {
+      const nameA = document.getElementById('selTeamA').value || 'ĐỘI A';
+      const nameB = document.getElementById('selTeamB').value || 'ĐỘI B';
+      document.getElementById('printTournamentText').innerText = document.getElementById('tournamentName').value;
+      document.getElementById('printNameA').innerText = nameA;
+      document.getElementById('printNameB').innerText = nameB;
+      document.getElementById('printFinalScore').innerText = `${scoreA} - ${scoreB}`;
+      document.getElementById('printRefereeName').innerText = document.getElementById('refereeName').value;
+
+      const printLog = document.getElementById('printEventsList');
+      if (eventsList.length === 0) {
+        printLog.innerHTML = '<span class="text-muted fst-italic">Trận đấu kết thúc bình thường, không có biên bản sự cố.</span>';
+      } else {
+        printLog.innerHTML = eventsList.map(e => `<div>${e}</div>`).join('');
+      }
+    }
+
+    // TẠO ÂM THANH CÒI TRỌNG TÀI BẰNG WEB AUDIO API (KHÔNG CẦN TẢI FILE MP3 NGOÀI)
+    function playWhistle() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        // Tần số còi thể thao tiêu chuẩn (~2800 Hz)
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(2800, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(2600, audioCtx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(2900, audioCtx.currentTime + 0.2);
+
+        gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.6);
+      } catch (e) {
+        console.warn("Không phát được âm thanh còi:", e);
+      }
+    }
+  </script>
+</body>
+</html>
