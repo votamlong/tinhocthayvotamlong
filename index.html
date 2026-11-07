@@ -1163,16 +1163,19 @@
 
       var menuHtml = '';
       var dataMenu = res.menu || res.menus || [];
-      // ÉP THẲNG MENU ĐĨA BAY & SỔ TAY VÀO ĐẦU DANH SÁCH CHO ADMIN
-      if (res.role === 'ADMIN') {
-        dataMenu = dataMenu.filter(function(m) { 
-          return m.id !== 'diabay2627' && m.id !== 'meeting_notebook_2627'; 
-        });
-        dataMenu.splice(1, 0, 
-          { id: 'diabay2627', text: '🛸 Đĩa Bay Gọi Tên 2627', icon: 'fa-satellite-dish text-info' },
-          { id: 'meeting_notebook_2627', text: '📖 Sổ Tay Họp Tổ 2627', icon: 'fa-book-open text-success' }
-        );
-      }
+            /*
+       // ÉP THẲNG MENU ĐĨA BAY & SỔ TAY VÀO ĐẦU DANH SÁCH CHO ADMIN
+       if (res.role === 'ADMIN') {
+          dataMenu = dataMenu.filter(function(m) {
+            return m.id !== 'diabay2627' && m.id !== 'meeting_notebook_2627';
+          });
+      
+          dataMenu.splice(1, 0,
+            { id: 'diabay2627', text: '🛸 Đĩa Bay Gọi Tên 2627', icon: 'fa-satellite-dish text-info' },
+            { id: 'meeting_notebook_2627', text: '📖 Sổ Tay Họp Tổ 2627', icon: 'fa-book-open text-success' }
+          );
+       }
+      */
 
       // NẾU LÀ HỌC SINH (HS), TỰ ĐỘNG BỔ SUNG MENU CHUÔNG TRỐNG NẾU CHƯA CÓ
       if (res.role === 'HS') {
