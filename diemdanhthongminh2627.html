@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Điểm Danh Thông Minh 2627 - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 18px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      padding: 22px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 22px 28px;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.2);
+    }
+    .stat-card {
+      border-radius: 14px;
+      border: none;
+      padding: 16px;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      vertical-align: middle;
+      border-bottom: 2px solid #cbd5e1;
+    }
+    /* Thẻ học sinh khi điểm danh */
+    .status-btn {
+      width: 48px;
+      font-weight: 700;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    .row-absent {
+      background-color: #fef2f2 !important;
+    }
+    .row-late {
+      background-color: #fffbeb !important;
+    }
+    .quick-action-btn {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 50px;
+    }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .print-footer { display: flex !important; }
+      .panel-box { border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; }
+      .status-btn-group { display: none !important; }
+      .print-status { display: inline-block !important; font-weight: bold; }
+    }
+    .print-status { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1350px;">
+    
+    <!-- BANNER & ĐIỀU HƯỚNG -->
+    <div class="header-banner mb-4 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-check-double me-1"></i>ATTENDANCE 2627</span>
+          <span class="opacity-75 small">Đồng bộ chính xác Sheet: ATTENDANCE (Cột A -> H)</span>
+        </div>
+        <h4 class="fw-bold mb-1">HỆ THỐNG ĐIỂM DANH THÔNG MINH & CHUYÊN CẦN 4.0</h4>
+        <small class="opacity-75">Thao tác 1 chạm, tự động phân loại diện vắng, trễ và tính toán chuyên cần</small>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button onclick="markAllPresent()" class="btn btn-warning rounded-pill px-3 fw-bold text-dark shadow-sm">
+          <i class="fas fa-check-circle me-1"></i> Tất cả có mặt (C)
+        </button>
+        <button onclick="saveAttendanceData()" id="btnSave" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm">
+          <i class="fas fa-save me-1"></i> Lưu vào Sheet
+        </button>
+        <button onclick="window.print()" class="btn btn-outline-light rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In sổ
+        </button>
+      </div>
+    </div>
+
+    <!-- KHUNG ĐIỀU HƯỚNG BỘ LỌC ĐIỂM DANH -->
+    <div class="panel-box mb-4 no-print border-start border-4 border-primary">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">1. Lớp học</label>
+          <select id="selClass" class="form-select form-select-sm fw-bold border-primary" onchange="onClassChange()">
+            <option value="">-- Chọn lớp --</option>
+          </select>
+          <div id="gvcnDisplay" class="small mt-1 text-danger italic" style="font-size: 11px;">GVCN: --</div>
+        </div>
+
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">2. Ngày điểm danh</label>
+          <input type="date" id="attDate" class="form-control form-control-sm fw-bold" onchange="loadAttendanceList()">
+        </div>
+
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">3. Tiết học (Cột F)</label>
+          <select id="selTiet" class="form-select form-select-sm fw-bold" onchange="loadAttendanceList()">
+            <option value="Tiết 1 Sáng">Tiết 1 Sáng</option>
+            <option value="Tiết 2 Sáng">Tiết 2 Sáng</option>
+            <option value="Tiết 3 Sáng" selected>Tiết 3 Sáng</option>
+            <option value="Tiết 4 Sáng">Tiết 4 Sáng</option>
+            <option value="Tiết 5 Sáng">Tiết 5 Sáng</option>
+            <option value="Tiết 1 Chiều">Tiết 1 Chiều</option>
+            <option value="Tiết 2 Chiều">Tiết 2 Chiều</option>
+            <option value="Tiết 3 Chiều">Tiết 3 Chiều</option>
+            <option value="Tiết 4 Chiều">Tiết 4 Chiều</option>
+            <option value="Tiết 5 Chiều">Tiết 5 Chiều</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="small fw-bold text-secondary mb-1">4. Môn học (Cột H)</label>
+          <input type="text" id="inpMon" class="form-control form-control-sm fw-bold text-primary" value="Tin học quốc tế" placeholder="Vd: Tin học quốc tế, Toán, GDĐP...">
+        </div>
+
+        <div class="col-md-3">
+          <label class="small fw-bold text-secondary mb-1">5. GV Bộ Môn (Cột G)</label>
+          <input type="text" id="inpGVBM" class="form-control form-control-sm fw-bold text-dark" value="Võ Tâm Long" placeholder="Tên Giáo viên giảng dạy...">
+        </div>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA GIẤY (CHỈ HIỆN KHI IN) -->
+    <div class="print-header d-none text-center mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">Lớp: <b class="text-dark fs-5" id="printClassName">...</b></div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">PHIẾU ĐIỂM DANH CHUYÊN CẦN TIẾT HỌC</h3>
+      <p class="text-secondary small fst-italic">Ngày: <b class="text-dark" id="printDateText">...</b> | <span id="printTietMonText">Tiết 3 Sáng - Tin học quốc tế</span> | GV: <b class="text-dark" id="printGVBMText">Võ Tâm Long</b></p>
+      <hr>
+    </div>
+
+    <!-- 4 THẺ THỐNG KÊ NHANH -->
+    <div class="row g-3 mb-4 text-center">
+      <div class="col-md-3">
+        <div class="stat-card bg-primary">
+          <small class="fw-bold text-uppercase opacity-75 d-block">1. Sĩ Số Lớp</small>
+          <h2 class="fw-bold my-1" id="statSiso">0</h2>
+          <small class="opacity-75">Học sinh trong danh sách</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card bg-success">
+          <small class="fw-bold text-uppercase opacity-75 d-block">2. Có Mặt (C)</small>
+          <h2 class="fw-bold my-1" id="statPresent">0</h2>
+          <small class="opacity-75">Hiện diện tại lớp</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card bg-danger">
+          <small class="fw-bold text-uppercase opacity-75 d-block">3. Vắng Học (V)</small>
+          <h2 class="fw-bold my-1" id="statAbsent">0</h2>
+          <small class="opacity-75">Không tham gia tiết</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card bg-warning text-dark">
+          <small class="fw-bold text-uppercase opacity-75 d-block">4. Đi Học Muộn (T)</small>
+          <h2 class="fw-bold my-1" id="statLate">0</h2>
+          <small class="opacity-75">Vào lớp trễ tiết</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- BẢNG DANH SÁCH HỌC SINH ĐIỂM DANH -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 text-center small" id="attTable">
+          <thead>
+            <tr>
+              <th style="width: 50px;">STT</th>
+              <th style="width: 100px;">MÃ HS (B)</th>
+              <th class="text-start ps-3" style="min-width: 200px;">HỌ VÀ TÊN HỌC SINH (C)</th>
+              <th style="width: 220px;" class="no-print">TRẠNG THÁI (D)</th>
+              <th style="width: 80px;" class="print-status">TRẠNG THÁI</th>
+              <th style="min-width: 260px;" class="text-start ps-3">LÝ DO / GHI CHÚ (E)</th>
+            </tr>
+          </thead>
+          <tbody id="attTableBody">
+            <tr><td colspan="5" class="p-5 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang nạp danh sách học sinh...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHỮ KÝ BÀN GIAO (CHỈ HIỆN KHI IN) -->
+    <div class="row mt-5 pt-4 text-center print-footer d-none">
+      <div class="col-6">
+        <p class="fw-bold mb-1">GIÁO VIÊN CHỦ NHIỆM</p>
+        <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+        <div class="mt-5 fw-bold" id="printTeacherSign">...</div>
+      </div>
+      <div class="col-6">
+        <p class="fw-bold mb-1">GIÁO VIÊN BỘ MÔN ĐIỂM DANH</p>
+        <small class="text-muted">(Ký và ghi rõ họ tên)</small>
+        <div class="mt-5 fw-bold" id="printGVBMSign">Võ Tâm Long</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxMVlNLWvw5uDjO9TEPGART_yxxy8SpyfaSa-7x94IkmSY3319NyFB1Lt2OMm9MXUj1/exec";
+
+    let currentStudents = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      // Đặt ngày mặc định hôm nay
+      const todayStr = new Date().toISOString().split('T')[0];
+      document.getElementById('attDate').value = todayStr;
+
+      try {
+        const classes = await callApi('getAllClasses');
+        const selClass = document.getElementById('selClass');
+        let html = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => html += `<option value="${c}">${c}</option>`);
+        selClass.innerHTML = html;
+
+        if (classes && classes.length > 0) {
+          selClass.value = classes[0];
+          await onClassChange();
+        }
+      } catch (err) {
+        console.error("Lỗi nạp danh sách lớp:", err);
+      }
+    };
+
+    // Khi chọn lớp: Lấy tên GVCN và danh sách học sinh
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      document.getElementById('printClassName').innerText = className;
+
+      // 1. Lấy tên GVCN
+      try {
+        const gv = await callApi('getTeacherByClass', className);
+        document.getElementById('gvcnDisplay').innerText = "GVCN: " + (gv || "Chưa phân công");
+        document.getElementById('printTeacherSign').innerText = gv || "Giáo viên chủ nhiệm";
+      } catch(e) {}
+
+      // 2. Nạp học sinh của lớp
+      try {
+        currentStudents = await callApi('getStudentList', className);
+      } catch(e) {
+        currentStudents = [];
+      }
+
+      await loadAttendanceList();
+    }
+
+    // TẢI BẢNG ĐIỂM DANH (ĐỐI CHIẾU DỮ LIỆU CŨ TỪ SHEET NẾU ĐÃ CÓ)
+    async function loadAttendanceList() {
+      const className = document.getElementById('selClass').value;
+      const dateVal = document.getElementById('attDate').value;
+      const tiet = document.getElementById('selTiet').value;
+      const mon = document.getElementById('inpMon').value;
+      const gvbm = document.getElementById('inpGVBM').value;
+      const body = document.getElementById('attTableBody');
+
+      if (!className) return;
+
+      // Cập nhật thông tin in ấn
+      let dParts = dateVal.split('-');
+      let dateDisplay = `${dParts[2]}/${dParts[1]}/${dParts[0]}`;
+      document.getElementById('printDateText').innerText = dateDisplay;
+      document.getElementById('printTietMonText').innerText = `${tiet} - ${mon}`;
+      document.getElementById('printGVBMText').innerText = gvbm;
+      document.getElementById('printGVBMSign').innerText = gvbm;
+
+      body.innerHTML = '<tr><td colspan="5" class="p-5 text-muted"><i class="fas fa-sync fa-spin me-2"></i>Đang nạp dữ liệu từ Sheet ATTENDANCE...</td></tr>';
+
+      try {
+        // Lấy lịch sử đã điểm danh của ngày và tiết này (nếu có)
+        const historyMap = await callApi('getSmartAttendanceHistory2627', className, dateDisplay, tiet) || {};
+
+        let html = '';
+        currentStudents.forEach((st, idx) => {
+          let saved = historyMap[st.id] || { status: 'C', note: '' };
+          let isC = saved.status === 'C';
+          let isV = saved.status === 'V';
+          let isT = saved.status === 'T';
+
+          let rowClass = '';
+          if (isV) rowClass = 'row-absent';
+          else if (isT) rowClass = 'row-late';
+
+          html += `
+            <tr id="row_${st.id}" class="${rowClass}">
+              <td class="text-muted fw-bold">${idx + 1}</td>
+              <td class="fw-bold text-secondary">${st.id}</td>
+              <td class="text-start ps-3 fw-bold text-dark">${st.name}</td>
+              
+              <!-- Nút chọn trạng thái màn hình Web -->
+              <td class="no-print">
+                <div class="btn-group btn-group-sm" role="group">
+                  <input type="radio" class="btn-check" name="status_${st.id}" id="c_${st.id}" value="C" ${isC ? 'checked' : ''} onchange="onStatusChange('${st.id}', 'C')">
+                  <label class="btn btn-outline-success status-btn" for="c_${st.id}">C</label>
+
+                  <input type="radio" class="btn-check" name="status_${st.id}" id="v_${st.id}" value="V" ${isV ? 'checked' : ''} onchange="onStatusChange('${st.id}', 'V')">
+                  <label class="btn btn-outline-danger status-btn" for="v_${st.id}">V</label>
+
+                  <input type="radio" class="btn-check" name="status_${st.id}" id="t_${st.id}" value="T" ${isT ? 'checked' : ''} onchange="onStatusChange('${st.id}', 'T')">
+                  <label class="btn btn-outline-warning status-btn" for="t_${st.id}">T</label>
+                </div>
+              </td>
+
+              <!-- Ký hiệu trạng thái khi in ra giấy -->
+              <td class="print-status" id="printStatus_${st.id}">${saved.status}</td>
+
+              <!-- Ô ghi chú lý do -->
+              <td class="text-start ps-3">
+                <input type="text" id="note_${st.id}" class="form-control form-control-sm border-0 bg-transparent" 
+                       value="${saved.note}" placeholder="Ghi chú lý do nếu vắng/trễ...">
+              </td>
+            </tr>
+          `;
+        });
+
+        body.innerHTML = html || '<tr><td colspan="5" class="p-4 text-muted">Lớp này chưa có học sinh.</td></tr>';
+        updateStats();
+      } catch (err) {
+        body.innerHTML = `<tr><td colspan="5" class="p-4 text-danger">Lỗi kết nối: ${err.message}</td></tr>`;
+      }
+    }
+
+    // THAY ĐỔI TRẠNG THÁI HỌC SINH
+    function onStatusChange(studentId, status) {
+      const row = document.getElementById(`row_${studentId}`);
+      row.classList.remove('row-absent', 'row-late');
+
+      if (status === 'V') row.classList.add('row-absent');
+      else if (status === 'T') row.classList.add('row-late');
+
+      document.getElementById(`printStatus_${studentId}`).innerText = status;
+      updateStats();
+    }
+
+    // THAO TÁC 1 CHẠM: TẤT CẢ CÓ MẶT (C)
+    function markAllPresent() {
+      currentStudents.forEach(st => {
+        const radC = document.getElementById(`c_${st.id}`);
+        if (radC) {
+          radC.checked = true;
+          onStatusChange(st.id, 'C');
+        }
+      });
+      updateStats();
+    }
+
+    // TÍNH TOÁN 4 THẺ THỐNG KÊ
+    function updateStats() {
+      let total = currentStudents.length;
+      let present = 0;
+      let absent = 0;
+      let late = 0;
+
+      currentStudents.forEach(st => {
+        const checked = document.querySelector(`input[name="status_${st.id}"]:checked`);
+        if (checked) {
+          if (checked.value === 'C') present++;
+          else if (checked.value === 'V') absent++;
+          else if (checked.value === 'T') late++;
+        }
+      });
+
+      document.getElementById('statSiso').innerText = total;
+      document.getElementById('statPresent').innerText = present;
+      document.getElementById('statAbsent').innerText = absent;
+      document.getElementById('statLate').innerText = late;
+    }
+
+    // LƯU KẾT QUẢ VÀO SHEET ATTENDANCE
+    async function saveAttendanceData() {
+      const className = document.getElementById('selClass').value;
+      const dateVal = document.getElementById('attDate').value;
+      const tiet = document.getElementById('selTiet').value;
+      const mon = document.getElementById('inpMon').value;
+      const gvbm = document.getElementById('inpGVBM').value;
+
+      if (!className) return alert("Vui lòng chọn lớp!");
+      if (currentStudents.length === 0) return alert("Không có học sinh nào để lưu!");
+
+      const studentList = [];
+      currentStudents.forEach(st => {
+        const checked = document.querySelector(`input[name="status_${st.id}"]:checked`);
+        const noteInp = document.getElementById(`note_${st.id}`);
+        studentList.push({
+          id: st.id,
+          name: st.name,
+          status: checked ? checked.value : 'C',
+          note: noteInp ? noteInp.value.trim() : ''
+        });
+      });
+
+      const btn = document.getElementById('btnSave');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      try {
+        const msg = await callApi('saveSmartAttendance2627', className, dateVal, tiet, gvbm, mon, studentList);
+        alert(msg);
+      } catch (err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+  </script>
+</body>
+</html>
