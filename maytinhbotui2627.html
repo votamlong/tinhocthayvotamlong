@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Máy Tính Bỏ Túi Khoa Học 2627 - Casio FX</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #0f172a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f8fafc;
+      padding: 16px;
+      user-select: none;
+    }
+    .calc-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    /* Thân máy tính Casio */
+    .casio-body {
+      background: #1e293b;
+      border-radius: 28px;
+      padding: 24px;
+      border: 3px solid #334155;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    /* Màn hình hiển thị LCD 2 dòng */
+    .casio-screen {
+      background: #020617;
+      border: 2px solid #475569;
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+      font-family: 'Courier New', Courier, monospace;
+    }
+    .screen-top {
+      font-size: 11px;
+      color: #38bdf8;
+      display: flex;
+      justify-content: space-between;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .screen-expr {
+      font-size: 20px;
+      color: #94a3b8;
+      min-height: 30px;
+      text-align: right;
+      overflow-x: auto;
+      white-space: nowrap;
+      word-break: break-all;
+    }
+    .screen-res {
+      font-size: 38px;
+      font-weight: 800;
+      color: #facc15;
+      text-align: right;
+      overflow-x: auto;
+      white-space: nowrap;
+      line-height: 1.1;
+      text-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+    }
+    /* Phím bấm */
+    .calc-btn {
+      height: 48px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+    }
+    .calc-btn:active {
+      transform: translateY(2px);
+      box-shadow: none;
+    }
+    .btn-num { background: #334155; }
+    .btn-num:hover { background: #475569; }
+    .btn-func { background: #1e3a8a; font-size: 13px; color: #93c5fd; }
+    .btn-func:hover { background: #1d4ed8; color: #fff; }
+    .btn-op { background: #0284c7; }
+    .btn-op:hover { background: #0369a1; }
+    .btn-action { background: #dc2626; color: #fff; }
+    .btn-action:hover { background: #b91c1c; }
+    .btn-equal { background: #ea580c; color: #fff; font-size: 22px; }
+    .btn-equal:hover { background: #c2410c; }
+
+    /* Hộp lịch sử */
+    .history-card {
+      background: #1e293b;
+      border-radius: 24px;
+      border: 1px solid #334155;
+      padding: 20px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .history-list {
+      flex: 1;
+      overflow-y: auto;
+      max-height: 520px;
+    }
+    .history-item {
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      border: 1px solid #1e293b;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .history-item:hover {
+      border-color: #38bdf8;
+      background: #1e293b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calc-container">
+    
+    <!-- THANH TIÊU ĐỀ -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h5 class="fw-bold text-warning mb-0"><i class="fas fa-calculator me-2"></i>MÁY TÍNH BỎ TÚI KHOA HỌC 2627</h5>
+        <small class="text-secondary">Đồng bộ tự động vào Google Sheet: <b>LICH_SU_MAY_TINH_2627</b></small>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <label class="small text-secondary fw-bold">Model máy:</label>
+        <select id="selModel" class="form-select form-select-sm bg-dark text-warning border-secondary fw-bold" style="width: 170px;">
+          <option value="Casio FX-580VN">Casio FX-580VN</option>
+          <option value="Casio FX-880BT">Casio FX-880BT</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- CỘT 1: THÂN MÁY TÍNH CASIO -->
+      <div class="col-lg-7">
+        <div class="casio-body">
+          
+          <!-- MÀN HÌNH LCD -->
+          <div class="casio-screen">
+            <div class="screen-top">
+              <span id="modelIndicator">FX-580VN PLUS</span>
+              <span>
+                <span class="badge bg-primary bg-opacity-25 text-info px-2 me-1" id="angleMode" onclick="toggleAngleMode()" style="cursor: pointer;">DEG</span>
+                <span>MATH D</span>
+              </span>
+            </div>
+            <div class="screen-expr" id="displayExpr"></div>
+            <div class="screen-res" id="displayRes">0</div>
+          </div>
+
+          <!-- PHÍM BẤM KHOA HỌC -->
+          <div class="row g-2">
+            <!-- HÀNG 1: HÀM TOÁN HỌC -->
+            <div class="col-2"><button onclick="insertFunc('sin(')" class="btn calc-btn btn-func w-100">sin</button></div>
+            <div class="col-2"><button onclick="insertFunc('cos(')" class="btn calc-btn btn-func w-100">cos</button></div>
+            <div class="col-2"><button onclick="insertFunc('tan(')" class="btn calc-btn btn-func w-100">tan</button></div>
+            <div class="col-2"><button onclick="insertFunc('√(')" class="btn calc-btn btn-func w-100">√( )</button></div>
+            <div class="col-2"><button onclick="insertOp('^2')" class="btn calc-btn btn-func w-100">x²</button></div>
+            <div class="col-2"><button onclick="insertOp('^')" class="btn calc-btn btn-func w-100">xʸ</button></div>
+
+            <!-- HÀNG 2: NGOẶC & HẰNG SỐ -->
+            <div class="col-2"><button onclick="insertText('(')" class="btn calc-btn btn-num w-100">(</button></div>
+            <div class="col-2"><button onclick="insertText(')')" class="btn calc-btn btn-num w-100">)</button></div>
+            <div class="col-2"><button onclick="insertText('π')" class="btn calc-btn btn-func w-100">π</button></div>
+            <div class="col-2"><button onclick="insertOp('%')" class="btn calc-btn btn-func w-100">%</button></div>
+            <div class="col-2"><button onclick="btnDelete()" class="btn calc-btn btn-action w-100">DEL</button></div>
+            <div class="col-2"><button onclick="btnClearAll()" class="btn calc-btn btn-action w-100 fw-bold">AC</button></div>
+
+            <!-- HÀNG 3: 7 8 9 × ÷ -->
+            <div class="col-2"><button onclick="insertText('7')" class="btn calc-btn btn-num w-100">7</button></div>
+            <div class="col-2"><button onclick="insertText('8')" class="btn calc-btn btn-num w-100">8</button></div>
+            <div class="col-2"><button onclick="insertText('9')" class="btn calc-btn btn-num w-100">9</button></div>
+            <div class="col-3"><button onclick="insertOp('÷')" class="btn calc-btn btn-op w-100">÷</button></div>
+            <div class="col-3"><button onclick="insertOp('×')" class="btn calc-btn btn-op w-100">×</button></div>
+
+            <!-- HÀNG 4: 4 5 6 + - -->
+            <div class="col-2"><button onclick="insertText('4')" class="btn calc-btn btn-num w-100">4</button></div>
+            <div class="col-2"><button onclick="insertText('5')" class="btn calc-btn btn-num w-100">5</button></div>
+            <div class="col-2"><button onclick="insertText('6')" class="btn calc-btn btn-num w-100">6</button></div>
+            <div class="col-3"><button onclick="insertOp('+')" class="btn calc-btn btn-op w-100">+</button></div>
+            <div class="col-3"><button onclick="insertOp('-')" class="btn calc-btn btn-op w-100">-</button></div>
+
+            <!-- HÀNG 5: 1 2 3 0 . = -->
+            <div class="col-2"><button onclick="insertText('1')" class="btn calc-btn btn-num w-100">1</button></div>
+            <div class="col-2"><button onclick="insertText('2')" class="btn calc-btn btn-num w-100">2</button></div>
+            <div class="col-2"><button onclick="insertText('3')" class="btn calc-btn btn-num w-100">3</button></div>
+            <div class="col-3"><button onclick="insertText('0')" class="btn calc-btn btn-num w-100">0</button></div>
+            <div class="col-3"><button onclick="insertText('.')" class="btn calc-btn btn-num w-100">.</button></div>
+
+            <!-- HÀNG 6: DẤU BẰNG LỚN & ANS -->
+            <div class="col-4"><button onclick="insertAns()" class="btn calc-btn btn-func w-100">Ans</button></div>
+            <div class="col-8"><button onclick="calculateResult()" class="btn calc-btn btn-equal w-100 fw-bold">=</button></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CỘT 2: LỊCH SỬ TÍNH TOÁN ĐỒNG BỘ GOOGLE SHEETS -->
+      <div class="col-lg-5">
+        <div class="history-card">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary">
+            <h6 class="fw-bold text-info m-0"><i class="fas fa-history me-1"></i>LỊCH SỬ TÍNH TOÁN (SHEET)</h6>
+            <button onclick="loadHistoryFromSheet()" class="btn btn-outline-info btn-sm rounded-pill px-3" title="Tải lại từ Sheet">
+              <i class="fas fa-sync-alt"></i> Tải lại
+            </button>
+          </div>
+
+          <div class="history-list" id="historyListContainer">
+            <div class="text-center text-muted p-4"><i class="fas fa-spinner fa-spin me-2"></i>Đang nạp lịch sử...</div>
+          </div>
+          
+          <div class="mt-2 text-center text-secondary small">
+            <i class="fas fa-info-circle me-1"></i>Bấm vào dòng lịch sử bất kỳ để nạp lại kết quả vào màn hình máy tính.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwVY-JY7JfCb8nByN3xy9BDKBC7tfpQtMzc_6TFGa9ofvsSxqf4mJyKDMXHPDemIawZAA/exec";
+
+    let currentExpr = "";
+    let lastResult = "0";
+    let isDegree = true;
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = function() {
+      loadHistoryFromSheet();
+      document.getElementById('selModel').onchange = function() {
+        document.getElementById('modelIndicator').innerText = this.value.toUpperCase();
+      };
+    };
+
+    function toggleAngleMode() {
+      isDegree = !isDegree;
+      document.getElementById('angleMode').innerText = isDegree ? 'DEG' : 'RAD';
+    }
+
+    function insertText(val) {
+      currentExpr += val;
+      updateDisplay();
+    }
+
+    function insertFunc(funcStr) {
+      currentExpr += funcStr;
+      updateDisplay();
+    }
+
+    function insertOp(op) {
+      currentExpr += op;
+      updateDisplay();
+    }
+
+    function insertAns() {
+      currentExpr += lastResult;
+      updateDisplay();
+    }
+
+    function btnDelete() {
+      currentExpr = currentExpr.slice(0, -1);
+      updateDisplay();
+    }
+
+    function btnClearAll() {
+      currentExpr = "";
+      document.getElementById('displayExpr').innerText = "";
+      document.getElementById('displayRes').innerText = "0";
+    }
+
+    function updateDisplay() {
+      document.getElementById('displayExpr').innerText = currentExpr;
+    }
+
+    // THỰC THI PHÉP TÍNH KHOA HỌC
+    async function calculateResult() {
+      if (!currentExpr) return;
+
+      const rawExpr = currentExpr;
+      let evalExpr = currentExpr;
+
+      try {
+        // Thay thế ký hiệu toán học
+        evalExpr = evalExpr.replace(/×/g, '*');
+        evalExpr = evalExpr.replace(/÷/g, '/');
+        evalExpr = evalExpr.replace(/π/g, 'Math.PI');
+        evalExpr = evalExpr.replace(/\^2/g, '**2');
+        evalExpr = evalExpr.replace(/\^/g, '**');
+
+        // Hàm căn bậc 2: √(9) -> Math.sqrt(9)
+        evalExpr = evalExpr.replace(/√\(([^)]+)\)/g, 'Math.sqrt($1)');
+
+        // Lượng giác sin, cos, tan theo DEG hoặc RAD
+        const toRad = isDegree ? '*(Math.PI/180)' : '';
+        evalExpr = evalExpr.replace(/sin\(([^)]+)\)/g, `Math.sin(($1)${toRad})`);
+        evalExpr = evalExpr.replace(/cos\(([^)]+)\)/g, `Math.cos(($1)${toRad})`);
+        evalExpr = evalExpr.replace(/tan\(([^)]+)\)/g, `Math.tan(($1)${toRad})`);
+
+        // Đánh giá biểu thức an toàn
+        let ans = Function('"use strict";return (' + evalExpr + ')')();
+
+        // Làm tròn số thập phân gọn gàng
+        if (typeof ans === 'number' && !Number.isInteger(ans)) {
+          ans = parseFloat(ans.toFixed(8));
+        }
+
+        lastResult = String(ans);
+        document.getElementById('displayRes').innerText = lastResult;
+
+        // Lưu bản ghi vào Google Sheet LICH_SU_MAY_TINH_2627
+        const model = document.getElementById('selModel').value;
+        callApi('saveCalculatorHistory2627', model, rawExpr, lastResult, "votamlong@gmail.com")
+          .then(() => loadHistoryFromSheet())
+          .catch(err => console.error("Lỗi lưu sheet:", err));
+
+      } catch (err) {
+        document.getElementById('displayRes').innerText = "Syntax ERROR";
+      }
+    }
+
+    // TẢI LỊCH SỬ TỪ SHEET VÀ HIỂN THỊ
+    async function loadHistoryFromSheet() {
+      const container = document.getElementById('historyListContainer');
+      try {
+        const list = await callApi('getCalculatorHistory2627');
+
+        if (!list || list.length === 0) {
+          container.innerHTML = '<div class="text-center text-muted p-4">Chưa có phép tính nào trong sheet LICH_SU_MAY_TINH_2627.</div>';
+          return;
+        }
+
+        let html = '';
+        list.forEach(item => {
+          html += `
+            <div class="history-item" onclick="reuseHistory('${item.res}')">
+              <div class="d-flex justify-content-between text-secondary" style="font-size: 11px;">
+                <span><i class="far fa-clock me-1"></i>${item.time}</span>
+                <span class="badge bg-secondary bg-opacity-25 text-info">${item.model}</span>
+              </div>
+              <div class="fw-bold text-light mt-1">${item.expr} =</div>
+              <div class="fs-5 fw-bold text-warning text-end">${item.res}</div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      } catch (err) {
+        container.innerHTML = '<div class="text-center text-danger p-4">Lỗi kết nối lịch sử sheet: ' + err.message + '</div>';
+      }
+    }
+
+    function reuseHistory(resVal) {
+      currentExpr += resVal;
+      updateDisplay();
+    }
+  </script>
+</body>
+</html>
