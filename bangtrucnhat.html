@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Phân Công Trực Nhật 2627 - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      padding: 20px 24px;
+    }
+    .banner-header {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      color: white;
+      border-radius: 14px;
+      padding: 20px 24px;
+    }
+    .duty-table th {
+      background-color: #fef3c7 !important;
+      color: #92400e !important;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      vertical-align: middle;
+      text-align: center;
+      border: 1px solid #fde68a !important;
+    }
+    .duty-table td {
+      vertical-align: middle;
+      padding: 8px;
+      border: 1px solid #fde68a !important;
+      background: #fff;
+    }
+    .task-title {
+      font-weight: 700;
+      color: #78350f;
+      background-color: #fffbeb !important;
+      text-align: left !important;
+      padding-left: 14px !important;
+      width: 220px;
+    }
+    .duty-cell textarea {
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 13px;
+      padding: 6px;
+      resize: vertical;
+      min-height: 52px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .duty-cell textarea:focus {
+      border-color: #d97706;
+      box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15);
+    }
+
+    /* ĐỊNH DẠNG IN KHỔ NGANG DÁN TƯỜNG LỚP HỌC */
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .duty-table { border: 2px solid #000 !important; width: 100% !important; }
+      .duty-table th { background-color: #f1f5f9 !important; color: #000 !important; border: 1px solid #000 !important; }
+      .duty-table td { border: 1px solid #000 !important; }
+      .task-title { color: #000 !important; background: #fafafa !important; font-weight: bold !important; }
+      .duty-cell textarea {
+        border: none !important;
+        resize: none !important;
+        padding: 0 !important;
+        font-weight: bold;
+        color: #000;
+      }
+      @page { size: landscape; margin: 12mm; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1300px;">
+    
+    <!-- THANH ĐIỀU HƯỚNG VÀ CÔNG CỤ (ẨN KHI IN) -->
+    <div class="banner-header mb-4 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <h5 class="fw-bold mb-1"><i class="fas fa-broom me-2"></i>BẢNG TRỰC NHẬT LỚP HỌC 2026 - 2027</h5>
+        <small class="opacity-75">Tự động phân công theo danh sách học sinh và in bảng trực nhật khổ A4 dán lớp</small>
+      </div>
+      <div class="d-flex align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-warning" style="width: 130px;" onchange="onClassChange()">
+          <option value="">-- Chọn lớp --</option>
+        </select>
+        <button onclick="autoAssignDuty()" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark" title="Phân công tự động theo danh sách học sinh">
+          <i class="fas fa-magic me-1"></i> Chia tự động
+        </button>
+        <button onclick="saveDutySchedule()" class="btn btn-success btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-save me-1"></i> Lưu bảng
+        </button>
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In A4
+        </button>
+      </div>
+    </div>
+
+    <!-- KHUNG IN TIÊU ĐỀ KHI DÁN BẢNG LỚP HỌC (CHỈ HIỆN KHI IN) -->
+    <div class="print-header d-none text-center mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">NĂM HỌC 2026 - 2027</div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 14px;">XANH - SẠCH - ĐẸP - AN TOÀN</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">BẢNG PHÂN CÔNG TRỰC NHẬT VỆ SINH LỚP HỌC</h3>
+      <p class="text-secondary small fst-italic">Lớp: <b class="text-dark fs-5" id="printClassName">...</b> | Giáo viên chủ nhiệm: <b class="text-dark" id="printTeacherName">...</b></p>
+    </div>
+
+    <!-- BẢNG PHÂN CÔNG CHÍNH -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="table-responsive">
+        <table class="table table-bordered duty-table mb-0 text-center">
+          <thead>
+            <tr>
+              <th style="width: 200px;">NỘI DUNG NHIỆM VỤ</th>
+              <th style="width: 16.6%;">THỨ HAI</th>
+              <th style="width: 16.6%;">THỨ BA</th>
+              <th style="width: 16.6%;">THỨ TƯ</th>
+              <th style="width: 16.6%;">THỨ NĂM</th>
+              <th style="width: 16.6%;">THỨ SÁU</th>
+              <th style="width: 16.6%;">THỨ BẢY</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Nhiệm vụ 1: Quét lớp & hành lang -->
+            <tr>
+              <td class="task-title">
+                <i class="fas fa-broom text-warning me-2"></i>1. Quét lớp & hành lang
+                <div class="small fw-normal text-muted">(2 học sinh)</div>
+              </td>
+              <td class="duty-cell"><textarea id="task_1_2" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_1_3" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_1_4" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_1_5" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_1_6" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_1_7" placeholder="Gõ tên HS..."></textarea></td>
+            </tr>
+
+            <!-- Nhiệm vụ 2: Lau bảng & giặt giẻ -->
+            <tr>
+              <td class="task-title">
+                <i class="fas fa-chalkboard text-primary me-2"></i>2. Lau bảng & bàn GV
+                <div class="small fw-normal text-muted">(1 học sinh)</div>
+              </td>
+              <td class="duty-cell"><textarea id="task_2_2" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_2_3" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_2_4" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_2_5" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_2_6" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_2_7" placeholder="Gõ tên HS..."></textarea></td>
+            </tr>
+
+            <!-- Nhiệm vụ 3: Kê bàn ghế thẳng hàng -->
+            <tr>
+              <td class="task-title">
+                <i class="fas fa-chair text-success me-2"></i>3. Kê bàn ghế ngay ngắn
+                <div class="small fw-normal text-muted">(1 học sinh)</div>
+              </td>
+              <td class="duty-cell"><textarea id="task_3_2" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_3_3" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_3_4" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_3_5" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_3_6" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_3_7" placeholder="Gõ tên HS..."></textarea></td>
+            </tr>
+
+            <!-- Nhiệm vụ 4: Đổ rác cuối buổi -->
+            <tr>
+              <td class="task-title">
+                <i class="fas fa-trash-alt text-danger me-2"></i>4. Thu gom & đổ rác
+                <div class="small fw-normal text-muted">(1 học sinh)</div>
+              </td>
+              <td class="duty-cell"><textarea id="task_4_2" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_4_3" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_4_4" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_4_5" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_4_6" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_4_7" placeholder="Gõ tên HS..."></textarea></td>
+            </tr>
+
+            <!-- Nhiệm vụ 5: Tắt quạt, điện & khóa cửa -->
+            <tr>
+              <td class="task-title">
+                <i class="fas fa-lightbulb text-info me-2"></i>5. Tắt điện, đóng cửa
+                <div class="small fw-normal text-muted">(Nhóm trưởng/1 HS)</div>
+              </td>
+              <td class="duty-cell"><textarea id="task_5_2" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_5_3" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_5_4" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_5_5" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_5_6" placeholder="Gõ tên HS..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_5_7" placeholder="Gõ tên HS..."></textarea></td>
+            </tr>
+
+            <!-- Nhiệm vụ 6: Tổ phụ trách trực tuần -->
+            <tr class="table-light">
+              <td class="task-title">
+                <i class="fas fa-users text-secondary me-2"></i>TỔ PHỤ TRÁCH CHÍNH
+              </td>
+              <td class="duty-cell"><textarea id="task_group_2" placeholder="Tổ 1..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_group_3" placeholder="Tổ 2..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_group_4" placeholder="Tổ 3..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_group_5" placeholder="Tổ 4..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_group_6" placeholder="Tổ 1..."></textarea></td>
+              <td class="duty-cell"><textarea id="task_group_7" placeholder="Tổ 2..."></textarea></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DẶN DÒ NỀ NẾP CUỐI BẢNG -->
+    <div class="row align-items-center mt-3 no-print">
+      <div class="col-md-8 text-muted small fst-italic">
+        <i class="fas fa-info-circle text-warning me-1"></i>
+        <b>Quy định:</b> Nhóm trực nhật đến trước giờ vào học 15 phút. Cuối buổi quét sạch lớp, đổ rác đúng nơi quy định, tắt hết thiết bị điện trước khi ra về.
+      </div>
+      <div class="col-md-4 text-end">
+        <button onclick="clearAllDuty()" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+          <i class="fas fa-trash me-1"></i> Xóa bảng hiện tại
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbyfOxTehbN-mYeYLyLRXQNrCmoWt5ECas57_bqMT731frTn-pF9sUAirvWG2q8RLQvw4g/exec";
+
+    let currentStudentList = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      try {
+        const classes = await callApi('getAllClasses');
+        const selClass = document.getElementById('selClass');
+        let html = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => html += `<option value="${c}">${c}</option>`);
+        selClass.innerHTML = html;
+
+        if (classes && classes.length > 0) {
+          selClass.value = classes[0];
+          await onClassChange();
+        }
+      } catch (err) {
+        console.error("Lỗi nạp lớp:", err);
+      }
+    };
+
+    // Khi chọn lớp: Nạp tên GVCN và danh sách học sinh
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      document.getElementById('printClassName').innerText = className;
+
+      // 1. Lấy tên GVCN
+      try {
+        const gv = await callApi('getTeacherByClass', className);
+        document.getElementById('printTeacherName').innerText = gv || "Thầy Võ Tâm Long";
+      } catch(e) {
+        document.getElementById('printTeacherName').innerText = "Giáo viên chủ nhiệm";
+      }
+
+      // 2. Lấy học sinh
+      try {
+        currentStudentList = await callApi('getStudentList', className);
+      } catch(e) {
+        currentStudentList = [];
+      }
+
+      // 3. Tải lại lịch trực đã lưu của lớp này
+      loadSavedDutySchedule(className);
+    }
+
+    // TỰ ĐỘNG CHIA VIỆC CHO CẢ TUẦN TỪ DANH SÁCH HỌC SINH
+    function autoAssignDuty() {
+      if (!currentStudentList || currentStudentList.length === 0) {
+        return alert("Lớp này chưa có danh sách học sinh để chia việc!");
+      }
+
+      const names = currentStudentList.map(s => s.name);
+      let idx = 0;
+
+      // Chia việc cho 6 ngày: Thứ 2 (2) -> Thứ 7 (7)
+      for (let day = 2; day <= 7; day++) {
+        // Nhiệm vụ 1: 2 em quét lớp
+        const q1 = names[idx % names.length]; idx++;
+        const q2 = names[idx % names.length]; idx++;
+        document.getElementById(`task_1_${day}`).value = `${q1}\n${q2}`;
+
+        // Nhiệm vụ 2: 1 em lau bảng
+        document.getElementById(`task_2_${day}`).value = names[idx % names.length]; idx++;
+
+        // Nhiệm vụ 3: 1 em kê bàn ghế
+        document.getElementById(`task_3_${day}`).value = names[idx % names.length]; idx++;
+
+        // Nhiệm vụ 4: 1 em đổ rác
+        document.getElementById(`task_4_${day}`).value = names[idx % names.length]; idx++;
+
+        // Nhiệm vụ 5: 1 em tắt điện đóng cửa
+        document.getElementById(`task_5_${day}`).value = names[idx % names.length]; idx++;
+
+        // Tổ phân công xoay vòng
+        const toNum = ((day - 2) % 4) + 1;
+        document.getElementById(`task_group_${day}`).value = `Tổ ${toNum}`;
+      }
+
+      saveDutySchedule();
+      alert("✅ Đã tự động phân chia trực nhật xoay vòng cho cả tuần!");
+    }
+
+    // LƯU BẢNG PHÂN CÔNG
+    function saveDutySchedule() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return alert("Vui lòng chọn lớp!");
+
+      const scheduleData = {};
+      const textareas = document.querySelectorAll('.duty-cell textarea');
+      textareas.forEach(t => {
+        scheduleData[t.id] = t.value;
+      });
+
+      localStorage.setItem('duty_schedule_2627_' + className, JSON.stringify(scheduleData));
+    }
+
+    // NẠP BẢNG PHÂN CÔNG ĐÃ LƯU
+    function loadSavedDutySchedule(className) {
+      clearAllInputs();
+      const saved = localStorage.getItem('duty_schedule_2627_' + className);
+      if (saved) {
+        try {
+          const scheduleData = JSON.parse(saved);
+          for (let id in scheduleData) {
+            const el = document.getElementById(id);
+            if (el) el.value = scheduleData[id];
+          }
+        } catch(e) {}
+      }
+    }
+
+    function clearAllInputs() {
+      document.querySelectorAll('.duty-cell textarea').forEach(t => t.value = "");
+    }
+
+    function clearAllDuty() {
+      if (confirm("Xóa toàn bộ nội dung trực nhật hiện tại của lớp?")) {
+        clearAllInputs();
+        const className = document.getElementById('selClass').value;
+        if (className) {
+          localStorage.removeItem('duty_schedule_2627_' + className);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
