@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vòng Quay Gọi Tên Học Sinh - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 18px;
+      user-select: none;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      padding: 24px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.25);
+    }
+    /* KHUNG CHỨA VÒNG QUAY */
+    .wheel-stage {
+      position: relative;
+      width: 460px;
+      height: 460px;
+      margin: 10px auto;
+    }
+    #wheelCanvas {
+      width: 460px;
+      height: 460px;
+      border-radius: 50%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border: 8px solid #ffffff;
+    }
+    /* MŨI TÊN CHỈ ĐIỂM (POINTER) */
+    .wheel-pointer {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 36px;
+      height: 46px;
+      background: #ef4444;
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+      z-index: 20;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    }
+    /* TRỤC TÂM VÒNG QUAY */
+    .wheel-center-cap {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 4px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #facc15;
+      font-size: 22px;
+      z-index: 10;
+      cursor: pointer;
+    }
+    .wheel-center-cap:active {
+      transform: translate(-50%, -50%) scale(0.92);
+    }
+    /* THẺ KẾT QUẢ TRÚNG THƯỞNG */
+    .winner-card {
+      background: #fefce8;
+      border: 2px dashed #f59e0b;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+    }
+    .called-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 5px 12px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1300px;">
+    
+    <!-- THANH TIÊU ĐỀ & CHỌN LỚP -->
+    <div class="header-banner mb-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-white text-danger fw-bold px-2 py-1"><i class="fas fa-dharmachakra me-1"></i>LUCKY WHEEL</span>
+          <span class="opacity-75 small">Công cụ hỗ trợ phát biểu ngẫu nhiên trong tiết học</span>
+        </div>
+        <h4 class="fw-bold mb-0">VÒNG QUAY MAY MẮN GỌI TÊN HỌC SINH</h4>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-danger" style="width: 130px;" onchange="onClassChange()">
+          <option value="">-- Chọn lớp --</option>
+        </select>
+        
+        <div class="form-check form-switch m-0 ms-2">
+          <input class="form-check-input" type="checkbox" id="chkNoRepeat" checked style="cursor: pointer;">
+          <label class="form-check-label small text-dark fw-bold" for="chkNoRepeat">Chống gọi trùng</label>
+        </div>
+
+        <button onclick="resetWheelList()" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+          <i class="fas fa-redo me-1"></i> Làm mới vòng
+        </button>
+      </div>
+    </div>
+
+    <!-- KHU VỰC VÒNG QUAY & DANH SÁCH -->
+    <div class="row g-4">
+      
+      <!-- CỘT TRÁI: VÒNG QUAY MAY MẮN -->
+      <div class="col-lg-7 text-center">
+        <div class="panel-box">
+          
+          <div class="wheel-stage">
+            <div class="wheel-pointer"></div>
+            <canvas id="wheelCanvas" width="460" height="460"></canvas>
+            <div class="wheel-center-cap" onclick="spinWheel()" title="Bấm để quay">
+              <i class="fas fa-play"></i>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <button onclick="spinWheel()" id="btnSpin" class="btn btn-danger btn-lg rounded-pill px-5 py-2 fw-bold shadow-lg fs-5">
+              <i class="fas fa-sync-alt me-2"></i> QUAY NGAY
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: KẾT QUẢ & DANH SÁCH ĐÃ GỌI -->
+      <div class="col-lg-5">
+        <div class="panel-box h-100 d-flex flex-column justify-content-between">
+          <div>
+            <h6 class="fw-bold text-danger mb-3 text-uppercase">
+              <i class="fas fa-award me-2"></i>Kết Quả Bốc Thăm Hiện Tại
+            </h6>
+            
+            <div class="winner-card mb-4" id="winnerBox">
+              <span class="badge bg-danger text-white fw-bold px-3 py-1 mb-2" id="winnerId">SẴN SÀNG</span>
+              <h2 class="fw-bold text-dark my-1" id="winnerName">Chưa quay</h2>
+              <small class="text-secondary" id="winnerDesc">Nhấn nút "QUAY NGAY" hoặc chạm trục giữa để bắt đầu</small>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+              <span class="small fw-bold text-secondary text-uppercase">
+                Đã gọi trong tiết (<span id="calledCount">0</span> em):
+              </span>
+              <span class="badge bg-primary bg-opacity-10 text-primary fw-bold" id="remainingCount">
+                Còn lại: 0 em
+              </span>
+            </div>
+
+            <!-- DANH SÁCH HỌC SINH ĐÃ GỌI -->
+            <div class="overflow-auto" style="max-height: 230px;" id="calledContainer">
+              <div class="text-muted small fst-italic py-3 text-center">Chưa có học sinh nào được gọi.</div>
+            </div>
+          </div>
+
+          <div class="p-3 bg-light rounded-3 text-secondary small mt-3">
+            <i class="fas fa-info-circle text-primary me-1"></i>
+            Chế độ <b>Chống gọi trùng</b> sẽ tự động loại bỏ học sinh đã trả lời ra khỏi vòng quay cho đến khi quay hết danh sách lớp.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxGLrwKpYewiFKaXBUIhkSdOHMIJmV4949BoNLZYvn6gGBPf5Dcd3a1JPqNK9gC5PpLhA/exec";
+
+    let rawStudents = [];
+    let currentWheelStudents = [];
+    let calledList = [];
+
+    let startAngle = 0;
+    let isSpinning = false;
+    let spinTimeout = null;
+    let spinAngleStart = 0;
+    let spinTime = 0;
+    let spinTimeTotal = 0;
+    let audioCtx = null;
+    let lastTickSector = -1;
+
+    const COLORS = [
+      '#ef4444', '#f97316', '#f59e0b', '#10b981', 
+      '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', 
+      '#ec4899', '#14b8a6', '#84cc16', '#e11d48'
+    ];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    // ÂM THANH TICK KHI VƯỢT QUA NAN QUẠT
+    function playTick() {
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(650 + Math.random() * 150, ctx.currentTime);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.04);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.05);
+      } catch(e) {}
+    }
+
+    // ÂM THANH KẾT QUẢ CHIẾN THẮNG
+    function playChime() {
+      try {
+        const ctx = getAudioContext();
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.08);
+          gain.gain.setValueAtTime(0.25, ctx.currentTime + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + idx * 0.08 + 0.4);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + idx * 0.08);
+          osc.stop(ctx.currentTime + idx * 0.08 + 0.45);
+        });
+      } catch(e) {}
+    }
+
+    window.onload = async function() {
+      drawRouletteWheel();
+      try {
+        const classes = await callApi('getAllClasses');
+        const sel = document.getElementById('selClass');
+        let html = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => html += `<option value="${c}">${c}</option>`);
+        sel.innerHTML = html;
+
+        if (classes && classes.length > 0) {
+          sel.value = classes[0];
+          await onClassChange();
+        }
+      } catch (err) {
+        console.error("Lỗi nạp lớp:", err);
+      }
+    };
+
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      calledList = [];
+      document.getElementById('winnerId').innerText = "LỚP: " + className;
+      document.getElementById('winnerName').innerText = "Sẵn sàng quay";
+      document.getElementById('winnerDesc').innerText = "Đang tải danh sách học sinh...";
+
+      try {
+        rawStudents = await callApi('getStudentList', className) || [];
+        currentWheelStudents = [...rawStudents];
+        updateCounters();
+        renderCalledList();
+        drawRouletteWheel();
+        document.getElementById('winnerDesc').innerText = `Lớp có ${rawStudents.length} học sinh sẵn sàng!`;
+      } catch (e) {
+        rawStudents = [];
+        currentWheelStudents = [];
+        drawRouletteWheel();
+      }
+    }
+
+    function updateCounters() {
+      document.getElementById('calledCount').innerText = calledList.length;
+      document.getElementById('remainingCount').innerText = `Còn lại: ${currentWheelStudents.length} em`;
+    }
+
+    // VẼ VÒNG QUAY TRÊN CANVAS
+    function drawRouletteWheel() {
+      const canvas = document.getElementById("wheelCanvas");
+      if (!canvas.getContext) return;
+      const ctx = canvas.getContext("2d");
+      const outsideRadius = 220;
+      const textRadius = 150;
+      const insideRadius = 40;
+
+      ctx.clearRect(0, 0, 460, 460);
+
+      const len = currentWheelStudents.length;
+      if (len === 0) {
+        ctx.fillStyle = "#cbd5e1";
+        ctx.beginPath();
+        ctx.arc(230, 230, outsideRadius, 0, 2 * Math.PI, false);
+        ctx.fill();
+        ctx.fillStyle = "#475569";
+        ctx.font = "bold 16px 'Segoe UI'";
+        ctx.textAlign = "center";
+        ctx.fillText("Chưa có học sinh", 230, 235);
+        return;
+      }
+
+      const arc = Math.PI * 2 / len;
+
+      for (let i = 0; i < len; i++) {
+        const angle = startAngle + i * arc;
+        ctx.fillStyle = COLORS[i % COLORS.length];
+
+        ctx.beginPath();
+        ctx.arc(230, 230, outsideRadius, angle, angle + arc, false);
+        ctx.arc(230, 230, insideRadius, angle + arc, angle, true);
+        ctx.stroke();
+        ctx.fill();
+
+        ctx.save();
+        ctx.fillStyle = "#ffffff";
+        ctx.font = len > 30 ? "bold 10px 'Segoe UI'" : (len > 20 ? "bold 12px 'Segoe UI'" : "bold 14px 'Segoe UI'");
+        ctx.translate(230 + Math.cos(angle + arc / 2) * textRadius, 
+                      230 + Math.sin(angle + arc / 2) * textRadius);
+        ctx.rotate(angle + arc / 2 + Math.PI / 2);
+
+        const name = currentWheelStudents[i].name;
+        // Rút gọn họ tên nếu danh sách đông
+        let displayName = name;
+        if (len > 25 && name.length > 15) {
+          const parts = name.split(' ');
+          displayName = parts[parts.length - 2] + " " + parts[parts.length - 1];
+        }
+
+        ctx.fillText(displayName, -ctx.measureText(displayName).width / 2, 0);
+        ctx.restore();
+      }
+    }
+
+    // KHỞI ĐỘNG VÒNG QUAY
+    function spinWheel() {
+      if (isSpinning) return;
+      if (currentWheelStudents.length === 0) {
+        if (confirm("Đã quay hết danh sách học sinh! Đặt lại vòng quay mới?")) {
+          resetWheelList();
+        }
+        return;
+      }
+
+      isSpinning = true;
+      document.getElementById('btnSpin').disabled = true;
+
+      spinAngleStart = Math.random() * 10 + 20;
+      spinTime = 0;
+      spinTimeTotal = Math.random() * 2000 + 4000; // Quay từ 4s đến 6s
+      rotateWheel();
+    }
+
+    function rotateWheel() {
+      spinTime += 20;
+      if (spinTime >= spinTimeTotal) {
+        stopRotateWheel();
+        return;
+      }
+
+      // Giảm tốc theo hàm mũ
+      const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+      startAngle += (spinAngle * Math.PI / 180);
+      drawRouletteWheel();
+
+      // Phát âm thanh khi qua nan quạt
+      const len = currentWheelStudents.length;
+      const arc = Math.PI * 2 / len;
+      const degrees = startAngle * 180 / Math.PI + 90;
+      const arcd = arc * 180 / Math.PI;
+      const currentSector = Math.floor((360 - degrees % 360) / arcd);
+      if (currentSector !== lastTickSector) {
+        playTick();
+        lastTickSector = currentSector;
+      }
+
+      spinTimeout = requestAnimationFrame(rotateWheel);
+    }
+
+    function stopRotateWheel() {
+      cancelAnimationFrame(spinTimeout);
+      isSpinning = false;
+      document.getElementById('btnSpin').disabled = false;
+
+      const len = currentWheelStudents.length;
+      const arc = Math.PI * 2 / len;
+      // Mũi tên nằm ở đỉnh trên (góc 270 độ hay 3*PI/2)
+      const degrees = startAngle * 180 / Math.PI + 90;
+      const arcd = arc * 180 / Math.PI;
+      const index = Math.floor((360 - degrees % 360) % 360 / arcd);
+
+      const winner = currentWheelStudents[index];
+      if (!winner) return;
+
+      playChime();
+
+      // Hiển thị kết quả
+      document.getElementById('winnerId').innerText = winner.id;
+      document.getElementById('winnerName').innerText = winner.name;
+      document.getElementById('winnerDesc').innerText = "🎯 Mời em đứng dậy trả lời câu hỏi!";
+
+      calledList.push(winner);
+
+      // Nếu bật chống trùng thì loại khỏi vòng quay
+      const noRepeat = document.getElementById('chkNoRepeat').checked;
+      if (noRepeat) {
+        currentWheelStudents.splice(index, 1);
+      }
+
+      updateCounters();
+      renderCalledList();
+      drawRouletteWheel();
+    }
+
+    function easeOut(t, b, c, d) {
+      const ts = (t /= d) * t;
+      const tc = ts * t;
+      return b + c * (tc + -3 * ts + 3 * t);
+    }
+
+    function renderCalledList() {
+      const container = document.getElementById('calledContainer');
+      if (calledList.length === 0) {
+        container.innerHTML = '<div class="text-muted small fst-italic py-3 text-center">Chưa có học sinh nào được gọi.</div>';
+        return;
+      }
+
+      let html = '';
+      calledList.slice().reverse().forEach(st => {
+        html += `<span class="called-pill"><i class="fas fa-check text-success"></i>${st.name} <span class="text-muted">(${st.id})</span></span>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function resetWheelList() {
+      calledList = [];
+      currentWheelStudents = [...rawStudents];
+      updateCounters();
+      renderCalledList();
+      drawRouletteWheel();
+      document.getElementById('winnerName').innerText = "Sẵn sàng quay";
+      document.getElementById('winnerDesc').innerText = "Đã làm mới vòng quay!";
+    }
+  </script>
+</body>
+</html>
