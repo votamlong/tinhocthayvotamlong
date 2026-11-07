@@ -1,256 +1,838 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>EduClass Pro</title>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
-<style>
-:root{--ink:#1f2a37;--board:#24493e;--chalk:#f4f6f3;--line:#d9dfd8;--warn:#b42318;--ok:#157f4b}
-body{font-family:'Be Vietnam Pro',system-ui,sans-serif;background:var(--chalk);color:var(--ink);padding-top:env(safe-area-inset-top)}
-#login{min-height:100vh;display:grid;place-items:center;background:var(--board)}
-#login .box{background:#fff;width:min(400px,92vw);padding:2rem;border-radius:6px}
-#app{display:none;min-height:100vh}
-#side{width:260px;background:var(--board);color:#e6eee9;flex-shrink:0;display:flex;flex-direction:column}
-#side .brand{padding:1.2rem 1.2rem .8rem;font-weight:700;font-size:1.15rem}
-#menu{flex:1;overflow:auto;padding:.4rem}
-#menu a{display:block;padding:.65rem .9rem;color:#cfdcd5;text-decoration:none;border-radius:4px;cursor:pointer;margin-bottom:2px}
-#menu a:hover{background:rgba(255,255,255,.08)}
-#menu a.on{background:var(--chalk);color:var(--board);font-weight:700}
-#main{flex:1;min-width:0;padding:1.4rem}
-.panel{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1.1rem}
-.num{font-size:2.6rem;font-weight:700;line-height:1}
-.tbl-wrap{overflow:auto;max-height:70vh}
-.tbl-wrap th{position:sticky;top:0;background:#eef2ee;white-space:nowrap}
-.warn{color:var(--warn)}.ok{color:var(--ok)}
-:focus-visible{outline:3px solid #f2b705;outline-offset:2px}
-@media(max-width:768px){#side{position:fixed;left:-270px;top:0;bottom:0;z-index:50;transition:left .25s}#side.open{left:0}#main{padding:.9rem}}
-@media(prefers-reduced-motion:reduce){#side{transition:none}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduClass Pro System - Quản Lý Toàn Diện</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <style>
+    body {
+      background-color: #f0f2f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1a202c;
+      max-width: 100vw !important;
+      overflow-x: hidden;
+    }
+
+    .list-group-item {
+      border: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      font-weight: 500;
+      border-radius: 12px !important;
+      padding: 12px 20px;
+      margin-bottom: 4px;
+    }
+
+    .list-group-item.active {
+      background-color: #ebf8ff !important;
+      color: #2b6cb0 !important;
+      font-weight: 700;
+      border-left: 5px solid #3182ce;
+    }
+
+    .gvcn-badge-header {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      padding: 6px 18px;
+      border-radius: 50px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .grid-table-scroll {
+      max-height: 75vh;
+      overflow-y: auto;
+      overflow-x: auto !important;
+      border: 1px solid #dee2e6;
+      border-radius: 12px;
+      background: white;
+      scroll-behavior: smooth;
+      position: relative;
+      display: block;
+      width: 100%;
+    }
+
+    #violation-grid-table, #weekly-emulation-table {
+      min-width: max-content !important;
+      border-collapse: separate !important;
+      border-spacing: 0;
+    }
+
+    .sticky-header th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc !important;
+      z-index: 20;
+      border-bottom: 2px solid #cbd5e0;
+      white-space: nowrap;
+    }
+
+    .sticky-col-fixed {
+      position: sticky !important;
+      left: 0 !important;
+      background-color: #ffffff !important;
+      z-index: 100 !important;
+      border-right: 3px solid #0d6efd !important;
+      min-width: 150px;
+      box-shadow: 4px 0 8px rgba(0,0,0,0.05);
+    }
+
+    .btn-nav-grid {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+      background-color: #0d6efd;
+      color: white !important;
+      border: none;
+    }
+    .btn-nav-grid:hover { background-color: #0b5ed7; transform: translateY(-2px); }
+
+    .content-tab { animation: fadeIn 0.4s ease-in-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background-color: #dee2e6;
+      gap: 1px;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .cal-header {
+      background-color: #f8f9fa;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 12px;
+      color: #495057;
+    }
+    .cal-day {
+      background-color: #fff;
+      min-height: 120px;
+      padding: 8px;
+      position: relative;
+    }
+    .cal-day:hover { background-color: #f0f7ff; }
+    .cal-day.today { background-color: #fff3cd !important; }
+    .cal-num { font-weight: bold; font-size: 14px; color: #adb5bd; margin-bottom: 5px; display: block; }
+    .cal-note { width: 100%; border: none; background: transparent; font-size: 12px; resize: none; height: 80px; outline: none; }
+
+    #V_SM_grid_container {
+      display: grid !important;
+      grid-template-columns: repeat(6, 145px) !important;
+      gap: 20px 15px;
+      justify-content: center;
+      padding: 30px;
+      background: #ffffff;
+    }
+    .v-sm-card {
+      width: 145px; background: white; border-radius: 15px; padding: 12px;
+      display: flex; flex-direction: column; align-items: center;
+      border: 2px solid #eee; transition: 0.3s ease;
+    }
+    .v-sm-card:hover { border-color: #0d6efd; transform: translateY(-3px); }
+    .v-sm-avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-bottom: 5px; }
+    .v-sm-name { font-size: 11px; font-weight: 700; text-align: center; height: 32px; overflow: hidden; line-height: 1.2; color: #333; }
+    .v-sm-input { width: 35px; height: 24px; font-size: 11px; padding: 0; text-align: center; border-radius: 4px; border: 1px solid #ddd; }
+
+    @media (max-width: 768px) {
+      #sidebar-wrapper {
+        position: fixed !important;
+        left: -280px;
+        top: 0; bottom: 0;
+        z-index: 9999;
+        transition: 0.3s all ease;
+      }
+      #sidebar-wrapper.active { left: 0 !important; }
+    }
+  </style>
 </head>
 <body>
 
-<div id="login">
-  <div class="box">
-    <h1 class="h4 fw-bold mb-1">EduClass Pro</h1>
-    <p class="text-muted small mb-4">Đăng nhập để quản lý lớp học</p>
-    <label class="small fw-bold" for="em">Email</label>
-    <input id="em" class="form-control mb-3" autocomplete="username">
-    <label class="small fw-bold" for="pw">Mật khẩu</label>
-    <input id="pw" type="password" class="form-control mb-3" autocomplete="current-password">
-    <div id="lerr" class="warn small mb-2"></div>
-    <button id="lbtn" class="btn btn-success w-100 fw-bold">Đăng nhập</button>
+  <!-- MÀN HÌNH ĐĂNG NHẬP -->
+  <div id="login-view" class="d-flex align-items-center justify-content-center vh-100 bg-light">
+    <div class="card shadow-lg p-5 border-0 rounded-4" style="width: 420px;">
+      <div class="text-center mb-5">
+        <div class="mb-3"><i class="fas fa-school fa-4x text-primary"></i></div>
+        <h2 class="fw-bold text-dark">EduClass <span class="text-primary">Pro</span></h2>
+        <p class="text-muted small fw-bold text-uppercase">Hệ thống Quản lý Sư phạm 2026</p>
+      </div>
+      <div class="mb-3">
+        <label class="small fw-bold text-secondary mb-1">Email quản trị</label>
+        <input type="text" id="email" class="form-control py-2 shadow-none" value="admin@edu.vn">
+      </div>
+      <div class="mb-4">
+        <label class="small fw-bold text-secondary mb-1">Mật khẩu</label>
+        <input type="password" id="pass" class="form-control py-2 shadow-none" value="admin123">
+      </div>
+      <button type="button" id="btnLogin" onclick="processLogin()" class="btn btn-primary w-100 fw-bold rounded-pill py-2 shadow-sm">XÁC NHẬN ĐĂNG NHẬP</button>
+    </div>
   </div>
-</div>
 
-<div id="app" class="d-flex">
-  <nav id="side">
-    <div class="brand"><i class="fas fa-graduation-cap me-2"></i>EduClass Pro</div>
-    <div id="menu"></div>
-    <div class="p-3 border-top border-secondary small">
-      <div id="uname" class="fw-bold text-truncate"></div>
-      <div id="urole" class="opacity-75 mb-2"></div>
-      <button id="logout" class="btn btn-sm btn-outline-light w-100">Đăng xuất</button>
+  <!-- MÀN HÌNH CHÍNH -->
+  <div id="main-view" class="d-none d-flex vh-100 overflow-hidden">
+    <!-- SIDEBAR -->
+    <div id="sidebar-wrapper" class="bg-white border-end d-flex flex-column shadow-sm" style="width: 280px; min-width: 280px;">
+      <div class="p-4 fw-bold text-primary fs-5 border-bottom d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-graduation-cap me-2 fa-lg text-warning"></i>
+          <span>EduClass Admin</span>
+        </div>
+        <button class="btn btn-light d-md-none border-0" onclick="toggleSidebar()">
+          <i class="fas fa-times text-secondary"></i>
+        </button>
+      </div>
+      <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto"></div>
+      <div class="p-3 border-top bg-light">
+        <div class="d-flex align-items-center mb-3 p-2 bg-white rounded-3 shadow-sm">
+          <img id="u-avatar" class="rounded-circle me-3 border border-primary" width="45" height="45" style="object-fit:cover">
+          <div class="overflow-hidden">
+            <div id="u-name" class="fw-bold small text-truncate">User Name</div>
+            <div id="u-role" class="text-muted small">Chức vụ</div>
+          </div>
+        </div>
+        <button onclick="handleLogout()" class="btn btn-sm btn-outline-danger w-100 rounded-pill fw-bold">Thoát hệ thống</button>
+      </div>
     </div>
-  </nav>
-  <main id="main">
-    <div class="d-flex align-items-center gap-3 mb-3">
-      <button id="burger" class="btn btn-outline-secondary d-md-none" aria-label="Mở menu"><i class="fas fa-bars"></i></button>
-      <h2 id="title" class="h5 fw-bold m-0"></h2>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="flex-grow-1 bg-light d-flex flex-column">
+      <div class="bg-white border-bottom px-4 py-3 shadow-sm d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-outline-primary d-md-none" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h5 class="m-0 fw-bold text-secondary text-uppercase" id="page-title">Tổng quan</h5>
+          <div id="stats-gvcn-display" class="gvcn-badge-header d-none">GVCN: --</div>
+        </div>
+        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 border border-primary d-none d-md-block">Năm học 2026-2027</span>
+      </div>
+
+      <div class="p-4 overflow-auto h-100">
+        <!-- TAB DASHBOARD -->
+        <div id="tab-dashboard" class="content-tab">
+          <div class="d-flex align-items-center mb-4">
+            <h6 class="fw-bold me-3 m-0">Lọc lớp:</h6>
+            <select id="dash-class-select" class="form-select w-auto shadow-sm" onchange="loadDashboard()"><option value="">Toàn trường</option></select>
+          </div>
+          <div class="row g-4 mb-4 text-center">
+            <div class="col-md-4"><div class="card p-4 border-0 shadow-sm rounded-4 h-100"><h3><span id="stat-siso">0</span></h3><small>SĨ SỐ</small></div></div>
+            <div class="col-md-4"><div class="card p-4 border-0 shadow-sm rounded-4 h-100"><h3><span id="stat-tile">0%</span></h3><small>TỶ LỆ GIỎI</small></div></div>
+          </div>
+          <div class="card p-4 border-0 shadow-sm rounded-4 bg-white" style="height:350px"><canvas id="myChart"></canvas></div>
+        </div>
+
+        <!-- TAB ĐIỂM DANH -->
+        <div id="tab-attendance" class="content-tab d-none">
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header d-flex justify-content-between align-items-center p-4">
+              <div class="d-flex align-items-center gap-3">
+                <h6>Lớp:</h6>
+                <select id="att-class-select" class="form-select w-auto" onchange="loadAttendance(); google.script.run.withSuccessHandler(n => document.getElementById('att-gvcn-display').innerText = 'GVCN: ' + n).getTeacherByClass(this.value)"></select>
+                <span id="att-gvcn-display" class="gvcn-badge-header shadow-sm">GVCN: --</span>
+              </div>
+              <button onclick="submitAttendance()" class="btn btn-primary rounded-pill px-5 shadow-sm fw-bold">LƯU</button>
+            </div>
+            <div class="card-body p-0 table-responsive">
+              <table class="table mb-0"><tbody id="attendance-list"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB GHI NHẬN VI PHẠM -->
+        <div id="tab-discipline" class="content-tab d-none">
+          <div class="row g-4">
+            <div class="col-md-5">
+              <div class="card shadow border-0 p-4 rounded-4 bg-white border-top border-danger border-5">
+                <h6 class="fw-bold mb-4 text-danger text-uppercase">Phiếu kỷ luật</h6>
+                <div class="mb-3">
+                  <label class="small fw-bold">1. CHỌN LỚP</label>
+                  <div class="d-flex gap-2">
+                    <select id="disc-class-select" class="form-select shadow-sm" onchange="loadDisciplineStudents()"></select>
+                    <span id="disc-gvcn-display" class="gvcn-badge-header shadow-sm">--</span>
+                  </div>
+                </div>
+                <div class="mb-3"><label class="small fw-bold">2. HỌC SINH</label><select id="disc-student" class="form-select shadow-sm"></select></div>
+                <div class="mb-3"><label class="small fw-bold">3. LOẠI LỖI</label><select id="disc-type" class="form-select shadow-sm"></select></div>
+                <div class="mb-4"><label class="small fw-bold">4. GHI CHÚ</label><textarea id="disc-note" class="form-control shadow-sm" rows="3"></textarea></div>
+                <button onclick="submitDiscipline()" class="btn btn-danger w-100 rounded-pill fw-bold shadow-lg">GHI LỖI</button>
+              </div>
+            </div>
+            <div class="col-md-7"><div class="card p-4 rounded-4 bg-white h-100"><h6>Lịch sử vi phạm lớp</h6><div id="disc-history" class="list-group"></div></div></div>
+          </div>
+        </div>
+
+        <!-- TAB BẢNG ĐIỂM TRỪ KHỐI -->
+        <div id="tab-violation_grid" class="content-tab d-none">
+          <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+            <div class="card-header bg-white py-3 border-bottom">
+              <div class="d-flex align-items-center justify-content-between">
+                <h6 class="m-0 fw-bold text-primary text-uppercase">Bảng Điểm Trừ Khối</h6>
+                <div class="d-flex align-items-center gap-2">
+                  <input type="date" id="grid-start" class="form-control form-control-sm">
+                  <input type="date" id="grid-end" class="form-control form-control-sm">
+                  <button onclick="loadViolationGrid()" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold">LỌC</button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="grid-table-scroll">
+                <table class="table table-bordered table-hover align-middle mb-0 small text-center" id="violation-grid-table">
+                  <thead class="table-light sticky-header" id="grid-header"></thead>
+                  <tbody id="grid-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB THI ĐUA TUẦN -->
+        <div id="tab-weekly_emulation" class="content-tab d-none">
+          <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+            <div class="card-header bg-white py-3 border-bottom">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <h6 class="m-0 fw-bold text-primary text-uppercase">Thi Đua Tuần</h6>
+                <div class="d-flex gap-2">
+                  <select id="we-grade-select" class="form-select form-select-sm" style="width:120px;">
+                    <option value="all">Toàn trường</option>
+                    <option value="6">Khối 6</option><option value="7">Khối 7</option>
+                    <option value="8">Khối 8</option><option value="9">Khối 9</option>
+                  </select>
+                  <input type="date" id="we-start" class="form-control form-control-sm" style="width:130px">
+                  <input type="date" id="we-end" class="form-control form-control-sm" style="width:130px">
+                  <button onclick="loadWeeklyEmulation()" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold">LỌC</button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="grid-table-scroll">
+                <table class="table table-bordered table-hover align-middle mb-0 small text-center" id="weekly-emulation-table">
+                  <thead class="table-light sticky-header" id="we-header"></thead>
+                  <tbody id="we-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB QUỸ LỚP -->
+        <div id="tab-class_fund" class="content-tab d-none">
+          <div class="row mb-4"><div class="col-md-4"><h6 class="fw-bold text-primary mb-2">Quỹ lớp:</h6><select id="fund-class-select" class="form-select shadow-sm" onchange="loadClassFund()"></select></div></div>
+          <div class="row g-3 mb-4 text-center">
+            <div class="col-md-4"><div class="card p-4 bg-success bg-opacity-75 text-white rounded-4"><h6>TỔNG THU</h6><h3 id="fund-total-thu">0 đ</h3></div></div>
+            <div class="col-md-4"><div class="card p-4 bg-danger bg-opacity-75 text-white rounded-4"><h6>TỔNG CHI</h6><h3 id="fund-total-chi">0 đ</h3></div></div>
+            <div class="col-md-4"><div class="card p-4 bg-primary text-white rounded-4 shadow-lg"><h6>TỒN QUỸ</h6><h3 id="fund-balance">0 đ</h3></div></div>
+          </div>
+          <div id="fund-admin-area" class="card d-none p-4 bg-white border-start border-primary border-5 mb-3">
+            <h6 class="fw-bold">Lập phiếu mới</h6>
+            <div class="row g-2 align-items-end">
+              <div class="col-md-5"><label class="small">Nội dung:</label><input type="text" id="fund-content" class="form-control"></div>
+              <div class="col-md-2"><label class="small">Loại:</label><select id="fund-type" class="form-select"><option value="Thu">Thu</option><option value="Chi">Chi</option></select></div>
+              <div class="col-md-3"><label class="small">Tiền (đ):</label><input type="number" id="fund-amount" class="form-control"></div>
+              <div class="col-md-2"><button onclick="submitFund()" class="btn btn-primary w-100 fw-bold shadow-sm">LƯU</button></div>
+            </div>
+          </div>
+          <div class="card table-responsive"><table class="table table-hover align-middle mb-0"><thead class="bg-light"><tr><th class="ps-4">Ngày</th><th>Nội dung</th><th>Người lập</th><th class="text-end">Tiền</th><th>#</th></tr></thead><tbody id="fund-list-body"></tbody></table></div>
+        </div>
+
+        <!-- TAB THÔNG BÁO -->
+        <div id="tab-notifications" class="content-tab d-none">
+          <div id="gv-notif-area" class="card p-4 mb-4 bg-white border-top border-warning border-5">
+            <h6>Gửi thông báo</h6>
+            <input id="n-title" class="form-control mb-3" placeholder="Tiêu đề...">
+            <textarea id="n-content" class="form-control mb-3" rows="3" placeholder="Nội dung..."></textarea>
+            <button onclick="sendNotif()" class="btn btn-warning rounded-pill fw-bold">GỬI</button>
+          </div>
+          <div id="notif-list" class="list-group shadow-sm"></div>
+        </div>
+      </div>
     </div>
-    <div id="view"></div>
-  </main>
-</div>
+  </div>
 
-<script>
-/* ===== CẤU HÌNH: dán link Web app Apps Script (kết thúc bằng /exec) ===== */
-const API_URL = "https://script.google.com/macros/s/AKfycbyfOxTehbN-mYeYLyLRXQNrCmoWt5ECas57_bqMT731frTn-pF9sUAirvWG2q8RLQvw4g/exec";
+  <script>
+    /* ==============================================================================
+       1. CẤU HÌNH API & BỘ GIẢ LẬP google.script.run
+       ============================================================================== */
+    const API_URL = "https://script.google.com/macros/s/AKfycbyfOxTehbN-mYeYLyLRXQNrCmoWt5ECas57_bqMT731frTn-pF9sUAirvWG2q8RLQvw4g/exec";
 
-const $ = id => document.getElementById(id);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const vnd = n => Number(n || 0).toLocaleString('vi-VN') + ' đ';
-const today = () => new Date().toISOString().slice(0, 10);
-let user = null, chart = null;
+    window.google = window.google || {};
+    window.google.script = window.google.script || {};
 
-async function api(fn, ...args) {
-  const r = await fetch(API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args }) });
-  const j = await r.json();
-  if (j.error) throw new Error(j.error);
-  return j.result;
-}
-const fail = e => alert('Lỗi: ' + e.message);
-const opts = (list, first) => `<option value="">${first}</option>` + list.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-const isStaff = () => ['ADMIN', 'GVCN', 'GVBM'].includes(String(user.role).toUpperCase());
+    function createRunner(successHandler, failureHandler) {
+      return new Proxy({}, {
+        get: function(target, prop) {
+          if (prop === 'withSuccessHandler') {
+            return function(cb) { return createRunner(cb, failureHandler); };
+          }
+          if (prop === 'withFailureHandler') {
+            return function(cb) { return createRunner(successHandler, cb); };
+          }
+          return async function(...args) {
+            try {
+              const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ fn: prop, args: args })
+              });
+              const json = await res.json();
+              if (json.error) {
+                if (typeof failureHandler === 'function') failureHandler(new Error(json.error));
+                else alert('Lỗi máy chủ: ' + json.error);
+                return;
+              }
+              if (typeof successHandler === 'function') {
+                successHandler(json.result);
+              }
+            } catch (err) {
+              if (typeof failureHandler === 'function') failureHandler(err);
+              else {
+                console.error('Lỗi API (' + prop + '):', err);
+                alert('Không thể kết nối đến máy chủ: ' + err.message);
+              }
+            }
+          };
+        }
+      });
+    }
 
-/* ===== Đăng nhập ===== */
-async function login() {
-  $('lerr').textContent = ''; $('lbtn').disabled = true; $('lbtn').textContent = 'Đang kiểm tra…';
-  try {
-    const res = await api('loginUser', $('em').value, $('pw').value);
-    if (!res.success) throw new Error(res.message);
-    sessionStorage.setItem('edu', JSON.stringify(res)); start(res);
-  } catch (e) { $('lerr').textContent = e.message; }
-  $('lbtn').disabled = false; $('lbtn').textContent = 'Đăng nhập';
-}
-function start(res) {
-  user = res;
-  $('login').style.display = 'none'; $('app').style.display = 'flex';
-  $('uname').textContent = res.name; $('urole').textContent = res.role;
-  const items = (res.menu || []).filter((m, i, a) => VIEWS[m.id] && a.findIndex(x => x.id === m.id) === i);
-  $('menu').innerHTML = items.map(m => `<a data-id="${m.id}">${esc(VIEWS[m.id].t)}</a>`).join('');
-  $('menu').onclick = e => { const a = e.target.closest('a'); if (a) go(a.dataset.id); };
-  go(items.length ? items[0].id : 'dashboard');
-}
-function go(id) {
-  document.querySelectorAll('#menu a').forEach(a => a.classList.toggle('on', a.dataset.id === id));
-  $('title').textContent = VIEWS[id].t; $('side').classList.remove('open');
-  $('view').innerHTML = '<div class="text-muted p-4">Đang tải…</div>';
-  VIEWS[id].f().catch(fail);
-}
-$('lbtn').onclick = login;
-$('pw').onkeydown = e => { if (e.key === 'Enter') login(); };
-$('burger').onclick = () => $('side').classList.toggle('open');
-$('logout').onclick = () => { sessionStorage.removeItem('edu'); location.reload(); };
+    window.google.script.run = createRunner();
 
-/* ===== Tổng quan ===== */
-async function vDash() {
-  const classes = await api('getAllClasses');
-  $('view').innerHTML = `<select id="dc" class="form-select w-auto mb-3">${opts(classes, 'Toàn trường')}</select>
-  <div class="row g-3"><div class="col-6 col-md-3"><div class="panel"><div class="num" id="d1">0</div>Sĩ số</div></div>
-  <div class="col-6 col-md-3"><div class="panel"><div class="num" id="d2">0%</div>Tỷ lệ học lực giỏi</div></div></div>
-  <div class="panel mt-3" style="height:340px"><canvas id="ch"></canvas></div>`;
-  const load = async () => {
-    const d = await api('getDashboardData', $('dc').value);
-    $('d1').textContent = d.siso; $('d2').textContent = d.tile + '%';
-    if (chart) chart.destroy();
-    chart = new Chart($('ch'), { type: 'bar', data: { labels: ['Giỏi', 'Khá', 'Trung bình'], datasets: [{ label: 'Số học sinh', data: d.chart, backgroundColor: ['#157f4b', '#24493e', '#8a948d'] }] }, options: { responsive: true, maintainAspectRatio: false } });
-  };
-  $('dc').onchange = () => load().catch(fail); load();
-}
+    /* ==============================================================================
+       2. LOGIC ĐIỀU HÀNH HỆ THỐNG
+       ============================================================================== */
+    var currentUser = {};
 
-/* ===== Điểm danh ===== */
-async function vAtt() {
-  const classes = await api('getAllClasses');
-  $('view').innerHTML = `<div class="panel"><div class="d-flex flex-wrap gap-2 mb-3">
-  <select id="ac" class="form-select w-auto">${opts(classes, 'Chọn lớp')}</select>
-  <span id="agv" class="align-self-center text-muted small"></span>
-  <button id="asave" class="btn btn-success ms-auto">Lưu điểm danh</button></div>
-  <div class="tbl-wrap"><table class="table align-middle"><tbody id="ab"><tr><td class="text-muted">Chọn lớp để hiện danh sách học sinh.</td></tr></tbody></table></div></div>`;
-  $('ac').onchange = async () => {
-    const c = $('ac').value; if (!c) return;
-    api('getTeacherByClass', c).then(n => $('agv').textContent = 'GVCN: ' + n);
-    const l = await api('getStudentList', c);
-    $('ab').innerHTML = l.map(s => `<tr data-id="${esc(s.id)}" data-name="${esc(s.name)}"><td class="fw-bold">${esc(s.name)}</td><td class="text-end">
-    <div class="btn-group btn-group-sm"><input type="radio" class="btn-check" name="a_${esc(s.id)}" id="c_${esc(s.id)}" value="C" checked><label class="btn btn-outline-success" for="c_${esc(s.id)}">Có mặt</label>
-    <input type="radio" class="btn-check" name="a_${esc(s.id)}" id="v_${esc(s.id)}" value="V"><label class="btn btn-outline-danger" for="v_${esc(s.id)}">Vắng</label></div></td></tr>`).join('') || '<tr><td>Lớp chưa có học sinh.</td></tr>';
-  };
-  $('asave').onclick = async () => {
-    const c = $('ac').value; if (!c) return alert('Chọn lớp trước.');
-    const d = [...$('ab').querySelectorAll('tr[data-id]')].map(r => ({ id: r.dataset.id, name: r.dataset.name, class: c, status: r.querySelector('input:checked').value }));
-    if (!d.length) return;
-    alert(await api('saveAttendance', d));
-  };
-}
+    window.onload = function() {
+      var saved = localStorage.getItem('eduUser');
+      if (saved) {
+        try { loginSuccess(JSON.parse(saved)); } catch (e) { localStorage.removeItem('eduUser'); }
+      }
+    };
 
-/* ===== Ghi nhận vi phạm ===== */
-async function vDisc() {
-  const [classes, types] = await Promise.all([api('getAllClasses'), api('getViolationTypes')]);
-  $('view').innerHTML = `<div class="row g-3"><div class="col-lg-5"><div class="panel">
-  <label class="small fw-bold">Lớp</label><select id="dc" class="form-select mb-2">${opts(classes, 'Chọn lớp')}</select>
-  <label class="small fw-bold">Học sinh</label><select id="ds" class="form-select mb-2"></select>
-  <label class="small fw-bold">Loại lỗi</label><select id="dt" class="form-select mb-2">${opts(types, 'Chọn lỗi')}</select>
-  <label class="small fw-bold">Ghi chú</label><textarea id="dn" class="form-control mb-3" rows="3"></textarea>
-  <button id="dsave" class="btn btn-danger w-100">Ghi nhận vi phạm</button></div></div>
-  <div class="col-lg-7"><div class="panel"><h3 class="h6 fw-bold">Vi phạm gần đây của lớp</h3><div id="dh" class="text-muted">Chọn lớp để xem.</div></div></div></div>`;
-  const hist = async c => { const l = await api('getDisciplineHistory', c); $('dh').innerHTML = l.map(i => `<div class="border-bottom py-2"><b>${esc(i.name)}</b> <span class="warn">${esc(i.type)}</span><div class="small text-muted">${esc(i.date)} ${esc(i.note)}</div></div>`).join('') || 'Chưa có vi phạm.'; };
-  $('dc').onchange = async () => {
-    const c = $('dc').value; if (!c) return;
-    const l = await api('getStudentList', c);
-    $('ds').innerHTML = '<option value="">Chọn học sinh</option>' + l.map(s => `<option value="${esc(s.id)}" data-n="${esc(s.name)}">${esc(s.name)}</option>`).join('');
-    hist(c);
-  };
-  $('dsave').onclick = async () => {
-    const o = $('ds').selectedOptions[0], c = $('dc').value;
-    if (!o || !o.value || !$('dt').value) return alert('Chọn học sinh và loại lỗi.');
-    alert(await api('saveDiscipline', o.value, o.dataset.n, c, $('dt').value, $('dn').value));
-    $('dn').value = ''; hist(c);
-  };
-}
+    function processLogin() {
+      var btn = document.getElementById('btnLogin');
+      var email = document.getElementById('email').value;
+      var pass = document.getElementById('pass').value;
+      if (!email || !pass) return alert("Vui lòng nhập đủ thông tin!");
+      btn.innerText = "Đang kiểm tra..."; btn.disabled = true;
 
-/* ===== Bảng điểm trừ khối ===== */
-async function vGrid() {
-  $('view').innerHTML = `<div class="panel"><div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
-  <input type="date" id="gs" class="form-control w-auto" value="${today()}"> đến <input type="date" id="ge" class="form-control w-auto" value="${today()}">
-  <button id="gl" class="btn btn-success">Xem kết quả</button></div>
-  <div class="tbl-wrap"><table class="table table-bordered table-sm text-center align-middle" id="gt"></table></div>
-  <p class="small text-muted mt-2 mb-0">Điểm thi đua bắt đầu từ 100. Mức trừ lấy từ sheet DS_LOI.</p></div>`;
-  $('gl').onclick = async () => {
-    const res = await api('getViolationGridData', $('gs').value, $('ge').value);
-    if (res.error) return alert(res.error);
-    const hs = res.headers.filter(h => res.rows.some(r => (r.violations[h.name] || 0) > 0));
-    const rows = res.rows.map(r => { const t = hs.reduce((s, h) => s + (r.violations[h.name] || 0) * h.points, 0); return { ...r, t, left: 100 - t }; }).sort((a, b) => b.left - a.left);
-    $('gt').innerHTML = `<thead><tr><th class="text-start">Lớp</th>${hs.map(h => `<th title="${esc(h.name)}">${esc(h.code)}</th>`).join('')}<th>Tổng trừ</th><th>Còn lại</th><th>Hạng</th></tr></thead><tbody>` +
-      rows.map((r, i) => `<tr><td class="text-start fw-bold">${esc(r.className)}<div class="small text-muted fw-normal">${esc(r.teacher)}</div></td>${hs.map(h => { const v = r.violations[h.name] || 0; return `<td>${v ? `<b class="warn">${v}</b>` : '-'}</td>`; }).join('')}<td class="warn fw-bold">${r.t}</td><td class="fw-bold ${r.left < 80 ? 'warn' : 'ok'}">${r.left}</td><td>${i + 1}</td></tr>`).join('') + '</tbody>' +
-      (hs.length ? `<caption class="small text-start">${hs.map(h => `<b>${esc(h.code)}</b>: ${esc(h.name)} (−${h.points}đ)`).join(' &nbsp; ')}</caption>` : '');
-  };
-  $('gl').click();
-}
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res && res.success) {
+            localStorage.setItem('eduUser', JSON.stringify(res));
+            loginSuccess(res);
+          } else {
+            alert(res ? res.message : "Đăng nhập thất bại");
+            btn.innerText = "XÁC NHẬN ĐĂNG NHẬP"; btn.disabled = false;
+          }
+        })
+        .withFailureHandler(function(err) {
+          alert("Lỗi kết nối: " + err.message);
+          btn.innerText = "XÁC NHẬN ĐĂNG NHẬP"; btn.disabled = false;
+        })
+        .loginUser(email, pass);
+    }
 
-/* ===== Quỹ lớp ===== */
-async function vFund() {
-  const classes = await api('getAllClasses');
-  $('view').innerHTML = `<select id="fc" class="form-select w-auto mb-3">${opts(classes, 'Chọn lớp')}</select>
-  <div class="row g-3 mb-3"><div class="col-4"><div class="panel"><div class="num ok h3" id="ft">0 đ</div>Tổng thu</div></div>
-  <div class="col-4"><div class="panel"><div class="num warn h3" id="fx">0 đ</div>Tổng chi</div></div>
-  <div class="col-4"><div class="panel"><div class="num h3" id="fb">0 đ</div>Tồn quỹ</div></div></div>
-  ${['ADMIN', 'GVCN'].includes(String(user.role).toUpperCase()) ? `<div class="panel mb-3"><div class="row g-2"><div class="col-md-5"><input id="fn" class="form-control" placeholder="Nội dung"></div>
-  <div class="col-md-2"><select id="fy" class="form-select"><option>Thu</option><option>Chi</option></select></div>
-  <div class="col-md-3"><input id="fa" type="number" class="form-control" placeholder="Số tiền (đ)"></div>
-  <div class="col-md-2"><button id="fs" class="btn btn-success w-100">Lưu phiếu</button></div></div></div>` : ''}
-  <div class="panel tbl-wrap"><table class="table align-middle mb-0"><thead><tr><th>Ngày</th><th>Nội dung</th><th>Người lập</th><th class="text-end">Số tiền</th><th></th></tr></thead><tbody id="fl"></tbody></table></div>`;
-  const load = async () => {
-    const c = $('fc').value; if (!c) return;
-    const r = await api('getClassFundData', c);
-    $('ft').textContent = vnd(r.summary.thu); $('fx').textContent = vnd(r.summary.chi); $('fb').textContent = vnd(r.summary.du);
-    $('fl').innerHTML = r.items.map(i => `<tr><td class="small">${esc(i.date)}</td><td>${esc(i.content)}</td><td>${esc(i.creator)}</td><td class="text-end fw-bold ${i.type === 'Thu' ? 'ok' : 'warn'}">${vnd(i.amount)}</td>
-    <td>${['ADMIN', 'GVCN'].includes(String(user.role).toUpperCase()) ? `<button class="btn btn-sm text-danger" data-del="${esc(i.id)}" aria-label="Xóa phiếu"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`).join('') || '<tr><td colspan="5" class="text-muted">Chưa có phiếu thu chi.</td></tr>';
-  };
-  $('fc').onchange = () => load().catch(fail);
-  $('fl').onclick = async e => { const b = e.target.closest('[data-del]'); if (b && confirm('Xóa phiếu này?')) { alert(await api('deleteFundTransaction', b.dataset.del)); load(); } };
-  if ($('fs')) $('fs').onclick = async () => {
-    const t = { className: $('fc').value, content: $('fn').value.trim(), type: $('fy').value, amount: $('fa').value, creator: user.name };
-    if (!t.className || !t.content || !t.amount) return alert('Chọn lớp và điền đủ nội dung, số tiền.');
-    alert(await api('saveFundTransaction', t)); $('fn').value = ''; $('fa').value = ''; load();
-  };
-}
+    function loginSuccess(res) {
+      currentUser = res;
+      document.getElementById('u-name').innerText = res.name;
+      document.getElementById('u-role').innerText = res.role;
+      var avt = 'https://ui-avatars.com/api/?background=0D6EFD&color=fff&bold=true&name=' + encodeURIComponent(res.name);
+      document.getElementById('u-avatar').src = res.avatar || avt;
 
-/* ===== Thông báo ===== */
-async function vNotif() {
-  $('view').innerHTML = `${isStaff() ? `<div class="panel mb-3"><input id="nt" class="form-control mb-2" placeholder="Tiêu đề"><textarea id="nc" class="form-control mb-2" rows="3" placeholder="Nội dung"></textarea><button id="ns" class="btn btn-success">Gửi thông báo</button></div>` : ''}<div id="nl"></div>`;
-  const load = async () => {
-    const l = await api('getNotifications');
-    $('nl').innerHTML = l.map(i => `<div class="panel mb-2"><div class="d-flex justify-content-between"><b>${esc(i.title)}</b><span class="small text-muted">${esc(i.date)}</span></div><p class="mb-1" style="white-space:pre-wrap">${esc(i.content)}</p><div class="small text-muted">Người gửi: ${esc(i.sender)}</div></div>`).join('') || '<div class="text-muted">Chưa có thông báo nào.</div>';
-  };
-  if ($('ns')) $('ns').onclick = async () => {
-    if (!$('nt').value.trim() || !$('nc').value.trim()) return alert('Nhập tiêu đề và nội dung.');
-    alert(await api('sendNotification', $('nt').value.trim(), $('nc').value.trim(), user.name)); $('nt').value = ''; $('nc').value = ''; load();
-  };
-  load();
-}
+      var menuHtml = '';
+      var dataMenu = res.menu || res.menus || [];
+      dataMenu.forEach(function(m, i) {
+        menuHtml += `<div onclick="switchTab('${m.id}', this)" class="list-group-item rounded mb-2 ${i==0?'active':''}">
+                       <i class="fas ${m.icon} me-3" style="width:20px"></i> <span>${m.text}</span>
+                     </div>`;
+      });
+      document.getElementById('sidebar-menu').innerHTML = menuHtml;
+      document.getElementById('login-view').classList.add('d-none');
+      document.getElementById('main-view').classList.remove('d-none');
 
-const VIEWS = {
-  dashboard: { t: 'Tổng quan', f: vDash },
-  attendance: { t: 'Điểm danh', f: vAtt },
-  discipline: { t: 'Ghi nhận vi phạm', f: vDisc },
-  violation_grid: { t: 'Bảng điểm trừ khối', f: vGrid },
-  class_fund: { t: 'Quỹ lớp', f: vFund },
-  notifications: { t: 'Thông báo', f: vNotif }
-};
+      var notifArea = document.getElementById('gv-notif-area');
+      if (notifArea) {
+        if (['ADMIN', 'GVCN', 'GVBM'].includes(res.role)) notifArea.classList.remove('d-none');
+        else notifArea.classList.add('d-none');
+      }
 
-try { const s = sessionStorage.getItem('edu'); if (s) start(JSON.parse(s)); } catch (e) { sessionStorage.removeItem('edu'); }
-</script>
+      loadAllClasses();
+      loadDashboard();
+    }
+
+    function handleLogout() {
+      if (confirm("Bạn muốn thoát hệ thống?")) {
+        localStorage.removeItem('eduUser');
+        document.getElementById('main-view').classList.add('d-none');
+        document.getElementById('login-view').classList.remove('d-none');
+        var btn = document.getElementById('btnLogin');
+        if (btn) { btn.innerText = "XÁC NHẬN ĐĂNG NHẬP"; btn.disabled = false; }
+      }
+    }
+
+    function switchTab(id, el) {
+      if (window.innerWidth <= 768) {
+        var sidebar = document.getElementById('sidebar-wrapper');
+        if (sidebar) sidebar.classList.remove('active');
+      }
+
+      var tabs = document.querySelectorAll('.content-tab');
+      for (var i = 0; i < tabs.length; i++) tabs[i].classList.add('d-none');
+      var target = document.getElementById('tab-' + id);
+      if (target) target.classList.remove('d-none');
+
+      var items = document.querySelectorAll('#sidebar-menu .list-group-item');
+      for (var j = 0; j < items.length; j++) items[j].classList.remove('active');
+      if (el) {
+        el.classList.add('active');
+        document.getElementById('page-title').innerText = el.innerText.trim();
+      }
+
+      if (id === 'dashboard') loadDashboard();
+      else if (id === 'attendance') loadAttendance();
+      else if (id === 'discipline') loadDisciplineView();
+      else if (id === 'violation_grid') loadViolationGrid();
+      else if (id === 'weekly_emulation') {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('we-start').value = today;
+        document.getElementById('we-end').value = today;
+        loadWeeklyEmulation();
+      }
+      else if (id === 'class_fund') loadClassFundView();
+      else if (id === 'notifications') loadNotifs();
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar-wrapper').classList.toggle('active');
+    }
+
+    function loadAllClasses() {
+      google.script.run.withSuccessHandler(function(cs) {
+        var ids = ['att-class-select', 'disc-class-select', 'dash-class-select', 'fund-class-select'];
+        ids.forEach(id => {
+          var el = document.getElementById(id);
+          if (el) {
+            var h = (id === 'dash-class-select') ? '<option value="">-- Toàn trường --</option>' : '<option value="">-- Chọn lớp --</option>';
+            cs.forEach(c => h += `<option value="${c}">${c}</option>`);
+            el.innerHTML = h;
+          }
+        });
+      }).getAllClasses();
+    }
+
+    function loadDashboard() {
+      var c = document.getElementById('dash-class-select').value;
+      google.script.run.withSuccessHandler(function(d) {
+        if (!d) return;
+        document.getElementById('stat-siso').innerText = d.siso || 0;
+        document.getElementById('stat-tile').innerText = (d.tile || 0) + '%';
+        var ctx = document.getElementById('myChart');
+        if (window.myDashboardChart) window.myDashboardChart.destroy();
+        window.myDashboardChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Giỏi', 'Khá', 'TB'],
+            datasets: [{ label: 'HS', data: d.chart || [0,0,0], backgroundColor: ['#198754', '#0d6efd', '#6c757d'] }]
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }).getDashboardData(c);
+    }
+
+    function loadAttendance() {
+      var c = document.getElementById('att-class-select').value;
+      if (!c) return;
+      google.script.run.withSuccessHandler(function(l) {
+        var h = '';
+        l.forEach(s => h += `<tr>
+          <td class="fw-bold ps-4">${s.name}</td>
+          <td class="text-end pe-4">
+            <div class="btn-group">
+              <input type="radio" class="btn-check" name="att_${s.id}" id="c_${s.id}" value="C" checked>
+              <label class="btn btn-outline-primary btn-sm px-3" for="c_${s.id}">CÓ</label>
+              <input type="radio" class="btn-check" name="att_${s.id}" id="v_${s.id}" value="V">
+              <label class="btn btn-outline-danger btn-sm px-3" for="v_${s.id}">VẮNG</label>
+            </div>
+          </td>
+        </tr>`);
+        document.getElementById('attendance-list').innerHTML = h || '<tr><td colspan="2" class="p-3 text-muted">Lớp trống.</td></tr>';
+      }).getStudentList(c);
+    }
+
+    function submitAttendance() {
+      var d = [];
+      var c = document.getElementById('att-class-select').value;
+      if (!c) return alert("Vui lòng chọn lớp!");
+      document.querySelectorAll('#attendance-list tr').forEach(r => {
+        var rad = r.querySelector('input:checked');
+        if (rad) d.push({id: rad.name.split('_')[1], name: r.cells[0].innerText, class: c, status: rad.value});
+      });
+      google.script.run.withSuccessHandler(r => alert(r)).saveAttendance(d);
+    }
+
+    function loadDisciplineView() {
+      google.script.run.withSuccessHandler(function(ts) {
+        var h = '<option value="">--Chọn lỗi--</option>';
+        ts.forEach(t => h += `<option value="${t}">${t}</option>`);
+        document.getElementById('disc-type').innerHTML = h;
+      }).getViolationTypes();
+      loadDisciplineStudents();
+    }
+
+    function loadDisciplineStudents() {
+      var c = document.getElementById('disc-class-select').value;
+      if (!c) return;
+      google.script.run.withSuccessHandler(function(n) {
+        document.getElementById('disc-gvcn-display').innerText = 'GVCN: ' + n;
+      }).getTeacherByClass(c);
+      google.script.run.withSuccessHandler(function(l) {
+        var h = '<option value="">--Chọn HS--</option>';
+        l.forEach(i => h += `<option value="${i.id}|${i.name}">${i.name}</option>`);
+        document.getElementById('disc-student').innerHTML = h;
+      }).getStudentList(c);
+      loadDisciplineHistory(c);
+    }
+
+    function submitDiscipline() {
+      var v = document.getElementById('disc-student').value;
+      if (!v) return alert("Vui lòng chọn học sinh!");
+      var p = v.split('|'), c = document.getElementById('disc-class-select').value;
+      google.script.run.withSuccessHandler(function(r) {
+        alert(r); loadDisciplineHistory(c);
+      }).saveDiscipline(p[0], p[1], c, document.getElementById('disc-type').value, document.getElementById('disc-note').value);
+    }
+
+    function loadDisciplineHistory(c) {
+      google.script.run.withSuccessHandler(function(l) {
+        var h = '';
+        if (!l || l.length == 0) h = '<div class="text-muted p-3">Chưa có vi phạm.</div>';
+        else l.forEach(i => h += `<div class="list-group-item p-2 mb-1 border-start border-4 border-danger shadow-sm">
+          <h6>${i.name} - ${i.date}</h6>
+          <p class="text-danger small mb-0">${i.type}</p>
+        </div>`);
+        document.getElementById('disc-history').innerHTML = h;
+      }).getDisciplineHistory(c);
+    }
+
+    function loadViolationGrid() {
+      var b = document.getElementById('grid-body');
+      var hArea = document.getElementById('grid-header');
+      const startVal = document.getElementById('grid-start').value;
+      const endVal = document.getElementById('grid-end').value;
+      b.innerHTML = '<tr><td colspan="50" class="p-5 text-center"><i class="fas fa-sync fa-spin"></i> Đang tải dữ liệu...</td></tr>';
+
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res || res.error) return alert(res ? res.error : "Lỗi dữ liệu");
+        var activeHeaders = res.headers.filter(h => res.rows.some(r => (r.violations[h.name] || 0) > 0));
+        res.rows.forEach(r => {
+          let totalDeduction = 0;
+          activeHeaders.forEach(h => { totalDeduction += ((r.violations[h.name] || 0) * h.points); });
+          r.totalDeduction = totalDeduction;
+          r.remainingScore = 100 - totalDeduction;
+        });
+        let sortedRows = [...res.rows].sort((a, b) => b.remainingScore - a.remainingScore);
+
+        var h = `<tr>
+          <th rowspan="2" class="align-middle bg-light text-danger fw-bold sticky-col-fixed">LỚP QUẢN LÝ</th>
+          <th colspan="${activeHeaders.length || 1}" class="bg-light text-danger fw-bold text-center">CHI TIẾT LỖI</th>
+          <th rowspan="2" class="align-middle bg-light text-danger fw-bold" style="width:80px">TỔNG TRỪ</th>
+          <th rowspan="2" class="align-middle bg-light text-danger fw-bold" style="width:80px">CÒN LẠI</th>
+          <th rowspan="2" class="align-middle bg-light text-danger fw-bold" style="width:60px">HẠNG</th>
+        </tr><tr>`;
+        if (activeHeaders.length > 0) {
+          activeHeaders.forEach(hObj => { h += `<th title="${hObj.name}" style="font-size:11px; width:55px">${hObj.code}</th>`; });
+        } else {
+          h += `<th class="text-muted small">Nề nếp tốt</th>`;
+        }
+        hArea.innerHTML = h + '</tr>';
+
+        var bodyHtml = '';
+        sortedRows.forEach((r, idx) => {
+          bodyHtml += `<tr>
+            <td class="fw-bold bg-light ps-2 text-start sticky-col-fixed">
+              <span style="color:red">${r.className}</span><br>
+              <small class="text-muted" style="font-size:10px">GV: ${r.teacher}</small>
+            </td>`;
+          if (activeHeaders.length > 0) {
+            activeHeaders.forEach(hObj => {
+              var v = r.violations[hObj.name] || 0;
+              bodyHtml += `<td>${v > 0 ? `<b class="text-danger">${v}</b>` : '-'}</td>`;
+            });
+          } else {
+            bodyHtml += `<td class="text-success small">Tốt</td>`;
+          }
+          bodyHtml += `<td class="fw-bold text-danger bg-danger bg-opacity-10">${r.totalDeduction}</td>
+            <td class="fw-bold ${r.remainingScore < 70 ? 'text-danger' : 'text-success'}">${r.remainingScore}</td>
+            <td><span class="badge ${idx < 3 ? 'bg-success' : 'bg-secondary'} rounded-pill px-3">${idx + 1}</span></td>
+          </tr>`;
+        });
+        b.innerHTML = bodyHtml || '<tr><td colspan="50">Trống</td></tr>';
+      }).getViolationGridData(startVal, endVal);
+    }
+
+    function loadWeeklyEmulation() {
+      const start = document.getElementById('we-start').value;
+      const end = document.getElementById('we-end').value;
+      const grade = document.getElementById('we-grade-select').value;
+      const body = document.getElementById('we-body');
+      const header = document.getElementById('we-header');
+      if (!start || !end) return alert("Vui lòng chọn khoảng ngày!");
+      body.innerHTML = '<tr><td colspan="80" class="p-5 text-center"><i class="fas fa-spinner fa-spin"></i> Đang tải thi đua...</td></tr>';
+
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res || res.error) return alert(res ? res.error : "Lỗi nạp thi đua");
+        var activeHeaders = res.headers.filter(h => res.rows.some(r => (r.violations[h.name] || 0) > 0));
+        let hHtml = `<tr>
+          <th rowspan="2" class="align-middle bg-light text-danger fw-bold sticky-col-fixed">LỚP QUẢN LÝ</th>
+          <th colspan="${activeHeaders.length || 1}" class="bg-light text-danger fw-bold text-center">CHI TIẾT LỖI</th>
+          <th rowspan="2" class="align-middle bg-light text-danger fw-bold" style="width:80px">TỔNG TRỪ</th>
+          <th rowspan="2" class="align-middle bg-light text-danger fw-bold" style="width:80px">CÒN LẠI</th>
+          <th rowspan="2" class="align-middle bg-light text-danger fw-bold" style="width:60px">HẠNG</th>
+        </tr><tr>`;
+        if (activeHeaders.length > 0) {
+          activeHeaders.forEach(hObj => hHtml += `<th title="${hObj.name}" style="font-size:11px; width:55px">${hObj.code}</th>`);
+        } else {
+          hHtml += `<th class="text-muted small">Tốt</th>`;
+        }
+        header.innerHTML = hHtml + '</tr>';
+
+        let rows = res.rows.map(r => {
+          let deduct = 0;
+          activeHeaders.forEach(h => { deduct += ((r.violations[h.name] || 0) * h.points); });
+          r.totalDeduct = deduct; r.remain = 100 - deduct;
+          return r;
+        }).sort((a, b) => b.remain - a.remain);
+
+        let bHtml = "";
+        rows.forEach((r, idx) => {
+          bHtml += `<tr>
+            <td class="fw-bold bg-light ps-2 text-start sticky-col-fixed">
+              <span style="color:red">${r.className}</span><br>
+              <small class="text-muted" style="font-size:10px">GV: ${r.teacher}</small>
+            </td>`;
+          if (activeHeaders.length > 0) {
+            activeHeaders.forEach(h => {
+              var v = r.violations[h.name] || 0;
+              bHtml += `<td>${v > 0 ? `<b class="text-danger">${v}</b>` : '-'}</td>`;
+            });
+          } else {
+            bHtml += `<td>-</td>`;
+          }
+          bHtml += `<td class="fw-bold text-danger bg-danger bg-opacity-10">${r.totalDeduct}</td>
+            <td class="fw-bold ${r.remain < 80 ? 'text-danger' : 'text-success'}">${r.remain}</td>
+            <td><span class="badge ${idx < 3 ? 'bg-success' : 'bg-secondary'} rounded-pill px-3">${idx + 1}</span></td>
+          </tr>`;
+        });
+        body.innerHTML = bHtml || '<tr><td colspan="80">Trống</td></tr>';
+      }).getWeeklyEmulationData(start, end, grade);
+    }
+
+    var formatVND = function(n) { return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n); };
+
+    function loadClassFundView() {
+      if (['ADMIN', 'GVCN'].includes(currentUser.role)) document.getElementById('fund-admin-area').classList.remove('d-none');
+      loadClassFund();
+    }
+
+    function loadClassFund() {
+      var lop = document.getElementById('fund-class-select').value;
+      if (!lop) return;
+      google.script.run.withSuccessHandler(function(r) {
+        if (!r) return;
+        document.getElementById('fund-total-thu').innerText = formatVND(r.summary.thu);
+        document.getElementById('fund-total-chi').innerText = formatVND(r.summary.chi);
+        document.getElementById('fund-balance').innerText = formatVND(r.summary.du);
+        var h = '';
+        r.items.forEach(i => {
+          h += `<tr>
+            <td class="small">${i.date}</td>
+            <td>${i.content}</td>
+            <td>${i.creator}</td>
+            <td class="text-end fw-bold ${i.type=='Thu'?'text-success':'text-danger'}">${formatVND(i.amount)}</td>
+            <td class="text-center"><button onclick="deleteFund('${i.id}')" class="btn btn-sm text-danger"><i class="fas fa-trash"></i></button></td>
+          </tr>`;
+        });
+        document.getElementById('fund-list-body').innerHTML = h || '<tr><td colspan="5" class="p-3 text-muted">Chưa có giao dịch.</td></tr>';
+      }).getClassFundData(lop);
+    }
+
+    function submitFund() {
+      var t = {
+        className: document.getElementById('fund-class-select').value,
+        content: document.getElementById('fund-content').value,
+        type: document.getElementById('fund-type').value,
+        amount: document.getElementById('fund-amount').value,
+        creator: currentUser.name
+      };
+      if (!t.className || !t.content || !t.amount) return alert("Điền đủ thông tin!");
+      google.script.run.withSuccessHandler(function(r) {
+        alert(r); loadClassFund();
+        document.getElementById('fund-content').value = "";
+        document.getElementById('fund-amount').value = "";
+      }).saveFundTransaction(t);
+    }
+
+    function deleteFund(id) {
+      if (confirm("Bạn có chắc chắn muốn xóa giao dịch này?")) {
+        google.script.run.withSuccessHandler(function(r) { alert(r); loadClassFund(); }).deleteFundTransaction(id);
+      }
+    }
+
+    function loadNotifs() {
+      var listArea = document.getElementById('notif-list');
+      listArea.innerHTML = '<div class="text-center p-4"><i class="fas fa-spinner fa-spin fa-2x text-warning"></i><br>Đang tải thông báo...</div>';
+      google.script.run.withSuccessHandler(function(list) {
+        var html = '';
+        if (!list || list.length === 0) {
+          html = '<div class="alert alert-light text-center">Chưa có thông báo nào.</div>';
+        } else {
+          list.forEach(function(item) {
+            html += `<div class="card border-0 shadow-sm mb-3 rounded-4 bg-white border-start border-4 border-warning">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="fw-bold text-dark mb-0"><i class="fas fa-bullhorn text-warning me-2"></i>${item.title}</h6>
+                  <span class="badge bg-light text-muted small border">${item.date}</span>
+                </div>
+                <p class="text-secondary small mb-3" style="white-space: pre-wrap;">${item.content}</p>
+                <small class="text-muted fw-bold">Người gửi: ${item.sender}</small>
+              </div>
+            </div>`;
+          });
+        }
+        listArea.innerHTML = html;
+      }).getNotifications();
+    }
+
+    function sendNotif() {
+      var titleInp = document.getElementById('n-title');
+      var contentInp = document.getElementById('n-content');
+      var title = titleInp.value.trim();
+      var content = contentInp.value.trim();
+      if (!title || !content) return alert("Vui lòng nhập đủ Tiêu đề và Nội dung!");
+
+      google.script.run.withSuccessHandler(function(res) {
+        alert(res);
+        titleInp.value = ""; contentInp.value = "";
+        loadNotifs();
+      }).sendNotification(title, content, currentUser.name);
+    }
+  </script>
 </body>
 </html>
