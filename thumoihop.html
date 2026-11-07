@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thư Mời Họp Phụ Huynh - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .config-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    /* Mẫu giấy mời họp phụ huynh trang nhã */
+    .invitation-card {
+      background: #fffdfa;
+      border: 2px solid #b45309;
+      border-radius: 12px;
+      padding: 24px 28px;
+      position: relative;
+      margin-bottom: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .invitation-inner-border {
+      border: 1px dashed #d97706;
+      border-radius: 8px;
+      padding: 20px 24px;
+    }
+    .invitation-title {
+      color: #b45309;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .dotted-line {
+      border-bottom: 1px dotted #94a3b8;
+      display: inline-block;
+      min-width: 180px;
+      font-weight: bold;
+      color: #0f172a;
+    }
+
+    /* Định dạng in ấn chuẩn trang A4 (2 giấy mời / trang) */
+    @media print {
+      body { background: white; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-area { display: block !important; }
+      .invitation-card {
+        page-break-inside: avoid;
+        margin-bottom: 15mm;
+        box-shadow: none;
+        border: 1.5px solid #000;
+      }
+      .invitation-inner-border {
+        border: 1px dashed #666;
+      }
+      .invitation-title { color: #000 !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1250px;">
+    
+    <!-- KHUNG THIẾT LẬP THÔNG TIN (ẨN KHI IN) -->
+    <div class="config-card p-4 mb-4 no-print">
+      <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+        <h5 class="fw-bold text-primary m-0">
+          <i class="fas fa-envelope-open-text text-warning me-2"></i>SOẠN & IN THƯ MỜI HỌP PHỤ HUYNH
+        </h5>
+        <div class="d-flex gap-2">
+          <button onclick="generateInvitations()" class="btn btn-primary rounded-pill px-4 fw-bold">
+            <i class="fas fa-sync-alt me-1"></i> Tạo giấy mời
+          </button>
+          <button onclick="window.print()" class="btn btn-success rounded-pill px-4 fw-bold">
+            <i class="fas fa-print me-1"></i> In giấy mời
+          </button>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <!-- Cột chọn lớp & học sinh -->
+        <div class="col-md-3">
+          <label class="small fw-bold text-secondary mb-1">1. Lớp học</label>
+          <select id="selClass" class="form-select shadow-sm" onchange="onClassChange()">
+            <option value="">-- Đang nạp lớp... --</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="small fw-bold text-secondary mb-1">2. Chọn học sinh (Hoặc in cả lớp)</label>
+          <select id="selStudent" class="form-select shadow-sm">
+            <option value="ALL">⭐ IN TOÀN BỘ HỌC SINH CẢ LỚP</option>
+          </select>
+        </div>
+        <div class="col-md-5">
+          <label class="small fw-bold text-secondary mb-1">3. Giáo viên chủ nhiệm</label>
+          <input type="text" id="inpTeacher" class="form-control shadow-sm" placeholder="Tên Giáo viên chủ nhiệm...">
+        </div>
+
+        <!-- Cột thông tin cuộc họp -->
+        <div class="col-md-4">
+          <label class="small fw-bold text-secondary mb-1">4. Thời gian họp</label>
+          <input type="text" id="inpTime" class="form-control shadow-sm" value="08 giờ 00 phút, Chủ Nhật ngày 15/01/2027">
+        </div>
+        <div class="col-md-4">
+          <label class="small fw-bold text-secondary mb-1">5. Địa điểm họp</label>
+          <input type="text" id="inpLocation" class="form-control shadow-sm" value="Phòng học lớp ... - Trường THCS Bình Tân">
+        </div>
+        <div class="col-md-4">
+          <label class="small fw-bold text-secondary mb-1">6. Lý do / Tiêu đề cuộc họp</label>
+          <input type="text" id="inpReason" class="form-control shadow-sm" value="Họp sơ kết Học kỳ I và triển khai phương hướng Học kỳ II">
+        </div>
+
+        <div class="col-12">
+          <label class="small fw-bold text-secondary mb-1">7. Lời nhắn / Dặn dò phụ huynh</label>
+          <input type="text" id="inpNote" class="form-control shadow-sm" value="Kính mong Quý Phụ huynh sắp xếp thời gian tham dự đầy đủ, đúng giờ để buổi họp đạt kết quả tốt nhất. Điểm giữ xe tại cổng phụ của trường.">
+        </div>
+      </div>
+    </div>
+
+    <!-- KHU VỰC HIỂN THỊ CÁC GIẤY MỜI ĐỂ XEM TRƯỚC VÀ IN -->
+    <div id="printArea" class="print-area">
+      <div class="text-center text-muted p-5 bg-white rounded-4 border">
+        <i class="fas fa-spinner fa-spin fa-2x text-warning mb-2"></i><br>
+        Đang nạp dữ liệu lớp và học sinh từ hệ thống...
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbyfOxTehbN-mYeYLyLRXQNrCmoWt5ECas57_bqMT731frTn-pF9sUAirvWG2q8RLQvw4g/exec";
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    let currentStudentsList = [];
+
+    window.onload = async function() {
+      try {
+        const classes = await callApi('getAllClasses');
+        const selClass = document.getElementById('selClass');
+        let html = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => html += `<option value="${c}">${c}</option>`);
+        selClass.innerHTML = html;
+
+        if (classes && classes.length > 0) {
+          selClass.value = classes[0];
+          await onClassChange();
+        }
+      } catch (err) {
+        alert("Lỗi tải danh sách lớp: " + err.message);
+      }
+    };
+
+    // Khi chọn Lớp: lấy tên GVCN và danh sách học sinh
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      document.getElementById('inpLocation').value = `Phòng học lớp ${className} - Trường THCS Bình Tân`;
+
+      // 1. Lấy tên GVCN
+      try {
+        const gv = await callApi('getTeacherByClass', className);
+        document.getElementById('inpTeacher').value = gv || "Thầy Võ Tâm Long";
+      } catch(e) {
+        document.getElementById('inpTeacher').value = "Giáo viên chủ nhiệm";
+      }
+
+      // 2. Lấy danh sách HS của lớp
+      const selStudent = document.getElementById('selStudent');
+      selStudent.innerHTML = '<option value="ALL">⭐ IN TOÀN BỘ HỌC SINH CẢ LỚP</option><option disabled>Đang nạp HS...</option>';
+
+      try {
+        currentStudentsList = await callApi('getStudentList', className);
+        let h = '<option value="ALL">⭐ IN TOÀN BỘ HỌC SINH CẢ LỚP (' + (currentStudentsList.length) + ' em)</option>';
+        (currentStudentsList || []).forEach(s => {
+          h += `<option value="${s.id}" data-name="${s.name}">${s.name} (${s.id})</option>`;
+        });
+        selStudent.innerHTML = h;
+        generateInvitations();
+      } catch(e) {
+        selStudent.innerHTML = '<option value="ALL">⭐ IN TOÀN BỘ HỌC SINH CẢ LỚP</option>';
+      }
+    }
+
+    // TẠO CÁC GIẤY MỜI THEO DANH SÁCH ĐÃ CHỌN
+    function generateInvitations() {
+      const className = document.getElementById('selClass').value;
+      const studentMode = document.getElementById('selStudent').value;
+      const teacherName = document.getElementById('inpTeacher').value;
+      const meetingTime = document.getElementById('inpTime').value;
+      const meetingLoc = document.getElementById('inpLocation').value;
+      const meetingReason = document.getElementById('inpReason').value;
+      const meetingNote = document.getElementById('inpNote').value;
+      const printArea = document.getElementById('printArea');
+
+      if (!className) {
+        printArea.innerHTML = '<div class="alert alert-warning text-center">Vui lòng chọn một lớp học để tạo giấy mời.</div>';
+        return;
+      }
+
+      let studentsToPrint = [];
+      if (studentMode === "ALL") {
+        studentsToPrint = currentStudentsList.length > 0 ? currentStudentsList : [{ name: "..................................................", id: "..." }];
+      } else {
+        const selOpt = document.getElementById('selStudent').selectedOptions[0];
+        studentsToPrint = [{ name: selOpt.getAttribute('data-name') || "..................................................", id: studentMode }];
+      }
+
+      let html = '';
+      studentsToPrint.forEach((st, idx) => {
+        html += `
+          <div class="invitation-card">
+            <div class="invitation-inner-border">
+              <!-- Tiêu ngữ trường học -->
+              <div class="row align-items-center mb-3">
+                <div class="col-6 text-start">
+                  <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+                  <div class="small text-muted">Lớp: <b>${className}</b></div>
+                </div>
+                <div class="col-6 text-end">
+                  <div class="fw-bold small text-uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+                  <div class="small fst-italic" style="font-size: 11px;">Độc lập - Tự do - Hạnh phúc</div>
+                </div>
+              </div>
+
+              <!-- Tiêu đề thư mời -->
+              <div class="text-center my-3">
+                <h4 class="invitation-title text-uppercase m-0">GIẤY MỜI HỌP PHỤ HUYNH</h4>
+                <div class="small fst-italic text-secondary mt-1">Năm học 2026 - 2027</div>
+              </div>
+
+              <!-- Nội dung lời mời -->
+              <div class="mb-3" style="line-height: 2;">
+                <div>Kính gửi Quý Phụ huynh của em: <span class="dotted-line text-primary">${st.name}</span></div>
+                <div>Ban giám hiệu và Giáo viên chủ nhiệm lớp <b>${className}</b> trân trọng kính mời Quý Phụ huynh đến tham dự buổi họp phụ huynh học sinh.</div>
+                <div><i class="far fa-clock me-2 text-danger"></i><b>Thời gian:</b> ${meetingTime}</div>
+                <div><i class="fas fa-map-marker-alt me-2 text-danger"></i><b>Địa điểm:</b> ${meetingLoc}</div>
+                <div><i class="fas fa-clipboard-list me-2 text-primary"></i><b>Nội dung:</b> ${meetingReason}</div>
+                <div class="small text-muted fst-italic mt-2"><i class="fas fa-info-circle me-1"></i>${meetingNote}</div>
+              </div>
+
+              <!-- Chữ ký -->
+              <div class="row mt-4 pt-2 text-center">
+                <div class="col-6">
+                  <div class="small fst-italic">Ý kiến xác nhận của Phụ huynh:</div>
+                  <div class="mt-4 pt-4 text-muted small">(Ký và ghi rõ họ tên)</div>
+                </div>
+                <div class="col-6">
+                  <div class="small fst-italic">TP. Hồ Chí Minh, ngày ..... tháng ..... năm 2027</div>
+                  <div class="fw-bold text-uppercase mt-1">GIÁO VIÊN CHỦ NHIỆM</div>
+                  <div class="mt-5 fw-bold text-dark">${teacherName}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      printArea.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
