@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chuông & Trống Trường 2627 - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 18px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      padding: 22px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 22px 28px;
+      box-shadow: 0 4px 15px rgba(180, 83, 9, 0.2);
+    }
+    .clock-display {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 3.5rem;
+      font-weight: 900;
+      line-height: 1;
+      color: #f59e0b;
+      text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+    }
+    .table thead th {
+      background-color: #fef3c7;
+      color: #92400e;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      vertical-align: middle;
+      border-bottom: 2px solid #fde68a;
+    }
+    .bell-btn {
+      transition: all 0.2s ease;
+      font-weight: 700;
+    }
+    .bell-btn:active {
+      transform: scale(0.95);
+    }
+    .row-active-now {
+      background-color: #fef9c3 !important;
+      font-weight: bold;
+    }
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .panel-box { border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; font-size: 11px; }
+      @page { size: landscape; margin: 10mm; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1350px;">
+    
+    <!-- BANNER & ĐIỀU HƯỚNG -->
+    <div class="header-banner mb-4 no-print d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-bell me-1"></i>HỆ THỐNG PHÁT LỆNH BÁO GIỜ 2627</span>
+          <span class="opacity-75 small">Sheet: CHUONG_TRONG_2627</span>
+        </div>
+        <h4 class="fw-bold mb-1">ĐIỀU HÀNH CHUÔNG & TRỐNG TRƯỜNG THCS BÌNH TÂN</h4>
+        <small class="opacity-75">Tự động canh giờ chính xác từng giây, phát âm thanh trống & chuông và đồng bộ với Google Sheets</small>
+      </div>
+
+      <div class="d-flex align-items-center gap-3 bg-dark bg-opacity-25 p-3 rounded-4 border border-light border-opacity-25">
+        <div class="text-center">
+          <small class="text-uppercase text-light opacity-75 d-block" style="font-size: 10px;">ĐỒNG HỒ HỆ THỐNG</small>
+          <div class="clock-display" id="liveClock">00:00:00</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KHUNG ĐIỀU KHIỂN & BẬT ÂM THANH TRỰC TIẾP (ẨN KHI IN) -->
+    <div class="row g-3 mb-4 no-print">
+      <!-- CỘT PHÁT LỆNH THỦ CÔNG (ĐÁNH TRỐNG / RUNG CHUÔNG) -->
+      <div class="col-lg-7">
+        <div class="panel-box h-100 border-start border-4 border-warning">
+          <h6 class="fw-bold text-warning text-uppercase mb-3">
+            <i class="fas fa-volume-up me-2"></i>Bảng Điều Khiển Phát Lệnh Tức Thì (Thủ Công)
+          </h6>
+          <div class="d-flex flex-wrap gap-2">
+            <button onclick="playDrumSequence(1)" class="btn btn-warning rounded-pill px-3 py-2 bell-btn text-dark shadow-sm">
+              <i class="fas fa-drum me-1"></i> Trống: 1 Tiếng (Báo ra chơi)
+            </button>
+            <button onclick="playDrumSequence(3)" class="btn btn-warning rounded-pill px-3 py-2 bell-btn text-dark shadow-sm">
+              <i class="fas fa-drum me-1"></i> Trống: 3 Tiếng (Vào lớp)
+            </button>
+            <button onclick="playDrumRoll()" class="btn btn-danger rounded-pill px-3 py-2 bell-btn shadow-sm">
+              <i class="fas fa-drum me-1"></i> Trống: Hồi Dài (Tan học)
+            </button>
+            <button onclick="playElectricBell(3)" class="btn btn-primary rounded-pill px-3 py-2 bell-btn shadow-sm">
+              <i class="fas fa-bell me-1"></i> Rung Chuông Điện (Renggg)
+            </button>
+          </div>
+          <div class="mt-3 small text-muted">
+            <i class="fas fa-info-circle me-1 text-primary"></i>
+            Âm thanh được mô phỏng lập trình qua Web Audio API độ nét cao, phát trực tiếp qua loa trường không cần tệp ghi âm ngoài.
+          </div>
+        </div>
+      </div>
+
+      <!-- CỘT TRẠNG THÁI TỰ ĐỘNG -->
+      <div class="col-lg-5">
+        <div class="panel-box h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="fw-bold text-primary text-uppercase m-0">Trạng Thái Tự Động</h6>
+              <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" id="chkAutoPlay" checked style="cursor: pointer;">
+                <label class="form-check-label fw-bold small text-success" for="chkAutoPlay">BẬT TỰ ĐỘNG</label>
+              </div>
+            </div>
+            <p class="small text-muted mb-2">Hệ thống liên tục so khớp giờ hệ thống với bảng thời gian biểu. Đến đúng giờ sẽ tự động phát âm thanh theo cột F, G, H.</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button onclick="saveScheduleToSheet()" id="btnSave" class="btn btn-success btn-sm rounded-pill px-4 fw-bold">
+              <i class="fas fa-save me-1"></i> Lưu vào Sheet
+            </button>
+            <button onclick="loadScheduleFromSheet()" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+              <i class="fas fa-sync-alt me-1"></i> Tải lại
+            </button>
+            <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+              <i class="fas fa-print me-1"></i> In Lịch A4
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header d-none text-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">BỘ PHẬN BẢO VỆ - GIÁM THỊ</div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">THỜI GIAN BIỂU ĐÁNH TRỐNG & CHUÔNG BÁO GIỜ HỌC</h3>
+      <p class="text-secondary small fst-italic">Áp dụng từ ngày: <b>01/09/2026</b></p>
+      <hr>
+    </div>
+
+    <!-- BẢNG THỜI GIAN BIỂU CHUÔNG & TRỐNG (10 CỘT A-J) -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle mb-0 text-center small" id="bellTable">
+          <thead>
+            <tr>
+              <th style="width: 80px;">MÃ MỐC</th>
+              <th style="width: 80px;">BUỔI</th>
+              <th style="width: 80px;">TIẾT</th>
+              <th style="width: 110px;">GIỜ VÀO</th>
+              <th style="width: 110px;">GIỜ RA</th>
+              <th style="width: 120px;">ÂM THANH</th>
+              <th style="width: 100px;">TIẾNG VÀO</th>
+              <th style="width: 100px;">TIẾNG RA</th>
+              <th style="width: 100px;">KÍCH HOẠT</th>
+              <th class="text-start ps-3">GHI CHÚ MỐC THỜI GIAN</th>
+            </tr>
+          </thead>
+          <tbody id="bellTableBody">
+            <tr><td colspan="10" class="p-5 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu từ Sheet CHUONG_TRONG_2627...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxhG2fzeWPATQKgv-ZrKDYZ4REF3tsOmrSLP92BKz3D4dhQrIEzWZihs7sIoLFK0jdhpg/exec";
+
+    let bellSchedule = [];
+    let audioCtx = null;
+    let lastRingMinute = "";
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // 1. TẠO ÂM THANH TIẾNG TRỐNG TRƯỜNG TRẦM HÙNG BẰNG WEB AUDIO API
+    function playSingleDrumHit(timeOffset = 0, isCac = false) {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime + timeOffset;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      if (isCac) {
+        // Tiếng gõ vành trống "Cắc"
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(900, now);
+        osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.09);
+      } else {
+        // Tiếng trống cái "TÙNG"
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(45, now + 0.5);
+
+        gain.gain.setValueAtTime(1.0, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      }
+    }
+
+    // Đánh chuỗi tiếng trống (1 tiếng, 3 tiếng)
+    function playDrumSequence(count) {
+      getAudioContext();
+      for (let i = 0; i < count; i++) {
+        playSingleDrumHit(i * 1.1, false);
+      }
+    }
+
+    // Đánh 1 hồi trống dài (Tan học: Tùng... rập rập... tùng tùng tùng)
+    function playDrumRoll() {
+      getAudioContext();
+      let delay = 0;
+      // Nhịp dồn đầu
+      for (let i = 0; i < 12; i++) {
+        playSingleDrumHit(delay, false);
+        delay += Math.max(0.08, 0.35 - (i * 0.025));
+      }
+      // 3 tiếng chốt hạ cuối
+      delay += 0.4;
+      playSingleDrumHit(delay, false);
+      playSingleDrumHit(delay + 1.0, false);
+      playSingleDrumHit(delay + 2.0, false);
+      playSingleDrumHit(delay + 2.8, true); // Tiếng cắc kết thúc
+    }
+
+    // 2. TẠO ÂM THANH CHUÔNG ĐIỆN (RENGGG)
+    function playElectricBell(durationSec = 2.5) {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc1.type = 'sine';
+      osc2.type = 'sine';
+      osc1.frequency.setValueAtTime(840, now);
+      osc2.frequency.setValueAtTime(860, now); // Tạo tần số rung phách tự nhiên
+
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + durationSec);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + durationSec);
+      osc2.stop(now + durationSec);
+    }
+
+    // PHÁT THEO CẤU HÌNH (TRỐNG HOẶC CHUÔNG)
+    function triggerAlarmSound(type, count) {
+      if (String(type).toUpperCase() === 'CHUÔNG') {
+        playElectricBell(count > 1 ? 3.5 : 1.8);
+      } else {
+        if (count >= 5) playDrumRoll();
+        else playDrumSequence(count);
+      }
+    }
+
+    // 3. ĐỒNG HỒ THỜI GIAN THỰC & BỘ CANH GIỜ TỰ ĐỘNG
+    window.onload = function() {
+      loadScheduleFromSheet();
+
+      setInterval(() => {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        const ss = String(now.getSeconds()).padStart(2, '0');
+        const currentTimeStr = `${hh}:${mm}:${ss}`;
+        const currentMinuteStr = `${hh}:${mm}`;
+
+        document.getElementById('liveClock').innerText = currentTimeStr;
+
+        // Kiểm tra đúng giây 00 để kích hoạt âm thanh
+        if (ss === '00' && currentMinuteStr !== lastRingMinute) {
+          checkAndTriggerAutoBell(currentMinuteStr);
+          lastRingMinute = currentMinuteStr;
+        }
+      }, 1000);
+    };
+
+    function checkAndTriggerAutoBell(timeNow) {
+      const isAuto = document.getElementById('chkAutoPlay').checked;
+      if (!isAuto || bellSchedule.length === 0) return;
+
+      bellSchedule.forEach(item => {
+        if (!item.active) return;
+
+        // Kiểm tra giờ vào
+        if (item.timeIn === timeNow) {
+          triggerAlarmSound(item.soundType, Number(item.inBeeps) || 3);
+        }
+        // Kiểm tra giờ ra
+        if (item.timeOut === timeNow) {
+          triggerAlarmSound(item.soundType, Number(item.outBeeps) || 1);
+        }
+      });
+    }
+
+    // 4. NẠP DỮ LIỆU TỪ SHEET CHUONG_TRONG_2627
+    async function loadScheduleFromSheet() {
+      const body = document.getElementById('bellTableBody');
+      body.innerHTML = '<tr><td colspan="10" class="p-5 text-muted"><i class="fas fa-sync fa-spin me-2"></i>Đang tải thời gian biểu từ Sheet...</td></tr>';
+
+      try {
+        const data = await callApi('getSchoolBell2627Data');
+        bellSchedule = (data && data.length > 0) ? data : getDefaultSchedule();
+
+        renderTable();
+      } catch (err) {
+        bellSchedule = getDefaultSchedule();
+        renderTable();
+      }
+    }
+
+    function getDefaultSchedule() {
+      return [
+        { id: "T01_S", session: "SÁNG", period: "Tiết 1", timeIn: "07:15", timeOut: "08:00", soundType: "TRỐNG", inBeeps: 3, outBeeps: 1, active: true, note: "Vào học buổi sáng / Ra chơi ngắn" },
+        { id: "T02_S", session: "SÁNG", period: "Tiết 2", timeIn: "08:05", timeOut: "08:50", soundType: "TRỐNG", inBeeps: 3, outBeeps: 3, active: true, note: "Vào tiết 2 / Ra chơi lớn" },
+        { id: "T03_S", session: "SÁNG", period: "Tiết 3", timeIn: "09:25", timeOut: "10:10", soundType: "TRỐNG", inBeeps: 3, outBeeps: 1, active: true, note: "Vào học sau ra chơi lớn" },
+        { id: "T04_S", session: "SÁNG", period: "Tiết 4", timeIn: "10:15", timeOut: "11:00", soundType: "TRỐNG", inBeeps: 3, outBeeps: 1, active: true, note: "Vào tiết 4" },
+        { id: "T05_S", session: "SÁNG", period: "Tiết 5", timeIn: "11:05", timeOut: "11:50", soundType: "TRỐNG", inBeeps: 3, outBeeps: 5, active: true, note: "Vào tiết 5 / Tan học buổi sáng" },
+        { id: "T01_C", session: "CHIỀU", period: "Tiết 1", timeIn: "13:30", timeOut: "14:15", soundType: "TRỐNG", inBeeps: 3, outBeeps: 1, active: true, note: "Vào học buổi chiều" },
+        { id: "T02_C", session: "CHIỀU", period: "Tiết 2", timeIn: "14:20", timeOut: "15:05", soundType: "TRỐNG", inBeeps: 3, outBeeps: 3, active: true, note: "Vào tiết 2 / Ra chơi chiều" },
+        { id: "T03_C", session: "CHIỀU", period: "Tiết 3", timeIn: "15:25", timeOut: "16:10", soundType: "TRỐNG", inBeeps: 3, outBeeps: 1, active: true, note: "Vào tiết 3 chiều" },
+        { id: "T04_C", session: "CHIỀU", period: "Tiết 4", timeIn: "16:15", timeOut: "17:00", soundType: "TRỐNG", inBeeps: 3, outBeeps: 1, active: true, note: "Vào tiết 4 chiều" },
+        { id: "T05_C", session: "CHIỀU", period: "Tiết 5", timeIn: "17:05", timeOut: "17:50", soundType: "TRỐNG", inBeeps: 3, outBeeps: 5, active: true, note: "Vào tiết 5 / Tan học chiều" }
+      ];
+    }
+
+    function renderTable() {
+      const body = document.getElementById('bellTableBody');
+      let html = '';
+
+      bellSchedule.forEach((r, idx) => {
+        html += `
+          <tr>
+            <td class="fw-bold text-secondary"><input type="text" class="form-control form-control-sm text-center border-0 bg-transparent fw-bold" value="${r.id}" onchange="bellSchedule[${idx}].id = this.value"></td>
+            <td><span class="badge ${r.session === 'SÁNG' ? 'bg-primary' : 'bg-warning text-dark'}">${r.session}</span></td>
+            <td class="fw-bold">${r.period}</td>
+            <td><input type="text" class="form-control form-control-sm text-center fw-bold text-primary" value="${r.timeIn}" onchange="bellSchedule[${idx}].timeIn = this.value"></td>
+            <td><input type="text" class="form-control form-control-sm text-center fw-bold text-danger" value="${r.timeOut}" onchange="bellSchedule[${idx}].timeOut = this.value"></td>
+            <td>
+              <select class="form-select form-select-sm text-center fw-bold" onchange="bellSchedule[${idx}].soundType = this.value">
+                <option value="TRỐNG" ${r.soundType === 'TRỐNG' ? 'selected' : ''}>🥁 TRỐNG</option>
+                <option value="CHUÔNG" ${r.soundType === 'CHUÔNG' ? 'selected' : ''}>🔔 CHUÔNG</option>
+              </select>
+            </td>
+            <td><input type="number" class="form-control form-control-sm text-center fw-bold" value="${r.inBeeps}" onchange="bellSchedule[${idx}].inBeeps = Number(this.value)"></td>
+            <td><input type="number" class="form-control form-control-sm text-center fw-bold" value="${r.outBeeps}" onchange="bellSchedule[${idx}].outBeeps = Number(this.value)"></td>
+            <td>
+              <input class="form-check-input" type="checkbox" ${r.active ? 'checked' : ''} onchange="bellSchedule[${idx}].active = this.checked" style="cursor:pointer;">
+            </td>
+            <td class="text-start ps-3"><input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${r.note}" onchange="bellSchedule[${idx}].note = this.value"></td>
+          </tr>
+        `;
+      });
+
+      body.innerHTML = html;
+    }
+
+    // 5. LƯU BẢNG VÀO SHEET
+    async function saveScheduleToSheet() {
+      const btn = document.getElementById('btnSave');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      try {
+        const msg = await callApi('saveSchoolBell2627Data', bellSchedule);
+        alert(msg);
+      } catch (err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+  </script>
+</body>
+</html>
