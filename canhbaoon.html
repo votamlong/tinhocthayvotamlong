@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cảnh Báo Ồn & Hú Còi - Quản Lý Nề Nếp</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+      user-select: none;
+    }
+    .main-box {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+    /* Đèn giao thông cảm xúc */
+    .status-circle {
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      margin: 0 auto 20px auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    .level-quiet {
+      background: radial-gradient(circle, #22c55e 0%, #15803d 100%);
+    }
+    .level-warning {
+      background: radial-gradient(circle, #facc15 0%, #ca8a04 100%);
+      color: #713f12;
+    }
+    .level-danger {
+      background: radial-gradient(circle, #ef4444 0%, #b91c1c 100%);
+      animation: pulse-danger 0.5s infinite alternate;
+    }
+    @keyframes pulse-danger {
+      from { transform: scale(1); box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+      to { transform: scale(1.08); box-shadow: 0 0 35px rgba(239, 68, 68, 0.9); }
+    }
+    /* Thanh hiển thị Decibel */
+    .db-meter {
+      height: 28px;
+      border-radius: 14px;
+      background-color: #e2e8f0;
+      overflow: hidden;
+    }
+    .db-fill {
+      height: 100%;
+      width: 0%;
+      transition: width 0.1s linear, background-color 0.2s ease;
+      border-radius: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-box text-center" id="boxContainer">
+    
+    <!-- TIÊU ĐỀ -->
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+      <div class="text-start">
+        <h4 class="fw-bold text-danger m-0">
+          <i class="fas fa-volume-up me-2"></i>HỆ THỐNG GIÁM SÁT TIẾNG ỒN LỚP HỌC
+        </h4>
+        <small class="text-muted">Tự động phát hiện nói chuyện ồn và hú còi nhắc nhở trật tự</small>
+      </div>
+      <div>
+        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill">
+          <i class="fas fa-exclamation-triangle me-1"></i> Số lần ồn: <b id="strikeCount" class="fs-6">0</b>
+        </span>
+      </div>
+    </div>
+
+    <!-- MẶT ĐÈN TRẠNG THÁI (ĐÈN GIAO THÔNG) -->
+    <div id="statusIndicator" class="status-circle level-quiet">
+      <i id="statusIcon" class="fas fa-smile fa-3x mb-1"></i>
+      <div id="statusText" class="fs-5">RẤT TỐT</div>
+    </div>
+
+    <!-- CHỈ SỐ DECIBEL HIỆN TẠI -->
+    <div class="mb-2">
+      <span class="text-muted small fw-bold text-uppercase">Cường độ âm thanh đo được:</span>
+      <h1 class="display-3 fw-bold text-dark my-1"><span id="dbValue">0</span> <small class="fs-4 text-muted">dB</small></h1>
+    </div>
+
+    <!-- THANH ĐO CƯỜNG ĐỘ ÂM THANH -->
+    <div class="db-meter mb-4 mx-auto" style="max-width: 650px;">
+      <div id="dbProgressBar" class="db-fill bg-success"></div>
+    </div>
+
+    <!-- THANH CÀI ĐẶT NGƯỠNG -->
+    <div class="card p-3 bg-light border-0 rounded-4 mb-4 text-start mx-auto" style="max-width: 650px;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <label for="thresholdRange" class="fw-bold small text-secondary">
+          <i class="fas fa-sliders-h me-1 text-primary"></i> Đặt ngưỡng âm thanh báo động:
+        </label>
+        <span class="badge bg-danger fs-6 px-3 py-1" id="thresholdDisplay">70 dB</span>
+      </div>
+      <input type="range" class="form-range" id="thresholdRange" min="40" max="95" value="70" oninput="updateThreshold(this.value)">
+      <div class="d-flex justify-content-between text-muted small" style="font-size: 11px;">
+        <span>40 dB (Thì thầm)</span>
+        <span>65 dB (Nói bình thường)</span>
+        <span>80 dB (Lớp rất ồn)</span>
+        <span>95 dB (Hét to)</span>
+      </div>
+    </div>
+
+    <!-- CÁC NÚT ĐIỀU KHIỂN CHÍNH -->
+    <div class="d-flex flex-wrap justify-content-center align-items-center gap-3">
+      <button id="btnToggleMic" onclick="toggleMic()" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">
+        <i class="fas fa-microphone me-2"></i> BẮT ĐẦU THEO DÕI
+      </button>
+
+      <button id="btnToggleSound" onclick="toggleSirenOption()" class="btn btn-outline-danger btn-lg rounded-pill px-4 fw-bold">
+        <i id="soundIcon" class="fas fa-bell me-2"></i> Còi hú: BẬT
+      </button>
+
+      <button onclick="resetStrikes()" class="btn btn-outline-secondary rounded-pill px-3" title="Đặt lại số lần ồn">
+        <i class="fas fa-redo"></i> Đặt lại
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    let isListening = false;
+    let audioContext = null;
+    let analyser = null;
+    let microphone = null;
+    let javascriptNode = null;
+    let alarmThreshold = 70;
+    let sirenEnabled = true;
+    let strikeCount = 0;
+    let isAlarmTriggered = false;
+    let alarmCooldown = false;
+
+    function updateThreshold(val) {
+      alarmThreshold = parseInt(val);
+      document.getElementById('thresholdDisplay').innerText = val + " dB";
+    }
+
+    function toggleSirenOption() {
+      sirenEnabled = !sirenEnabled;
+      const btn = document.getElementById('btnToggleSound');
+      const icon = document.getElementById('soundIcon');
+      if (sirenEnabled) {
+        btn.className = "btn btn-outline-danger btn-lg rounded-pill px-4 fw-bold";
+        btn.innerHTML = '<i id="soundIcon" class="fas fa-bell me-2"></i> Còi hú: BẬT';
+      } else {
+        btn.className = "btn btn-outline-secondary btn-lg rounded-pill px-4 fw-bold";
+        btn.innerHTML = '<i id="soundIcon" class="fas fa-bell-slash me-2"></i> Còi hú: TẮT';
+      }
+    }
+
+    function resetStrikes() {
+      strikeCount = 0;
+      document.getElementById('strikeCount').innerText = "0";
+    }
+
+    // BẬT / TẮT MICROPHONE
+    async function toggleMic() {
+      const btn = document.getElementById('btnToggleMic');
+      
+      if (!isListening) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioContext.createAnalyser();
+          microphone = audioContext.createMediaStreamSource(stream);
+
+          analyser.smoothingTimeConstant = 0.4;
+          analyser.fftSize = 512;
+
+          microphone.connect(analyser);
+
+          isListening = true;
+          btn.className = "btn btn-danger btn-lg rounded-pill px-5 fw-bold shadow";
+          btn.innerHTML = '<i class="fas fa-stop me-2"></i> DỪNG THEO DÕI';
+
+          processAudio();
+        } catch (err) {
+          alert("Không thể truy cập Microphone! Thầy vui lòng 'Cho phép (Allow)' quyền mic trên trình duyệt nhé.");
+          console.error(err);
+        }
+      } else {
+        // Dừng đo
+        isListening = false;
+        if (audioContext) audioContext.close();
+        btn.className = "btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow";
+        btn.innerHTML = '<i class="fas fa-microphone me-2"></i> BẮT ĐẦU THEO DÕI';
+        updateUI(0);
+      }
+    }
+
+    // TÍNH TOÁN CƯỜNG ĐỘ ÂM THANH THEO THỜI GIAN THỰC
+    function processAudio() {
+      if (!isListening) return;
+
+      const array = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(array);
+
+      let values = 0;
+      for (let i = 0; i < array.length; i++) {
+        values += array[i];
+      }
+
+      const average = values / array.length;
+      // Quy đổi tín hiệu mic về dải Decibel tương đối (khoảng 30dB - 100dB)
+      let currentDB = Math.round(35 + (average * 0.7));
+      if (currentDB > 105) currentDB = 105;
+
+      updateUI(currentDB);
+
+      // Kiểm tra vượt ngưỡng
+      if (currentDB >= alarmThreshold) {
+        triggerNoiseAlarm(currentDB);
+      }
+
+      requestAnimationFrame(processAudio);
+    }
+
+    // CẬP NHẬT GIAO DIỆN
+    function updateUI(db) {
+      document.getElementById('dbValue').innerText = isListening ? db : "0";
+      
+      const percent = Math.min(100, Math.max(0, ((db - 35) / (95 - 35)) * 100));
+      const bar = document.getElementById('dbProgressBar');
+      bar.style.width = percent + "%";
+
+      const indicator = document.getElementById('statusIndicator');
+      const icon = document.getElementById('statusIcon');
+      const text = document.getElementById('statusText');
+
+      if (!isListening) {
+        indicator.className = "status-circle bg-secondary";
+        icon.className = "fas fa-microphone-slash fa-3x mb-1";
+        text.innerText = "CHƯA BẬT";
+        bar.style.width = "0%";
+        return;
+      }
+
+      if (db < alarmThreshold - 10) {
+        indicator.className = "status-circle level-quiet";
+        icon.className = "fas fa-smile fa-3x mb-1";
+        text.innerText = "TRẬT TỰ";
+        bar.className = "db-fill bg-success";
+      } else if (db < alarmThreshold) {
+        indicator.className = "status-circle level-warning";
+        icon.className = "fas fa-meh fa-3x mb-1";
+        text.innerText = "HƠI ỒN";
+        bar.className = "db-fill bg-warning";
+      } else {
+        indicator.className = "status-circle level-danger";
+        icon.className = "fas fa-bullhorn fa-3x mb-1";
+        text.innerText = "QUÁ ỒN!";
+        bar.className = "db-fill bg-danger";
+      }
+    }
+
+    // PHÁT CÒI HÚ TỰ ĐỘNG BẰNG WEB AUDIO API (KHÔNG CẦN TẢI FILE MP3 NGOÀI)
+    function playSirenSound() {
+      if (!sirenEnabled || !audioContext) return;
+
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      osc.type = 'sawtooth';
+      
+      // Quét tần số còi hú cảnh sát (600Hz -> 1100Hz -> 600Hz)
+      const now = audioContext.currentTime;
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.linearRampToValueAtTime(1100, now + 0.35);
+      osc.frequency.linearRampToValueAtTime(600, now + 0.7);
+
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.75);
+
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.75);
+    }
+
+    // KÍCH HOẠT CẢNH BÁO
+    function triggerNoiseAlarm(db) {
+      if (alarmCooldown) return;
+
+      alarmCooldown = true;
+      strikeCount++;
+      document.getElementById('strikeCount').innerText = strikeCount;
+
+      playSirenSound();
+
+      // Giãn cách giữa các lần hú còi (tránh hú liên tục gây chói tai)
+      setTimeout(() => {
+        alarmCooldown = false;
+      }, 1400);
+    }
+  </script>
+</body>
+</html>
