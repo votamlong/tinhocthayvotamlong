@@ -345,7 +345,8 @@
     }
 
     // LƯU BẢNG PHÂN CÔNG
-    function saveDutySchedule() {
+    // LƯU BẢNG PHÂN CÔNG LÊN GOOGLE SHEETS
+    async function saveDutySchedule() {
       const className = document.getElementById('selClass').value;
       if (!className) return alert("Vui lòng chọn lớp!");
 
@@ -355,24 +356,49 @@
         scheduleData[t.id] = t.value;
       });
 
+      // Lưu dự phòng trên máy
       localStorage.setItem('duty_schedule_2627_' + className, JSON.stringify(scheduleData));
+
+      // Lưu trực tiếp lên Sheet TRUCNHAT
+      try {
+        const msg = await callApi('saveDutyToSheet', className, JSON.stringify(scheduleData));
+        alert(msg);
+      } catch (err) {
+        alert("Lỗi khi gửi lên Sheet: " + err.message);
+      }
     }
 
-    // NẠP BẢNG PHÂN CÔNG ĐÃ LƯU
-    function loadSavedDutySchedule(className) {
+    // NẠP BẢNG PHÂN CÔNG TỪ GOOGLE SHEETS
+    async function loadSavedDutySchedule(className) {
       clearAllInputs();
-      const saved = localStorage.getItem('duty_schedule_2627_' + className);
-      if (saved) {
-        try {
-          const scheduleData = JSON.parse(saved);
+      
+      try {
+        // Ưu tiên lấy từ Google Sheet
+        const scheduleData = await callApi('getDutyFromSheet', className);
+        if (scheduleData && Object.keys(scheduleData).length > 0) {
           for (let id in scheduleData) {
             const el = document.getElementById(id);
             if (el) el.value = scheduleData[id];
           }
+          return;
+        }
+      } catch (e) {
+        console.warn("Chưa lấy được từ Sheet, thử lấy từ bộ nhớ máy...");
+      }
+
+      // Nếu trên Sheet chưa có, lấy tạm từ bộ nhớ máy
+      const saved = localStorage.getItem('duty_schedule_2627_' + className);
+      if (saved) {
+        try {
+          const localData = JSON.parse(saved);
+          for (let id in localData) {
+            const el = document.getElementById(id);
+            if (el) el.value = localData[id];
+          }
         } catch(e) {}
       }
     }
-
+    //
     function clearAllInputs() {
       document.querySelectorAll('.duty-cell textarea').forEach(t => t.value = "");
     }
