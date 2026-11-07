@@ -1143,13 +1143,31 @@
       var avt = 'https://ui-avatars.com/api/?background=0D6EFD&color=fff&bold=true&name=' + encodeURIComponent(res.name);
       document.getElementById('u-avatar').src = res.avatar || avt;
 
+
       var menuHtml = '';
       var dataMenu = res.menu || res.menus || [];
+
+      // NẾU LÀ HỌC SINH (HS), TỰ ĐỘNG BỔ SUNG MENU CHUÔNG TRỐNG NẾU CHƯA CÓ
+      if (res.role === 'HS') {
+        var hasBell = dataMenu.some(function(m) { return m.id === 'school_bell_2627'; });
+        if (!hasBell) {
+          dataMenu.push({
+            id: 'school_bell_2627',
+            text: 'Chuông & Trống Trường',
+            icon: 'fa-bell'
+          });
+        }
+      }
+
       dataMenu.forEach(function(m, i) {
         menuHtml += `<div onclick="switchTab('${m.id}', this)" class="list-group-item rounded mb-2 ${i==0?'active':''}">
                        <i class="fas ${m.icon} me-3" style="width:20px"></i> <span>${m.text}</span>
                      </div>`;
       });
+
+
+
+      
       document.getElementById('sidebar-menu').innerHTML = menuHtml;
       document.getElementById('login-view').classList.add('d-none');
       document.getElementById('main-view').classList.remove('d-none');
