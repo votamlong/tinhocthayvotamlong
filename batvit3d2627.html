@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bắt Vịt 3D Gọi Tên 2627 - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #0c4a6e;
+      color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 16px;
+      user-select: none;
+      overflow-x: hidden;
+    }
+    /* SÂN HỒ NƯỚC 3D */
+    .pond-stage {
+      background: radial-gradient(circle at 50% 40%, #0284c7 0%, #0369a1 60%, #075985 100%);
+      border-radius: 28px;
+      border: 4px solid #38bdf8;
+      padding: 24px;
+      position: relative;
+      min-height: 560px;
+      overflow: hidden;
+      box-shadow: inset 0 0 50px rgba(0,0,0,0.3), 0 15px 35px rgba(2, 132, 199, 0.4);
+      perspective: 800px;
+    }
+    /* GỢN SÓNG NƯỚC */
+    .water-ripple {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, transparent 70%);
+      animation: water-breathe 4s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    @keyframes water-breathe {
+      from { transform: scale(0.95); opacity: 0.6; }
+      to { transform: scale(1.05); opacity: 0.9; }
+    }
+    /* LÁ SEN TRÔI */
+    .lily-pad {
+      position: absolute;
+      width: 70px;
+      height: 60px;
+      background: #15803d;
+      border-radius: 50%;
+      border: 2px solid #22c55e;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 55% 50%, 0% 100%);
+      opacity: 0.85;
+    }
+    /* ĐÀN VỊT BƠI TỰ DO */
+    .duck-item {
+      position: absolute;
+      font-size: 54px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));
+    }
+    .duck-item:hover {
+      transform: scale(1.25) translateY(-8px);
+    }
+    .duck-swimming {
+      animation: duck-bob 1.2s infinite ease-in-out alternate;
+    }
+    @keyframes duck-bob {
+      0% { transform: translateY(0) rotate(-3deg); }
+      100% { transform: translateY(-10px) rotate(3deg); }
+    }
+    /* CHÚ VỊT VÀNG TRÚNG THƯỞNG 3D PHÓNG LÊN GIỮA MÀN HÌNH */
+    .winner-duck-container {
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      z-index: 50;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-align: center;
+      pointer-events: none;
+    }
+    .winner-duck-container.active {
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: auto;
+    }
+    .giant-duck-icon {
+      font-size: 110px;
+      animation: duck-jump 0.6s infinite alternate;
+      filter: drop-shadow(0 15px 30px rgba(250, 204, 21, 0.6));
+    }
+    @keyframes duck-jump {
+      from { transform: translateY(0) rotate(-4deg); }
+      to { transform: translateY(-16px) rotate(4deg); }
+    }
+    .winner-badge-box {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      border: 3px solid #facc15;
+      border-radius: 20px;
+      padding: 16px 28px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+      margin-top: 8px;
+    }
+    .winner-name {
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: #facc15;
+      text-shadow: 0 0 20px rgba(250, 204, 21, 0.5);
+    }
+    .panel-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 20px;
+      padding: 18px;
+      height: 100%;
+    }
+    .history-item {
+      background: #1e293b;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      border-left: 4px solid #facc15;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1350px;">
+    
+    <!-- THANH ĐIỀU HƯỚNG BỘ LỌC -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-3 bg-dark bg-opacity-50 p-3 rounded-4 border border-secondary border-opacity-25">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-feather-alt me-1"></i>3D DUCK CATCHER</span>
+          <span class="text-secondary small">Sheet: <b>BAT_VIT_3D_2627</b></span>
+        </div>
+        <h4 class="fw-bold text-light mb-0">BẮT VỊT 3D GỌI TÊN HỌC SINH 2627</h4>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <span class="small fw-bold text-secondary">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm bg-dark text-warning border-secondary fw-bold" style="width: 130px;" onchange="onClassChange()">
+          <option value="">-- Nạp lớp... --</option>
+        </select>
+        
+        <div class="form-check form-switch m-0 ms-2">
+          <input class="form-check-input" type="checkbox" id="chkNoRepeat" checked style="cursor: pointer;">
+          <label class="form-check-label small text-light" for="chkNoRepeat">Chống gọi trùng</label>
+        </div>
+
+        <button onclick="resetCalledList()" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+          <i class="fas fa-redo me-1"></i> Làm mới vòng
+        </button>
+      </div>
+    </div>
+
+    <!-- KHU VỰC HỒ NƯỚC BẮT VỊT & NHẬT KÝ -->
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="pond-stage" id="pondStage">
+          <div class="water-ripple"></div>
+
+          <!-- LÁ SEN TRANG TRÍ -->
+          <div class="lily-pad" style="top: 15%; left: 10%;"></div>
+          <div class="lily-pad" style="bottom: 20%; right: 12%; transform: rotate(45deg);"></div>
+          <div class="lily-pad" style="top: 70%; left: 25%; transform: rotate(-30deg);"></div>
+
+          <!-- ĐÀN VỊT BƠI TỰ ĐỘNG SINH QUA JAVASCRIPT -->
+          <div id="ducksPond"></div>
+
+          <!-- CHÚ VỊT THẮNG CUỘC HIỆN BẢNG TÊN HỌC SINH -->
+          <div class="winner-duck-container" id="winnerBox">
+            <div class="giant-duck-icon">🦆</div>
+            <div class="winner-badge-box">
+              <span class="badge bg-warning text-dark fw-bold px-3 py-1 mb-2" id="winnerId">HS01</span>
+              <div class="winner-name" id="winnerName">Nguyễn Văn A</div>
+              <small class="text-info fw-bold" id="winnerStatus">🎯 MỜI EM LÊN BẢNG PHÁT BIỂU!</small>
+            </div>
+          </div>
+
+          <!-- NÚT BẮT VỊT TRUNG TÂM -->
+          <div class="position-absolute bottom-0 start-50 translate-middle-x mb-4" style="z-index: 60;">
+            <button onclick="startCatchDuck()" id="btnCatch" class="btn btn-warning btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg text-dark fs-5">
+              <i class="fas fa-hand-holding me-2"></i> BẮT VỊT GỌI TÊN NGAY
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CỘT NHẬT KÝ LƯỢT GỌI TRÊN GOOGLE SHEETS -->
+      <div class="col-lg-4">
+        <div class="panel-card d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary">
+            <h6 class="fw-bold text-warning m-0"><i class="fas fa-history me-2"></i>NHẬT KÝ BẮT VỊT (SHEET)</h6>
+            <button onclick="loadHistoryFromSheet()" class="btn btn-sm btn-outline-warning rounded-pill px-2">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+
+          <div class="flex-grow-1 overflow-auto mb-3" style="max-height: 430px;" id="historyContainer">
+            <div class="text-secondary small fst-italic py-3 text-center">Đang nạp dữ liệu từ Sheet...</div>
+          </div>
+
+          <div class="p-2 bg-dark bg-opacity-50 rounded-3 border border-secondary small text-secondary">
+            <i class="fas fa-database text-warning me-1"></i>
+            Mỗi chú vịt được bắt sẽ tự động lưu tên học sinh vào sheet <b>BAT_VIT_3D_2627</b>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzTXXGkxbfalcipzrIZcJEL57wpH454JWZCVxXQNdRsF4pasz4cMeEXZELePGr41Q3KXg/exec";
+
+    let studentList = [];
+    let calledIds = [];
+    let isCatching = false;
+    let audioCtx = null;
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    // ÂM THANH TIẾNG VỊT QUÁC QUÁC (SYNTHESIZED DUCK QUACK)
+    function playDuckQuack() {
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+
+        // Mô phỏng âm thanh quác 2 tiếng liên tiếp
+        [0, 0.14].forEach(delay => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const filter = ctx.createBiquadFilter();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(450, now + delay);
+          osc.frequency.exponentialRampToValueAtTime(260, now + delay + 0.12);
+
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(800, now + delay);
+          filter.Q.setValueAtTime(3, now + delay);
+
+          gain.gain.setValueAtTime(0.4, now + delay);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.12);
+
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start(now + delay);
+          osc.stop(now + delay + 0.13);
+        });
+      } catch(e) {}
+    }
+
+    // ÂM THANH BẮT VỊT CHIẾN THẮNG
+    function playVictoryChime() {
+      try {
+        const ctx = getAudioContext();
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.09);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime + idx * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + idx * 0.09 + 0.45);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + idx * 0.09);
+          osc.stop(ctx.currentTime + idx * 0.09 + 0.48);
+        });
+      } catch(e) {}
+    }
+
+    window.onload = async function() {
+      renderSwimmingDucks();
+      try {
+        const classes = await callApi('getAllClasses');
+        const sel = document.getElementById('selClass');
+        let html = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => html += `<option value="${c}">${c}</option>`);
+        sel.innerHTML = html;
+
+        if (classes && classes.length > 0) {
+          sel.value = classes[0];
+          await onClassChange();
+        }
+      } catch (err) {
+        console.error("Lỗi nạp lớp:", err);
+      }
+    };
+
+    // RENDER ĐÀN VỊT BƠI TRONG HỒ
+    function renderSwimmingDucks() {
+      const container = document.getElementById('ducksPond');
+      let html = '';
+      const positions = [
+        { top: 22, left: 18, delay: 0 },
+        { top: 35, left: 75, delay: 0.3 },
+        { top: 55, left: 35, delay: 0.6 },
+        { top: 72, left: 80, delay: 0.2 },
+        { top: 40, left: 50, delay: 0.5 },
+        { top: 68, left: 15, delay: 0.8 },
+        { top: 25, left: 60, delay: 0.4 }
+      ];
+
+      positions.forEach((p, idx) => {
+        html += `
+          <div class="duck-item duck-swimming" onclick="playDuckQuack()" 
+               style="top: ${p.top}%; left: ${p.left}%; animation-delay: ${p.delay}s;">
+            🦆
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      calledIds = [];
+      document.getElementById('winnerBox').classList.remove('active');
+
+      try {
+        studentList = await callApi('getStudentList', className) || [];
+      } catch (e) {
+        studentList = [];
+      }
+
+      loadHistoryFromSheet();
+    }
+
+    // TẢI LỊCH SỬ BẮT VỊT TỪ SHEET
+    async function loadHistoryFromSheet() {
+      const className = document.getElementById('selClass').value;
+      const container = document.getElementById('historyContainer');
+      try {
+        const list = await callApi('getCatchDuckHistory2627', className);
+        if (!list || list.length === 0) {
+          container.innerHTML = '<div class="text-secondary small fst-italic py-3 text-center">Chưa có lượt bắt vịt nào của lớp này trong Sheet.</div>';
+          return;
+        }
+
+        let html = '';
+        list.forEach(r => {
+          html += `
+            <div class="history-item">
+              <div class="d-flex justify-content-between text-secondary" style="font-size:11px;">
+                <span><i class="far fa-clock me-1"></i>${r.time}</span>
+                <span class="badge bg-warning text-dark fw-bold">${r.studentId}</span>
+              </div>
+              <div class="fw-bold text-light mt-1">${r.studentName}</div>
+              <div class="small text-info">${r.note || 'Trả lời câu hỏi'}</div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      } catch (e) {
+        container.innerHTML = '<div class="text-danger small p-2">Lỗi tải lịch sử sheet: ' + e.message + '</div>';
+      }
+    }
+
+    // BẮT ĐẦU TRÒ CHƠI BẮT VỊT 3D
+    function startCatchDuck() {
+      if (isCatching) return;
+      if (!studentList || studentList.length === 0) return alert("Lớp chưa có học sinh!");
+
+      const noRepeat = document.getElementById('chkNoRepeat').checked;
+      let availableStudents = noRepeat 
+        ? studentList.filter(s => !calledIds.includes(s.id))
+        : studentList;
+
+      if (availableStudents.length === 0) {
+        if (confirm("Đã bắt hết tất cả học sinh trong lớp! Đặt lại danh sách để bắt vòng mới?")) {
+          calledIds = [];
+          availableStudents = studentList;
+        } else {
+          return;
+        }
+      }
+
+      isCatching = true;
+      const btn = document.getElementById('btnCatch');
+      const winnerBox = document.getElementById('winnerBox');
+      const nameEl = document.getElementById('winnerName');
+      const idEl = document.getElementById('winnerId');
+
+      btn.disabled = true;
+      winnerBox.classList.remove('active');
+
+      // Vịt bơi quẫy nước hỗn loạn
+      const ducks = document.querySelectorAll('.duck-item');
+      ducks.forEach(d => d.style.transform = `scale(1.4) rotate(${Math.random()*40 - 20}deg)`);
+
+      let duration = 2800;
+      let startTime = Date.now();
+
+      const duckTimer = setInterval(() => {
+        playDuckQuack();
+        // Hiệu ứng dịch chuyển nhẹ đàn vịt
+        ducks.forEach(d => {
+          d.style.left = `${Math.max(10, Math.min(85, parseFloat(d.style.left) + (Math.random()*10 - 5)))}%`;
+        });
+
+        if (Date.now() - startTime > duration) {
+          clearInterval(duckTimer);
+
+          const winner = availableStudents[Math.floor(Math.random() * availableStudents.length)];
+          idEl.innerText = `${winner.id} - ${winner.class || document.getElementById('selClass').value}`;
+          nameEl.innerText = winner.name;
+
+          winnerBox.classList.add('active');
+          playVictoryChime();
+
+          if (noRepeat) calledIds.push(winner.id);
+
+          // GHI VÀO GOOGLE SHEET BAT_VIT_3D_2627
+          const currentClass = document.getElementById('selClass').value;
+          callApi('saveCatchDuckRecord2627', {
+            className: currentClass,
+            studentId: winner.id,
+            studentName: winner.name,
+            note: "Bắt vịt gọi tên"
+          }).then(() => {
+            loadHistoryFromSheet();
+          }).catch(err => {
+            console.error("Lỗi lưu sheet:", err);
+          });
+
+          btn.disabled = false;
+          isCatching = false;
+        }
+      }, 350);
+    }
+
+    function resetCalledList() {
+      calledIds = [];
+      document.getElementById('winnerBox').classList.remove('active');
+      alert("Đã làm mới vòng gọi tên học sinh!");
+    }
+  </script>
+</body>
+</html>
