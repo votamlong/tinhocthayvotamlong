@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UFO Gọi Tên Học Sinh 2627 - EduClass Pro</title>
+  <title>UFO Gọi Tên Học Sinh 2627</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -14,7 +14,6 @@
       color: #f8fafc;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 16px;
-      overflow-x: hidden;
       user-select: none;
     }
     .space-stage {
@@ -23,11 +22,10 @@
       border: 1px solid #312e81;
       padding: 24px;
       position: relative;
-      min-height: 580px;
+      min-height: 560px;
       overflow: hidden;
       box-shadow: 0 0 50px rgba(99, 102, 241, 0.15);
     }
-    /* Đồ họa Đĩa bay UFO */
     .ufo-wrapper {
       position: relative;
       z-index: 10;
@@ -38,23 +36,23 @@
       100% { transform: translateY(12px) rotate(1deg); }
     }
     .ufo-disk {
-      width: 220px;
-      height: 70px;
+      width: 230px;
+      height: 75px;
       background: linear-gradient(180deg, #64748b 0%, #334155 60%, #0f172a 100%);
       border-radius: 50%;
       margin: 0 auto;
       position: relative;
-      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+      box-shadow: 0 4px 25px rgba(56, 189, 248, 0.5);
       border: 2px solid #94a3b8;
     }
     .ufo-dome {
-      width: 100px;
-      height: 55px;
+      width: 105px;
+      height: 58px;
       background: radial-gradient(circle at 50% 30%, #38bdf8 0%, #0284c7 70%, #0369a1 100%);
       border-radius: 50% 50% 0 0;
-      margin: 0 auto -20px auto;
+      margin: 0 auto -22px auto;
       border: 2px solid #7dd3fc;
-      opacity: 0.9;
+      opacity: 0.95;
     }
     .ufo-lights {
       display: flex;
@@ -76,36 +74,34 @@
     .ufo-light:nth-child(4) { animation-delay: 0.6s; background: #f43f5e; }
     @keyframes light-blink {
       from { opacity: 0.3; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1.3); box-shadow: 0 0 10px #fff; }
+      to { opacity: 1; transform: scale(1.3); box-shadow: 0 0 12px #fff; }
     }
 
-    /* Tia sáng hút người (Tractor Beam) */
     .tractor-beam {
-      width: 320px;
-      height: 340px;
+      width: 330px;
+      height: 330px;
       margin: -15px auto 0 auto;
-      background: linear-gradient(180deg, rgba(56, 189, 248, 0.65) 0%, rgba(99, 102, 241, 0.15) 75%, transparent 100%);
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.7) 0%, rgba(99, 102, 241, 0.15) 75%, transparent 100%);
       clip-path: polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%);
       transition: all 0.3s ease;
       opacity: 0.25;
       filter: blur(1px);
     }
     .tractor-beam.active {
-      opacity: 0.9;
-      background: linear-gradient(180deg, rgba(56, 189, 248, 0.95) 0%, rgba(34, 197, 94, 0.5) 60%, rgba(99, 102, 241, 0.2) 100%);
-      animation: beam-pulse 0.25s infinite alternate;
+      opacity: 0.95;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.95) 0%, rgba(34, 197, 94, 0.6) 60%, rgba(99, 102, 241, 0.25) 100%);
+      animation: beam-pulse 0.2s infinite alternate;
     }
     @keyframes beam-pulse {
       from { filter: drop-shadow(0 0 15px #38bdf8); }
       to { filter: drop-shadow(0 0 35px #22c55e); }
     }
 
-    /* Khung học sinh được chiếu hút */
     .student-display-box {
       margin-top: -190px;
       position: relative;
       z-index: 20;
-      min-height: 140px;
+      min-height: 130px;
     }
     .student-name-text {
       font-size: 3.2rem;
@@ -113,48 +109,41 @@
       letter-spacing: 1px;
       color: #ffffff;
       text-shadow: 0 0 25px rgba(56, 189, 248, 0.8), 0 0 50px rgba(99, 102, 241, 0.6);
-      transition: transform 0.2s;
     }
     .student-id-text {
       color: #38bdf8;
       font-weight: 700;
       letter-spacing: 2px;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
     }
-
-    /* Danh sách đã gọi */
-    .pool-card {
+    .panel-card {
       background: #111827;
       border: 1px solid #1f2937;
       border-radius: 18px;
       padding: 16px;
       height: 100%;
     }
-    .called-tag {
-      background: #1f2937;
-      color: #cbd5e1;
-      padding: 4px 10px;
-      border-radius: 50px;
-      font-size: 12px;
-      border: 1px solid #374151;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin: 3px;
+    .history-item {
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      border-left: 3px solid #38bdf8;
+      font-size: 13px;
     }
   </style>
 </head>
 <body>
 
-  <div class="container-fluid" style="max-width: 1300px;">
+  <div class="container-fluid" style="max-width: 1350px;">
     
-    <!-- THANH ĐIỀU HƯỚNG VÀ BỘ CHỌN LỚP -->
+    <!-- THANH CÔNG CỤ -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4 bg-dark bg-opacity-50 p-3 rounded-4 border border-secondary border-opacity-25">
       <div>
         <h4 class="fw-bold text-info mb-1">
           <i class="fas fa-satellite-dish me-2"></i>UFO GỌI TÊN HỌC SINH 2627
         </h4>
-        <small class="text-secondary">Chiếu tia lượng tử chọn ngẫu nhiên học sinh lên bảng phát biểu</small>
+        <small class="text-secondary">Dữ liệu tự động lưu trữ vào Google Sheet: <b>UFO_GOI_TEN_2627</b></small>
       </div>
 
       <div class="d-flex flex-wrap align-items-center gap-2">
@@ -165,21 +154,20 @@
         
         <div class="form-check form-switch m-0 ms-2">
           <input class="form-check-input" type="checkbox" id="chkNoRepeat" checked style="cursor: pointer;">
-          <label class="form-check-label small text-light" for="chkNoRepeat">Chống trùng</label>
+          <label class="form-check-label small text-light" for="chkNoRepeat">Chống gọi trùng</label>
         </div>
 
-        <button onclick="resetCalledList()" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="Đặt lại danh sách">
+        <button onclick="resetCalledList()" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
           <i class="fas fa-redo me-1"></i> Làm mới
         </button>
       </div>
     </div>
 
-    <!-- KHU VỰC SÂN KHẤU UFO VŨ TRỤ -->
+    <!-- KHU VỰC ĐĨA BAY & LỊCH SỬ -->
     <div class="row g-4">
       <div class="col-lg-8">
         <div class="space-stage text-center">
           
-          <!-- HÌNH ĐĨA BAY UFO -->
           <div class="ufo-wrapper">
             <div class="ufo-dome"></div>
             <div class="ufo-disk">
@@ -192,17 +180,14 @@
             </div>
           </div>
 
-          <!-- TIA SÁNG HÚT (TRACTOR BEAM) -->
           <div class="tractor-beam" id="tractorBeam"></div>
 
-          <!-- VÙNG HIỂN THỊ TÊN HỌC SINH BỊ HÚT LÊN -->
           <div class="student-display-box">
             <div class="student-id-text" id="displayId">SẴN SÀNG QUÉT HỌC SINH</div>
             <div class="student-name-text my-1" id="displayName">🛸🛸🛸</div>
-            <div id="subStatus" class="small text-secondary mt-1">Bấm nút "PHÁT TIA HÚT" bên dưới để gọi tên</div>
+            <div id="subStatus" class="small text-secondary mt-1">Bấm nút bên dưới để phát tia hút lượng tử</div>
           </div>
 
-          <!-- NÚT KÍCH HOẠT QUÉT TIA SÁNG -->
           <div class="mt-4 pt-3 position-relative" style="z-index: 30;">
             <button onclick="startUfoScan()" id="btnScan" class="btn btn-info btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg text-dark fs-5">
               <i class="fas fa-meteor me-2"></i> PHÁT TIA HÚT GỌI TÊN
@@ -212,26 +197,23 @@
         </div>
       </div>
 
-      <!-- CỘT DANH SÁCH HỌC SINH & LỊCH SỬ ĐÃ GỌI -->
+      <!-- CỘT GHI VẾT LỊCH SỬ SHEET -->
       <div class="col-lg-4">
-        <div class="pool-card d-flex flex-column">
+        <div class="panel-card d-flex flex-column">
           <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary">
-            <h6 class="fw-bold text-info m-0"><i class="fas fa-list-ul me-2"></i>DANH SÁCH LỚP</h6>
-            <span class="badge bg-primary bg-opacity-25 text-info px-2 py-1" id="countStatus">0 / 0 em</span>
+            <h6 class="fw-bold text-info m-0"><i class="fas fa-history me-2"></i>NHẬT KÝ ĐÃ GỌI (SHEET)</h6>
+            <button onclick="loadHistoryFromSheet()" class="btn btn-sm btn-outline-info rounded-pill px-2">
+              <i class="fas fa-sync-alt"></i>
+            </button>
           </div>
 
-          <!-- DANH SÁCH ĐÃ ĐƯỢC UFO HÚT -->
-          <div class="small fw-bold text-secondary mb-2 text-uppercase" style="font-size: 11px;">
-            Đã gọi trong tiết (<span id="calledCount">0</span> em):
-          </div>
-          <div class="flex-grow-1 overflow-auto mb-3" style="max-height: 380px;" id="calledContainer">
-            <div class="text-secondary small fst-italic py-3 text-center" id="emptyCalledText">Chưa có học sinh nào được gọi.</div>
+          <div class="flex-grow-1 overflow-auto mb-3" style="max-height: 430px;" id="historyContainer">
+            <div class="text-secondary small fst-italic py-3 text-center">Đang nạp dữ liệu từ Sheet...</div>
           </div>
 
-          <!-- GỢI Ý ĐIỂM CỘNG -->
           <div class="p-2 bg-dark bg-opacity-50 rounded-3 border border-secondary small text-secondary">
-            <i class="fas fa-info-circle text-info me-1"></i>
-            Học sinh trả lời đúng có thể ghi nhận vào sổ điểm hoặc cộng điểm thi đua nề nếp.
+            <i class="fas fa-database text-warning me-1"></i>
+            Tự động lưu lượt gọi vào sheet <b>UFO_GOI_TEN_2627</b>.
           </div>
         </div>
       </div>
@@ -240,7 +222,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzpQCTDsWmwl1A0jo2UBdzo6Fxco22Rd0McBVq9YE9YfIprW9y7qvbCl39oK9O-28pQGg/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbx7CIwSPjv3PM9s7fdi1xLJOb18rkYG9upg9UgWOk8gdie_29e_uZrJZFOwQltYrLUxcw/exec";
 
     let studentList = [];
     let calledIds = [];
@@ -264,16 +246,15 @@
       return audioCtx;
     }
 
-    // ÂM THANH LASER QUÉT TIA (WEB AUDIO API)
     function playLaserHum() {
       try {
         const ctx = getAudioContext();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(250 + Math.random() * 400, ctx.currentTime);
+        osc.frequency.setValueAtTime(300 + Math.random() * 450, ctx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
         gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.1);
         osc.connect(gain);
         gain.connect(ctx.destination);
@@ -282,22 +263,20 @@
       } catch(e) {}
     }
 
-    // ÂM THANH KHI CHỐT HỌC SINH (FANFARE SCI-FI)
-    function playBeamingVictory() {
+    function playVictoryChime() {
       try {
         const ctx = getAudioContext();
-        const notes = [440, 554, 659, 880];
-        notes.forEach((freq, idx) => {
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
-          gain.gain.setValueAtTime(0.3, ctx.currentTime + idx * 0.1);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + idx * 0.1 + 0.4);
+          gain.gain.setValueAtTime(0.25, ctx.currentTime + idx * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + idx * 0.1 + 0.5);
           osc.connect(gain);
           gain.connect(ctx.destination);
           osc.start(ctx.currentTime + idx * 0.1);
-          osc.stop(ctx.currentTime + idx * 0.1 + 0.45);
+          osc.stop(ctx.currentTime + idx * 0.1 + 0.55);
         });
       } catch(e) {}
     }
@@ -315,7 +294,7 @@
           await onClassChange();
         }
       } catch (err) {
-        console.error("Lỗi nạp danh sách lớp:", err);
+        console.error("Lỗi nạp lớp:", err);
       }
     };
 
@@ -324,30 +303,47 @@
       if (!className) return;
 
       calledIds = [];
-      renderCalledList();
-
-      document.getElementById('displayId').innerText = "ĐANG TẢI HỌC SINH...";
-      document.getElementById('displayName').innerText = className;
+      document.getElementById('displayId').innerText = "ĐANG TẢI LỚP " + className;
+      document.getElementById('displayName').innerText = "🛸 SẴN SÀNG";
 
       try {
         studentList = await callApi('getStudentList', className) || [];
-        updatePoolCount();
-        document.getElementById('displayId').innerText = "LỚP: " + className;
-        document.getElementById('displayName').innerText = "🛸 SẴN SÀNG";
       } catch (e) {
         studentList = [];
-        document.getElementById('displayId').innerText = "LỖI";
-        document.getElementById('displayName').innerText = "Không có HS";
+      }
+
+      loadHistoryFromSheet();
+    }
+
+    async function loadHistoryFromSheet() {
+      const className = document.getElementById('selClass').value;
+      const container = document.getElementById('historyContainer');
+      try {
+        const list = await callApi('getUfoCallHistory2627', className);
+        if (!list || list.length === 0) {
+          container.innerHTML = '<div class="text-secondary small fst-italic py-3 text-center">Chưa có lượt gọi nào của lớp này trong Sheet.</div>';
+          return;
+        }
+
+        let html = '';
+        list.forEach(r => {
+          html += `
+            <div class="history-item">
+              <div class="d-flex justify-content-between text-secondary" style="font-size:11px;">
+                <span><i class="far fa-clock me-1"></i>${r.time}</span>
+                <span class="badge bg-secondary bg-opacity-25 text-info">${r.studentId}</span>
+              </div>
+              <div class="fw-bold text-light mt-1">${r.studentName}</div>
+              <div class="small text-warning">${r.note || 'Phát biểu'}</div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      } catch (e) {
+        container.innerHTML = '<div class="text-danger small p-2">Lỗi tải lịch sử sheet: ' + e.message + '</div>';
       }
     }
 
-    function updatePoolCount() {
-      const remaining = studentList.length - calledIds.length;
-      document.getElementById('countStatus').innerText = `${remaining} / ${studentList.length} em`;
-      document.getElementById('calledCount').innerText = calledIds.length;
-    }
-
-    // BẮT ĐẦU PHÁT TIA HÚT VÀ QUÉT TÊN
     function startUfoScan() {
       if (isScanning) return;
       if (!studentList || studentList.length === 0) return alert("Lớp chưa có học sinh!");
@@ -358,10 +354,8 @@
         : studentList;
 
       if (availableStudents.length === 0) {
-        if (confirm("Tất cả học sinh trong lớp đã được gọi hết! Thầy có muốn đặt lại vòng gọi mới?")) {
+        if (confirm("Đã gọi hết cả lớp! Đặt lại danh sách để gọi vòng mới?")) {
           calledIds = [];
-          renderCalledList();
-          updatePoolCount();
           availableStudents = studentList;
         } else {
           return;
@@ -377,63 +371,52 @@
 
       btn.disabled = true;
       beam.classList.add('active');
-      statusEl.innerText = "⚡ UFO ĐANG QUÉT TẦN SỐ TÂM LÝ...";
+      statusEl.innerText = "⚡ ĐANG CHIẾU TIA QUÉT HỌC SINH...";
 
-      let duration = 3200; // 3.2 giây quét
-      let intervalSpeed = 50;
+      let duration = 3000;
       let startTime = Date.now();
 
       const scanTimer = setInterval(() => {
         const rand = availableStudents[Math.floor(Math.random() * availableStudents.length)];
         nameEl.innerText = rand.name;
-        idEl.innerText = `${rand.id} • ${rand.gender || 'HS'}`;
+        idEl.innerText = `${rand.id}`;
         playLaserHum();
 
         if (Date.now() - startTime > duration) {
           clearInterval(scanTimer);
 
-          // CHỌN RA HỌC SINH CUỐI CÙNG
           const winner = availableStudents[Math.floor(Math.random() * availableStudents.length)];
           nameEl.innerText = winner.name;
-          idEl.innerText = `⭐ ĐÃ KHÓA MỤC TIÊU: ${winner.id}`;
-          statusEl.innerText = "🎯 MỜI EM LÊN BẢNG PHÁT BIỂU / TRẢ LỜI CÂU HỎI";
+          idEl.innerText = `⭐ ĐÃ CHỌN: ${winner.id}`;
+          statusEl.innerText = "🎯 ĐANG LƯU VÀO GOOGLE SHEET...";
 
-          playBeamingVictory();
+          playVictoryChime();
 
-          if (noRepeat) {
-            calledIds.push(winner.id);
-            renderCalledList();
-          }
+          if (noRepeat) calledIds.push(winner.id);
 
-          updatePoolCount();
+          const currentClass = document.getElementById('selClass').value;
+          callApi('saveUfoCallRecord2627', {
+            className: currentClass,
+            studentId: winner.id,
+            studentName: winner.name,
+            note: "Trả lời câu hỏi"
+          }).then(() => {
+            statusEl.innerText = "✅ ĐÃ LƯU VÀO SHEET UFO_GOI_TEN_2627!";
+            loadHistoryFromSheet();
+          }).catch(err => {
+            statusEl.innerText = "❌ Lỗi lưu sheet: " + err.message;
+          });
+
           beam.classList.remove('active');
           btn.disabled = false;
           isScanning = false;
         }
-      }, intervalSpeed);
-    }
-
-    function renderCalledList() {
-      const container = document.getElementById('calledContainer');
-      if (calledIds.length === 0) {
-        container.innerHTML = '<div class="text-secondary small fst-italic py-3 text-center" id="emptyCalledText">Chưa có học sinh nào được gọi.</div>';
-        return;
-      }
-
-      let html = '';
-      calledIds.slice().reverse().forEach(id => {
-        const s = studentList.find(item => item.id === id);
-        const name = s ? s.name : id;
-        html += `<span class="called-tag"><i class="fas fa-user-check text-success"></i>${name}</span>`;
-      });
-      container.innerHTML = html;
+      }, 60);
     }
 
     function resetCalledList() {
       calledIds = [];
-      renderCalledList();
-      updatePoolCount();
-      document.getElementById('subStatus').innerText = "Đã làm mới vòng gọi tên học sinh.";
+      document.getElementById('subStatus').innerText = "Đã làm mới danh sách gọi.";
     }
   </script>
 </body>
