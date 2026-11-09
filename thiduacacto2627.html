@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thi Đua Các Tổ 2627 - Tự Động Đồng Bộ Điểm</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2);
+    }
+    .team-card {
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      background: #ffffff;
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.03);
+      transition: all 0.2s;
+    }
+    .team-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    }
+    .team-header {
+      padding: 12px 18px;
+      font-weight: 800;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .score-display {
+      font-size: 2.6rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .rank-badge {
+      font-size: 13px;
+      font-weight: 800;
+      border-radius: 50px;
+      padding: 3px 12px;
+      background: rgba(255,255,255,0.25);
+    }
+    .rank-1 { border-color: #f59e0b !important; }
+    .rank-1 .team-header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important; }
+
+    .nav-tabs .nav-link {
+      font-weight: 700;
+      color: #64748b;
+      border-radius: 10px 10px 0 0;
+    }
+    .nav-tabs .nav-link.active {
+      color: #d97706;
+      border-color: #cbd5e1 #cbd5e1 #fff;
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #475569;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      border-bottom: 2px solid #cbd5e1;
+    }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .team-card { border: 1px solid #000 !important; box-shadow: none !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; }
+      @page { size: landscape; margin: 10mm; }
+    }
+    .print-header { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1350px;">
+    
+    <!-- THANH TIÊU ĐỀ & BỘ LỌC (ẨN KHI IN) -->
+    <div class="header-banner mb-3 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-flag-checkered me-1"></i>AUTO GROUP EMULATION</span>
+          <span class="opacity-75 small">Cộng: <b>LOG_DIEMCONG</b> | Trừ: <b>DISCIPLINE & DS_LOI</b></span>
+        </div>
+        <h4 class="fw-bold mb-0">THI ĐUA CÁC TỔ TỰ ĐỘNG THEO TUẦN</h4>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-warning" style="width: 120px;" onchange="loadEmulationData()">
+          <option value="">-- Chọn lớp --</option>
+        </select>
+
+        <span class="small fw-bold text-secondary ps-2">Từ:</span>
+        <input type="date" id="startDate" class="form-control form-control-sm border-0" style="width: 130px;">
+        <span class="small fw-bold text-secondary">đến:</span>
+        <input type="date" id="endDate" class="form-control form-control-sm border-0" style="width: 130px;">
+
+        <button onclick="loadEmulationData()" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark shadow-sm">
+          <i class="fas fa-sync-alt me-1"></i> Tải số liệu
+        </button>
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In tổng kết
+        </button>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header text-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">Lớp: <b class="text-dark fs-5" id="printClassName">...</b></div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+          <div class="small fst-italic">Bảng tổng hợp thi đua các tổ</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">BẢNG TỔNG KẾT ĐIỂM THI ĐUA CÁC TỔ</h3>
+      <p class="text-secondary small fst-italic">Khoảng thời gian: <b class="text-dark" id="printDateRange">...</b> | GVCN: <b>Thầy Võ Tâm Long</b></p>
+      <hr>
+    </div>
+
+    <!-- 4 THẺ TỔ HIỂN THỊ TỔNG ĐIỂM THI ĐUA -->
+    <div class="row g-3 mb-4" id="teamsCardsContainer">
+      <div class="col-12 text-center text-muted p-5"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu điểm...</div>
+    </div>
+
+    <!-- TABS XEM CHI TIẾT ĐỐI SOÁT -->
+    <div class="panel-box p-0 overflow-hidden">
+      <ul class="nav nav-tabs px-3 pt-3 bg-light no-print" id="emulationTabs" role="tablist">
+        <li class="nav-item">
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-ranking">
+            <i class="fas fa-trophy text-warning me-1"></i> Bảng Xếp Hạng
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link text-success" data-bs-toggle="tab" data-bs-target="#tab-bonus">
+            <i class="fas fa-plus-circle me-1"></i> Chi Tiết Điểm Cộng (<span id="totalBonusBadge">0</span>)
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link text-danger" data-bs-toggle="tab" data-bs-target="#tab-penalty">
+            <i class="fas fa-minus-circle me-1"></i> Chi Tiết Điểm Trừ (<span id="totalPenaltyBadge">0</span>)
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content p-3">
+        
+        <!-- 1. BẢNG XẾP HẠNG -->
+        <div class="tab-pane fade show active" id="tab-ranking">
+          <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle mb-0 text-center small">
+              <thead>
+                <tr>
+                  <th style="width: 80px;">HẠNG</th>
+                  <th style="width: 140px;">TỔ</th>
+                  <th style="width: 110px;">SĨ SỐ</th>
+                  <th style="width: 130px;" class="text-success">ĐIỂM CỘNG (+)</th>
+                  <th style="width: 130px;" class="text-danger">ĐIỂM TRỪ (-)</th>
+                  <th style="width: 140px;">TỔNG ĐIỂM</th>
+                  <th class="text-start ps-3">ĐÁNH GIÁ CHUNG</th>
+                </tr>
+              </thead>
+              <tbody id="rankingBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2. CHI TIẾT ĐIỂM CỘNG TỪ LOG_DIEMCONG -->
+        <div class="tab-pane fade" id="tab-bonus">
+          <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle mb-0 text-center small">
+              <thead>
+                <tr>
+                  <th style="width: 130px;">THỜI GIAN</th>
+                  <th style="width: 100px;">TỔ</th>
+                  <th style="width: 90px;">MÃ HS</th>
+                  <th class="text-start ps-3">HỌ VÀ TÊN</th>
+                  <th class="text-start ps-3">NỘI DUNG ĐIỂM CỘNG</th>
+                  <th style="width: 90px;" class="text-success">ĐIỂM CỘNG</th>
+                  <th style="width: 120px;">NGƯỜI CỘNG</th>
+                </tr>
+              </thead>
+              <tbody id="bonusBody">
+                <tr><td colspan="7" class="p-3 text-muted">Chưa có bản ghi điểm cộng trong khoảng thời gian này.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3. CHI TIẾT ĐIỂM TRỪ TỪ DISCIPLINE -->
+        <div class="tab-pane fade" id="tab-penalty">
+          <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle mb-0 text-center small">
+              <thead>
+                <tr>
+                  <th style="width: 130px;">THỜI GIAN</th>
+                  <th style="width: 100px;">TỔ</th>
+                  <th style="width: 90px;">MÃ HS</th>
+                  <th class="text-start ps-3">HỌ VÀ TÊN</th>
+                  <th class="text-start ps-3">LOẠI LỖI VI PHẠM</th>
+                  <th style="width: 90px;" class="text-danger">ĐIỂM TRỪ</th>
+                  <th class="text-start ps-3">GHI CHÚ</th>
+                </tr>
+              </thead>
+              <tbody id="penaltyBody">
+                <tr><td colspan="7" class="p-3 text-muted">Không có bản ghi vi phạm trong khoảng thời gian này.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwxmEvmwbM-kujwJiFJWh6L38z9x_ZIQZf-Kb2uQ3AowPBaHPU94GN7_L3FYiz2f7UX1A/exec";
+
+    let currentData = null;
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      // Đặt khoảng ngày mặc định: Đầu tuần đến hôm nay
+      const now = new Date();
+      const firstDay = new Date(now.setDate(now.getDate() - now.getDay() + 1)).toISOString().split('T')[0];
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('startDate').value = firstDay;
+      document.getElementById('endDate').value = today;
+
+      try {
+        const classes = await callApi('getAllClasses');
+        const selC = document.getElementById('selClass');
+        let hC = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => hC += `<option value="${c}">${c}</option>`);
+        selC.innerHTML = hC;
+
+        if (classes && classes.length > 0) {
+          selC.value = classes[0];
+          await loadEmulationData();
+        }
+      } catch(e) {
+        console.error(e);
+      }
+    };
+
+    async function loadEmulationData() {
+      const className = document.getElementById('selClass').value;
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      if (!className) return;
+
+      document.getElementById('printClassName').innerText = className;
+      document.getElementById('printDateRange').innerText = `${start} đến ${end}`;
+      document.getElementById('teamsCardsContainer').innerHTML = '<div class="col-12 text-center text-muted p-5"><i class="fas fa-sync fa-spin me-2"></i>Đang tổng hợp điểm từ Sheet LOG_DIEMCONG & DISCIPLINE...</div>';
+
+      try {
+        currentData = await callApi('getGroupEmulationFromLogs', className, start, end);
+        if (!currentData || currentData.error) {
+          alert(currentData ? currentData.error : "Lỗi nạp dữ liệu!");
+          return;
+        }
+        renderUI();
+      } catch(err) {
+        document.getElementById('teamsCardsContainer').innerHTML = `<div class="col-12 text-danger p-4 text-center">Lỗi: ${err.message}</div>`;
+      }
+    }
+
+    function renderUI() {
+      const teams = currentData.teams || [];
+      const cardsContainer = document.getElementById('teamsCardsContainer');
+      const rankBody = document.getElementById('rankingBody');
+      const bonusBody = document.getElementById('bonusBody');
+      const penaltyBody = document.getElementById('penaltyBody');
+
+      document.getElementById('totalBonusBadge').innerText = "+" + (currentData.totalBonus || 0);
+      document.getElementById('totalPenaltyBadge').innerText = "-" + (currentData.totalPenalty || 0);
+
+      // 1. Render 4 Thẻ Tổ
+      let cardHtml = '';
+      teams.forEach(t => {
+        let isFirst = t.rank === 1;
+        let rankText = t.rank === 1 ? '🥇 HẠNG 1' : (t.rank === 2 ? '🥈 HẠNG 2' : (t.rank === 3 ? '🥉 HẠNG 3' : 'HẠNG 4'));
+        cardHtml += `
+          <div class="col-md-6 col-lg-3">
+            <div class="team-card ${isFirst ? 'rank-1' : ''}">
+              <div class="team-header" style="background-color: ${t.color};">
+                <span><i class="fas fa-users me-2"></i>${t.name}</span>
+                <span class="rank-badge">${rankText}</span>
+              </div>
+              <div class="p-3 text-center flex-grow-1 d-flex flex-column justify-content-between">
+                <div>
+                  <small class="text-secondary fw-bold text-uppercase">Điểm thi đua tuần</small>
+                  <div class="score-display my-2 ${t.finalScore >= 100 ? 'text-success' : 'text-danger'}">
+                    ${t.finalScore}
+                  </div>
+                  <div class="d-flex justify-content-around py-2 border-top border-bottom my-2 small">
+                    <span class="text-success fw-bold"><i class="fas fa-arrow-up me-1"></i>+${t.bonusTotal}</span>
+                    <span class="text-danger fw-bold"><i class="fas fa-arrow-down me-1"></i>-${t.penaltyTotal}</span>
+                  </div>
+                </div>
+                <div class="small text-muted text-start mt-2">
+                  <i class="fas fa-user-friends me-1 text-primary"></i>Sĩ số: <b>${t.members.length} em</b>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      cardsContainer.innerHTML = cardHtml;
+
+      // 2. Render Bảng Xếp Hạng
+      let rHtml = '';
+      teams.forEach(t => {
+        let badgeColor = t.rank === 1 ? 'bg-warning text-dark' : (t.rank === 2 ? 'bg-secondary text-white' : 'bg-light text-dark border');
+        let comment = t.finalScore >= 105 ? '⭐ Hoạt động xuất sắc' : (t.finalScore >= 100 ? 'Tốt' : 'Cần đôn đốc nề nếp');
+        rHtml += `
+          <tr>
+            <td><span class="badge ${badgeColor} px-3 py-1 fw-bold fs-6">${t.rank}</span></td>
+            <td class="fw-bold fs-6" style="color: ${t.color};">${t.name}</td>
+            <td>${t.members.length} em</td>
+            <td class="text-success fw-bold">+${t.bonusTotal}</td>
+            <td class="text-danger fw-bold">-${t.penaltyTotal}</td>
+            <td class="fw-bold fs-5 ${t.finalScore >= 100 ? 'text-success' : 'text-danger'}">${t.finalScore}</td>
+            <td class="text-start ps-3 fw-bold">${comment}</td>
+          </tr>
+        `;
+      });
+      rankBody.innerHTML = rHtml;
+
+      // 3. Render Chi tiết điểm cộng từ LOG_DIEMCONG
+      let bHtml = '';
+      teams.forEach(t => {
+        (t.bonusLogs || []).forEach(b => {
+          bHtml += `
+            <tr>
+              <td class="text-muted small">${b.time}</td>
+              <td><span class="badge bg-light text-dark border">${b.teamName}</span></td>
+              <td class="fw-bold text-secondary">${b.studentId}</td>
+              <td class="text-start ps-3 fw-bold text-dark">${b.studentName}</td>
+              <td class="text-start ps-3">${b.content}</td>
+              <td class="text-success fw-bold">+${b.points}</td>
+              <td class="text-muted small">${b.author || 'GV'}</td>
+            </tr>
+          `;
+        });
+      });
+      bonusBody.innerHTML = bHtml || '<tr><td colspan="7" class="p-3 text-muted">Không có bản ghi điểm cộng trong tuần này.</td></tr>';
+
+      // 4. Render Chi tiết điểm trừ từ DISCIPLINE
+      let pHtml = '';
+      teams.forEach(t => {
+        (t.penaltyLogs || []).forEach(p => {
+          pHtml += `
+            <tr>
+              <td class="text-muted small">${p.time}</td>
+              <td><span class="badge bg-light text-dark border">${p.teamName}</span></td>
+              <td class="fw-bold text-secondary">${p.studentId}</td>
+              <td class="text-start ps-3 fw-bold text-dark">${p.studentName}</td>
+              <td class="text-start ps-3 text-danger fw-bold">${p.errorType}</td>
+              <td class="text-danger fw-bold">-${p.points}</td>
+              <td class="text-start ps-3 text-muted small">${p.note || '—'}</td>
+            </tr>
+          `;
+        });
+      });
+      penaltyBody.innerHTML = pHtml || '<tr><td colspan="7" class="p-3 text-muted">Không có bản ghi vi phạm trong tuần này.</td></tr>';
+    }
+  </script>
+</body>
+</html>
