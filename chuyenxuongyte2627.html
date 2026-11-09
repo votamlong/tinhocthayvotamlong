@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chuyển Xuống Y Tế - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+      color: #1e293b;
+      padding: 16px;
+      text-transform: none !important;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 16px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .status-badge {
+      font-weight: 700;
+      font-size: 11.5px;
+      padding: 5px 12px;
+      border-radius: 50px;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .status-nghi { background: #fef08a; color: #854d0e; border: 1px solid #fde047; }
+    .status-don { background: #e2e8f0; color: #334155; border: 1px solid #cbd5e1; }
+    .status-ve { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    input, select, textarea, button, label, span, h4, h6 {
+      text-transform: none !important;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- TIÊU ĐỀ & NĂM HỌC -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark m-0">CHUYỂN XUỐNG Y TẾ</h4>
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Năm học 2026-2027</span>
+    </div>
+
+    <!-- 2 CỘT NỘI DUNG -->
+    <div class="row g-4">
+      
+      <!-- CỘT TRÁI: FORM CHUYỂN Y TẾ -->
+      <div class="col-lg-5">
+        <div class="panel-box border-top border-4 border-danger">
+          <div class="header-card mb-3 p-3 bg-light border">
+            <div class="text-danger fs-2"><i class="fas fa-heartbeat"></i></div>
+            <div>
+              <h6 class="fw-bold text-dark m-0">CHUYỂN XUỐNG PHÒNG Y TẾ</h6>
+              <small class="text-muted">GV duyệt cho học sinh ốm đau xuống Y tế</small>
+            </div>
+            <span class="badge bg-danger ms-auto"><i class="fas fa-plus me-1"></i> Y TẾ</span>
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">1. Chọn lớp học</label>
+            <select id="selClass" class="form-select form-select-sm fw-bold border-danger" onchange="filterStudentsForMedical()">
+              <option value="">-- Chọn lớp --</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">2. Học sinh cần xuống Y tế</label>
+            <select id="selStudent" class="form-select form-select-sm fw-bold">
+              <option value="">-- Chọn học sinh --</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">3. Triệu chứng / Tình trạng sức khỏe</label>
+            <select id="selSymptomPreset" class="form-select form-select-sm mb-2" onchange="document.getElementById('inpSymptomCustom').value = this.value">
+              <option value="">-- Chọn triệu chứng thường gặp --</option>
+              <option value="Sốt nóng trong người, đau đầu">Sốt nóng trong người, đau đầu[cite: 24]</option>
+              <option value="Mệt / Hoa mắt / Choáng váng">Mệt / Hoa mắt / Choáng váng[cite: 24]</option>
+              <option value="Đau bụng / Buồn nôn">Đau bụng / Buồn nôn</option>
+              <option value="Xây xẩm mặt mày / Ngất xỉu nhẹ">Xây xẩm mặt mày / Ngất xỉu nhẹ</option>
+            </select>
+            <textarea id="inpSymptomCustom" class="form-control form-control-sm" rows="2" placeholder="Nhập triệu chứng cụ thể của học sinh..."></textarea>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">GV Cho Phép Xuống</label>
+              <input type="text" id="inpTeacher" class="form-control form-control-sm fw-bold" value="GV Bộ môn">
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Biện pháp xử lý / Thuốc</label>
+              <input type="text" id="inpTreatment" class="form-control form-control-sm" placeholder="Vd: Cho uống thuốc, nghỉ ngơi...">
+            </div>
+          </div>
+
+          <button onclick="submitMedicalRecord()" id="btnSubmit" class="btn btn-danger w-100 fw-bold rounded-pill py-2 shadow-sm">
+            <i class="fas fa-paper-plane me-1"></i> XÁC NHẬN CHUYỂN XUỐNG Y TẾ
+          </button>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: SỔ THEO DÕI Y TẾ -->
+      <div class="col-lg-7">
+        <div class="panel-box">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <h6 class="fw-bold text-dark m-0">
+              <i class="fas fa-book-medical text-danger me-1"></i> Sổ Theo Dõi Tiếp Nhận Y Tế Học Đường
+            </h6>
+            <div class="d-flex align-items-center gap-2">
+              <select id="filterClassLog" class="form-select form-select-sm border-secondary fw-bold" style="width: 140px;" onchange="renderLogTable()">
+                <option value="ALL">Tất cả lớp</option>
+              </select>
+              <button onclick="loadLogData()" class="btn btn-outline-secondary btn-sm fw-bold" title="Làm mới">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
+            <table class="table table-hover align-middle mb-0 small text-center">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 45px;">STT</th>
+                  <th style="width: 80px;">Lớp</th>
+                  <th class="text-start">Học Sinh</th>
+                  <th style="width: 80px;">Giờ Xuống</th>
+                  <th class="text-start">Triệu Chứng</th>
+                  <th style="width: 130px;">Tình Trạng Xử Lý</th>
+                  <th style="width: 60px;">In</th>
+                </tr>
+              </thead>
+              <tbody id="logTableBody">
+                <tr><td colspan="7" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải sổ y tế từ Sheet...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-footer bg-light py-2 px-3 mt-3 rounded-3 border d-flex justify-content-between align-items-center small text-muted">
+            <span><i class="fas fa-info-circle text-danger me-1"></i> Bấm vào nút trạng thái để cập nhật: Đã về lớp / PH đón.</span>
+            <span id="recordCountLabel">0 ca</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbz2eK8W7KO_iJOmU6dRFTdIfA2aR36sGx60gJIbdLTZgCjK_zpnrEqohY1aS9u0ts3lSg/exec";
+
+    let allStudents = [];
+    let allMedicalLogs = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      try {
+        allStudents = await callApi('getAllStudents2627') || [];
+        if (allStudents.length === 0) {
+          let stData = await callApi('getAllStudents');
+          allStudents = (stData || []).map(s => ({ id: s.id, name: s.name, className: s.className }));
+        }
+
+        let setC = new Set();
+        allStudents.forEach(s => { if (s.className) setC.add(s.className); });
+        let classes = Array.from(setC).sort();
+        if (classes.length === 0) classes = ["6A3", "6A4", "6A5"];
+
+        let classOpts = '<option value="">-- Chọn lớp --</option>';
+        classes.forEach(c => classOpts += `<option value="${c}">Lớp ${c}</option>`);
+        document.getElementById('selClass').innerHTML = classOpts;
+        document.getElementById('filterClassLog').innerHTML = '<option value="ALL">Tất cả lớp</option>' + classOpts;
+
+        if (classes.length > 0) {
+          document.getElementById('selClass').value = classes[0];
+          filterStudentsForMedical();
+        }
+
+        await loadLogData();
+      } catch (err) {
+        console.error("Lỗi khởi tạo y tế:", err);
+      }
+    };
+
+    function filterStudentsForMedical() {
+      const selectedClass = document.getElementById('selClass').value;
+      const selStudent = document.getElementById('selStudent');
+
+      let filtered = allStudents.filter(s => {
+        let cleanS = String(s.className || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        let cleanC = String(selectedClass || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        return cleanS === cleanC || cleanS.includes(cleanC);
+      });
+
+      let html = '<option value="">-- Chọn học sinh --</option>';
+      filtered.forEach(s => {
+        html += `<option value="${s.id}|${s.name}">[${s.id}] ${s.name}</option>`;
+      });
+      selStudent.innerHTML = html;
+    }
+
+    async function loadLogData() {
+      try {
+        allMedicalLogs = await callApi('getMedicalLogs2627') || [];
+        renderLogTable();
+      } catch (err) {
+        document.getElementById('logTableBody').innerHTML = `<tr><td colspan="7" class="p-4 text-danger text-center">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderLogTable() {
+      const filterClass = document.getElementById('filterClassLog').value;
+      const tbody = document.getElementById('logTableBody');
+
+      let list = allMedicalLogs.filter(l => {
+        if (filterClass === 'ALL') return true;
+        let cleanL = String(l.className || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        let cleanF = String(filterClass || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        return cleanL === cleanF;
+      });
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-muted">Không tìm thấy ca y tế nào.</td></tr>';
+        document.getElementById('recordCountLabel').innerText = `0 ca`;
+        return;
+      }
+
+      let html = '';
+      list.forEach((l, idx) => {
+        let stClass = 'status-nghi';
+        if (l.status.includes('ĐÃ VỀ LỚP') || l.status.includes('ĐÃ VỀ')) stClass = 'status-ve';
+        else if (l.status.includes('PH ĐÓN') || l.status.includes('ĐÓN VỀ')) stClass = 'status-don';
+
+        let timeOnly = l.time.includes(' ') ? l.time.split(' ')[1] : l.time;
+
+        html += `
+          <tr>
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td><span class="badge bg-secondary">${l.className}</span></td>
+            <td class="text-start fw-bold text-dark">${l.studentName}<br><small class="text-muted fw-normal">${l.studentId}</small></td>
+            <td class="fw-bold text-secondary">${timeOnly}</td>
+            <td class="text-start small text-danger fw-semibold">${l.symptoms} ${l.treatment ? '<br><span class="text-muted fw-normal">Xử lý: ' + l.treatment + '</span>' : ''}</td>
+            <td>
+              <span class="status-badge ${stClass}" onclick="cycleStatus(${l.rowIdx}, '${l.status}')" title="Bấm để đổi trạng thái">
+                ${l.status}
+              </span>
+            </td>
+            <td>
+              <button onclick="printMedicalPass('${l.studentName}', '${l.className}', '${l.symptoms}', '${timeOnly}')" class="btn btn-sm btn-outline-danger" title="In phiếu">
+                <i class="fas fa-print"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+      document.getElementById('recordCountLabel').innerText = `${list.length} ca`;
+    }
+
+    async function cycleStatus(rowIdx, currentStatus) {
+      let nextStatus = "ĐANG NẰM NGHỈ";
+      if (currentStatus.includes("ĐANG NẰM NGHỈ")) nextStatus = "ĐÃ LIÊN HỆ PH ĐÓN VỀ";
+      else if (currentStatus.includes("ĐÓN VỀ")) nextStatus = "ĐÃ VỀ LỚP HỌC";
+      else nextStatus = "ĐANG NẰM NGHỈ";
+
+      try {
+        await callApi('updateMedicalStatus2627', rowIdx, nextStatus);
+        await loadLogData();
+      } catch (err) {
+        alert("Lỗi cập nhật: " + err.message);
+      }
+    }
+
+    // LƯU PHIẾU VÀO SHEET SO_Y_TE_2627
+    async function submitMedicalRecord() {
+      const className = document.getElementById('selClass').value;
+      const studentVal = document.getElementById('selStudent').value;
+      const symptoms = document.getElementById('inpSymptomCustom').value.trim();
+      const teacher = document.getElementById('inpTeacher').value.trim();
+      const treatment = document.getElementById('inpTreatment').value.trim();
+
+      if (!className) return alert("Vui lòng chọn lớp học!");
+      if (!studentVal) return alert("Vui lòng chọn học sinh!");
+      if (!symptoms) return alert("Vui lòng nhập triệu chứng / tình trạng sức khỏe!");
+
+      let parts = studentVal.split('|');
+      let studentId = parts[0];
+      let studentName = parts[1];
+
+      const item = {
+        className: className,
+        studentId: studentId,
+        studentName: studentName,
+        symptoms: symptoms,
+        teacher: teacher || "GV Bộ môn",
+        status: "ĐANG NẰM NGHỈ",
+        treatment: treatment || "Theo dõi tại phòng y tế"
+      };
+
+      const btn = document.getElementById('btnSubmit');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang xử lý...';
+
+      try {
+        const msg = await callApi('saveMedicalRecord2627', item);
+        alert(msg);
+        document.getElementById('inpSymptomCustom').value = "";
+        document.getElementById('inpTreatment').value = "";
+        await loadLogData();
+      } catch (err) {
+        alert("Lỗi khi chuyển y tế: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    function printMedicalPass(name, className, symptoms, timeIn) {
+      let win = window.open('', '_blank', 'width=500,height=400');
+      win.document.write(`
+        <html>
+        <head>
+          <title>Giấy Chuyển Y Tế</title>
+          <style>
+            body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; text-align: center; }
+            .ticket { border: 2px solid #dc2626; padding: 20px; border-radius: 10px; }
+            h3 { margin-bottom: 5px; color: #dc2626; }
+          </style>
+        </head>
+        <body>
+          <div class="ticket">
+            <h3>GIẤY CHUYỂN PHÒNG Y TẾ</h3>
+            <p><b>Trường THCS Bình Tân</b></p>
+            <hr>
+            <p style="text-align: left;">Học sinh: <b>${name}</b> - Lớp: <b>${className}</b></p>
+            <p style="text-align: left;">Thời gian xuống: <b>${timeIn}</b></p>
+            <p style="text-align: left;">Triệu chứng: <b>${symptoms}</b></p>
+            <br><br>
+            <p style="text-align: right;"><b>Y TẾ HỌC ĐƯỜNG / GIÁM THỊ</b></p>
+          </div>
+          <script>window.print();<\/script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+  </script>
+</body>
+</html>
