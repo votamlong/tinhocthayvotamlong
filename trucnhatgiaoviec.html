@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trực Nhật & Giao Việc - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 18px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 15px rgba(13, 148, 136, 0.2);
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      border-bottom: 2px solid #cbd5e1;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .task-name-col {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #0f766e;
+      vertical-align: middle;
+      font-size: 13px;
+    }
+    .duty-input-cell {
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px;
+      min-height: 48px;
+      width: 100%;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .duty-input-cell:focus {
+      background: #ffffff;
+      border-color: #0d9488;
+      box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15);
+    }
+    .duty-input-cell:hover {
+      background: #f1f5f9;
+    }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .print-footer { display: flex !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; }
+      .duty-input-cell { border: none !important; font-size: 12px !important; }
+      @page { size: landscape; margin: 10mm; }
+    }
+    .print-header { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1350px;">
+    
+    <!-- THANH TIÊU ĐỀ & ĐIỀU HƯỚNG (ẨN KHI IN) -->
+    <div class="header-banner mb-4 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-broom me-1"></i>CLASS SANITATION</span>
+          <span class="opacity-75 small">Đồng bộ Sheet: <b>TRUCNHAT</b></span>
+        </div>
+        <h4 class="fw-bold mb-0">BẢNG PHÂN CÔNG TRỰC NHẬT & GIAO VIỆC HỌC TẬP</h4>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-teal" style="width: 130px; color: #0f766e;" onchange="onClassChange()">
+          <option value="">-- Chọn lớp --</option>
+        </select>
+
+        <button onclick="saveDutySchedule()" id="btnSave" class="btn btn-teal btn-sm rounded-pill px-3 fw-bold text-white shadow-sm" style="background-color: #0d9488;">
+          <i class="fas fa-save me-1"></i> Lưu Vào Sheet
+        </button>
+
+        <button onclick="autoFillByTeams()" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold" title="Phân công 4 tổ luân phiên từ Thứ 2 đến Thứ 7">
+          <i class="fas fa-users-cog me-1"></i> Gán theo 4 Tổ
+        </button>
+
+        <button onclick="clearDutyTable()" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-eraser me-1"></i> Xóa bảng
+        </button>
+
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In lịch A4
+        </button>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header text-center mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">Lớp học: <b class="text-dark fs-5" id="printClassName">...</b></div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+          <div class="small fst-italic">Kế hoạch vệ sinh & lao động lớp</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">LỊCH PHÂN CÔNG TRỰC NHẬT & BẢO QUẢN PHÒNG HỌC</h3>
+      <p class="text-secondary small fst-italic">Cập nhật: <b class="text-dark" id="printTodayDate">...</b> | GVCN: <b>Thầy Võ Tâm Long</b></p>
+      <hr>
+    </div>
+
+    <!-- BẢNG MA TRẬN NHIỆM VỤ THEO THỨ (THỨ 2 -> THỨ 7) -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center no-print">
+        <span class="small fw-bold text-secondary text-uppercase">
+          <i class="fas fa-clipboard-list me-1 text-teal" style="color: #0d9488;"></i> Phân công nhiệm vụ chi tiết theo ngày
+        </span>
+        <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Thầy có thể gõ trực tiếp tên học sinh hoặc gán nhanh theo Tổ</small>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle mb-0 text-center" id="dutyTable">
+          <thead>
+            <tr>
+              <th style="width: 200px;" class="ps-3 text-start">NHIỆM VỤ / CÔNG VIỆC</th>
+              <th style="width: 15%;">THỨ HAI</th>
+              <th style="width: 15%;">THỨ BA</th>
+              <th style="width: 15%;">THỨ TƯ</th>
+              <th style="width: 15%;">THỨ NĂM</th>
+              <th style="width: 15%;">THỨ SÁU</th>
+              <th style="width: 15%;">THỨ BẢY</th>
+            </tr>
+          </thead>
+          <tbody id="dutyTableBody">
+            <!-- Sinh 6 hàng công việc chính -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- KHUNG CHỮ KÝ BAN CÁN SỰ & GVCN KHI IN RA A4 (CHỈ HIỆN KHI IN) -->
+    <div class="row mt-5 pt-4 text-center print-footer d-none">
+      <div class="col-6">
+        <p class="fw-bold mb-1">LỚP TRƯỞNG / LỚP PHÓ LAO ĐỘNG</p>
+        <small class="text-muted">(Ký và đôn đốc trực nhật)</small>
+      </div>
+      <div class="col-6">
+        <p class="fw-bold mb-1">GIÁO VIÊN CHỦ NHIỆM</p>
+        <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+        <div class="mt-5 fw-bold">Thầy Võ Tâm Long</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxxf3TU0ptYXETC5I6PqxwcWwZrdH-ot8_T3n8-VwGXXCy-cpyW7QBvKMGQ5i4HZFMzIQ/exec";
+
+    // 6 NHIỆM VỤ TRỰC NHẬT THIẾT THỰC TRONG NHÀ TRƯỜNG
+    const TASKS = [
+      { id: 1, name: "1. Quét lớp & bục giảng", icon: "fa-broom", defaultDesc: "Quét sạch rác trong phòng học, đầu giờ và sau giờ tan học" },
+      { id: 2, name: "2. Lau bảng & giặt khăn", icon: "fa-chalkboard", defaultDesc: "Chuẩn bị phấn, giặt khăn lau bảng sạch sẽ trước mỗi tiết học" },
+      { id: 3, name: "3. Kê bàn ghế & bình hoa", icon: "fa-chair", defaultDesc: "Kê ngay ngắn các dãy bàn học sinh và khăn trải bàn giáo viên" },
+      { id: 4, name: "4. Đổ rác & quét hành lang", icon: "fa-trash-alt", defaultDesc: "Đổ rác đúng nơi quy định, quét sạch hành lang trước cửa lớp" },
+      { id: 5, name: "5. Tắt đèn, quạt & khóa cửa", icon: "fa-power-off", defaultDesc: "Kiểm tra tắt toàn bộ thiết bị điện và khóa cửa sổ, cửa chính" },
+      { id: 6, name: "6. Trực nhật trưởng / Đôn đốc", icon: "fa-user-check", defaultDesc: "Kiểm tra, nghiệm thu vệ sinh lớp và báo cáo giáo viên chủ nhiệm" }
+    ];
+
+    let currentDutyData = {};
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('vi-VN');
+      renderEmptyGrid();
+
+      try {
+        const classes = await callApi('getAllClasses');
+        const selC = document.getElementById('selClass');
+        let hC = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => hC += `<option value="${c}">${c}</option>`);
+        selC.innerHTML = hC;
+
+        if (classes && classes.length > 0) {
+          selC.value = classes[0];
+          await onClassChange();
+        }
+      } catch (e) {
+        console.error("Lỗi nạp lớp:", e);
+      }
+    };
+
+    function renderEmptyGrid() {
+      const body = document.getElementById('dutyTableBody');
+      let html = '';
+
+      TASKS.forEach(t => {
+        html += `
+          <tr>
+            <td class="task-name-col ps-3 text-start">
+              <i class="fas ${t.icon} me-2" style="color: #0d9488;"></i>${t.name}
+              <div class="small text-muted fw-normal" style="font-size: 11px;">${t.defaultDesc}</div>
+            </td>
+            ${[2, 3, 4, 5, 6, 7].map(day => `
+              <td class="p-1">
+                <textarea class="duty-input-cell text-center" 
+                          id="task_${t.id}_${day}" 
+                          placeholder="Nhập tên..." 
+                          rows="2"></textarea>
+              </td>
+            `).join('')}
+          </tr>
+        `;
+      });
+
+      body.innerHTML = html;
+    }
+
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      document.getElementById('printClassName').innerText = className;
+      clearDutyTable(false);
+
+      try {
+        const loadedJson = await callApi('getDutyFromSheet', className);
+        if (loadedJson && Object.keys(loadedJson).length > 0) {
+          currentDutyData = loadedJson;
+          fillDataToGrid(loadedJson);
+        }
+      } catch (err) {
+        console.error("Lỗi nạp trực nhật:", err);
+      }
+    }
+
+    function fillDataToGrid(dataObj) {
+      for (let key in dataObj) {
+        const el = document.getElementById(key);
+        if (el) el.value = dataObj[key];
+      }
+    }
+
+    function clearDutyTable(needConfirm = true) {
+      if (needConfirm && !confirm("Xóa trắng bảng phân công trực nhật hiện tại?")) return;
+      document.querySelectorAll('.duty-input-cell').forEach(inp => inp.value = "");
+      currentDutyData = {};
+    }
+
+    // GÁN NHANH PHÂN CÔNG THEO 4 TỔ (TỔ 1 ĐẾN TỔ 4 LUÂN PHIÊN)
+    function autoFillByTeams() {
+      if (!confirm("Tự động gán phân công 4 Tổ luân phiên trực nhật từ Thứ 2 đến Thứ 7?")) return;
+
+      const schedulePlan = {
+        2: "Tổ 1 (Trực nhật cả ngày)",
+        3: "Tổ 2 (Trực nhật cả ngày)",
+        4: "Tổ 3 (Trực nhật cả ngày)",
+        5: "Tổ 4 (Trực nhật cả ngày)",
+        6: "Tổ 1 & Tổ 2 (Tổng vệ sinh)",
+        7: "Tổ 3 & Tổ 4 (Tổng vệ sinh cuối tuần)"
+      };
+
+      TASKS.forEach(t => {
+        for (let day = 2; day <= 7; day++) {
+          const el = document.getElementById(`task_${t.id}_${day}`);
+          if (el) {
+            if (t.id === 6) {
+              el.value = `Tổ trưởng Tổ ${day <= 5 ? (day - 1) : (day === 6 ? '1' : '3')}`;
+            } else {
+              el.value = schedulePlan[day];
+            }
+          }
+        }
+      });
+    }
+
+    // LƯU BẢNG PHÂN CÔNG DẠNG JSON KHỚP CHÍNH XÁC VỚI SHEET TRUCNHAT
+    async function saveDutySchedule() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return alert("Vui lòng chọn lớp!");
+
+      // Đóng gói toàn bộ các ô thành JSON: {"task_1_2": "...", "task_1_3": "..."}
+      let exportJson = {};
+      TASKS.forEach(t => {
+        for (let day = 2; day <= 7; day++) {
+          let cellKey = `task_${t.id}_${day}`;
+          let val = document.getElementById(cellKey).value.trim();
+          if (val) {
+            exportJson[cellKey] = val;
+          }
+        }
+      });
+
+      const btn = document.getElementById('btnSave');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      try {
+        const msg = await callApi('saveDutyToSheet', className, JSON.stringify(exportJson));
+        alert(msg);
+      } catch (err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+  </script>
+</body>
+</html>
