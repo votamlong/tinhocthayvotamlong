@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giấy HS Vào Lớp - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+      color: #1e293b;
+      padding: 16px;
+      text-transform: none !important;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 16px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .badge-lesson { background: #fef08a; color: #854d0e; border: 1px solid #fde047; font-weight: 700; padding: 4px 10px; border-radius: 6px; font-size: 11.5px; }
+    input, select, textarea, button, label, span, h4, h6 {
+      text-transform: none !important;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- TIÊU ĐỀ & NĂM HỌC -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark m-0">GIẤY HS VÀO LỚP</h4>
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Năm học 2026-2027</span>
+    </div>
+
+    <!-- 2 CỘT NỘI DUNG -->
+    <div class="row g-4">
+      
+      <!-- CỘT TRÁI: CẤP GIẤY VÀO LỚP -->
+      <div class="col-lg-5">
+        <div class="panel-box border-top border-4 border-warning">
+          <div class="header-card mb-3 p-3 bg-light border">
+            <div class="text-warning fs-2"><i class="fas fa-ticket-alt"></i></div>
+            <div>
+              <h6 class="fw-bold text-dark m-0">CẤP GIẤY VÀO LỚP (ĐI TRỄ)</h6>
+              <small class="text-muted">Giám thị cấp giấy cho phép học sinh vào lớp</small>
+            </div>
+            <span class="badge bg-danger ms-auto">2627</span>
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">1. Chọn lớp học</label>
+            <select id="selClass" class="form-select form-select-sm fw-bold border-warning" onchange="filterStudentsForLate()">
+              <option value="">-- Chọn lớp --</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">2. Học sinh đi trễ</label>
+            <select id="selStudent" class="form-select form-select-sm fw-bold">
+              <option value="">-- Chọn học sinh --</option>
+            </select>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Tiết học cho phép vào</label>
+              <select id="selLesson" class="form-select form-select-sm fw-bold">
+                <option value="Đầu giờ / Tiết 1">Đầu giờ / Tiết 1</option>
+                <option value="Tiết 2">Tiết 2</option>
+                <option value="Tiết 3">Tiết 3</option>
+                <option value="Tiết 4">Tiết 4</option>
+                <option value="Tiết 5">Tiết 5</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Thầy Giám Thị Duyệt</label>
+              <input type="text" id="inpInspector" class="form-control form-control-sm fw-bold" value="Thầy Giám Thị">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="small fw-bold text-secondary mb-1">3. Lý do đi trễ</label>
+            <select id="selReasonPreset" class="form-select form-select-sm mb-2" onchange="document.getElementById('inpReasonCustom').value = this.value">
+              <option value="">-- Chọn lý do thường gặp --</option>
+              <option value="Kẹt xe trên đường đi học">Kẹt xe trên đường đi học</option>
+              <option value="Hư xe">Hư xe</option>
+              <option value="Lý do sức khỏe / gia đình">Lý do sức khỏe / gia đình</option>
+              <option value="Điểm danh trễ giờ">Điểm danh trễ giờ</option>
+            </select>
+            <input type="text" id="inpReasonCustom" class="form-control form-control-sm" placeholder="Nhập lý do cụ thể...">
+          </div>
+
+          <button onclick="submitLatePass()" id="btnSubmit" class="btn btn-warning w-100 fw-bold rounded-pill py-2 shadow-sm text-dark">
+            <i class="fas fa-check-circle me-1"></i> DUYỆT & CẤP GIẤY VÀO LỚP
+          </button>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: DANH SÁCH ĐƯỢC CẤP GIẤY -->
+      <div class="col-lg-7">
+        <div class="panel-box">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <h6 class="fw-bold text-dark m-0">
+              <i class="fas fa-list-ul text-primary me-1"></i> Danh Sách Được Cấp Giấy Vào Lớp
+            </h6>
+            <div class="d-flex align-items-center gap-2">
+              <select id="filterClassLog" class="form-select form-select-sm border-secondary fw-bold" style="width: 140px;" onchange="renderLogTable()">
+                <option value="ALL">Tất cả lớp</option>
+              </select>
+              <button onclick="loadLogData()" class="btn btn-outline-secondary btn-sm fw-bold" title="Làm mới">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
+            <table class="table table-hover align-middle mb-0 small text-center">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 45px;">STT</th>
+                  <th style="width: 80px;">Lớp</th>
+                  <th class="text-start">Họ và Tên Học Sinh</th>
+                  <th style="width: 80px;">Giờ Vào</th>
+                  <th style="width: 130px;">Vào Tiết</th>
+                  <th class="text-start">Lý Do Đi Trễ</th>
+                  <th style="width: 70px;">In Phiếu</th>
+                </tr>
+              </thead>
+              <tbody id="logTableBody">
+                <tr><td colspan="7" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu từ Sheet...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-footer bg-light py-2 px-3 mt-3 rounded-3 border d-flex justify-content-between align-items-center small text-muted">
+            <span><i class="fas fa-info-circle text-primary me-1"></i> GVBM xem bảng này để tiếp nhận học sinh vào lớp học.</span>
+            <span id="recordCountLabel">0 học sinh</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbxANPLgqq88AEUdqj5EExSXSy5FAdeAh0w4XCTCF-QuW0EMPVm-4lB8C00IDQ9wuxZBpQ/exec";
+
+    let allStudents = [];
+    let allLateLogs = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      try {
+        // Nạp danh sách học sinh từ sheet STUDENTS
+        allStudents = await callApi('getAllStudents2627') || [];
+        if (allStudents.length === 0) {
+          let stData = await callApi('getAllStudents');
+          allStudents = (stData || []).map(s => ({ id: s.id, name: s.name, className: s.className }));
+        }
+
+        // Trích xuất danh sách lớp
+        let setC = new Set();
+        allStudents.forEach(s => { if (s.className) setC.add(s.className); });
+        let classes = Array.from(setC).sort();
+        if (classes.length === 0) classes = ["6A3", "6A4", "6A5"];
+
+        let classOpts = '<option value="">-- Chọn lớp --</option>';
+        classes.forEach(c => classOpts += `<option value="${c}">Lớp ${c}</option>`);
+        document.getElementById('selClass').innerHTML = classOpts;
+        document.getElementById('filterClassLog').innerHTML = '<option value="ALL">Tất cả lớp</option>' + classOpts;
+
+        if (classes.length > 0) {
+          document.getElementById('selClass').value = classes[0];
+          filterStudentsForLate();
+        }
+
+        await loadLogData();
+      } catch (err) {
+        console.error("Lỗi khởi tạo giấy vào lớp:", err);
+      }
+    };
+
+    function filterStudentsForLate() {
+      const selectedClass = document.getElementById('selClass').value;
+      const selStudent = document.getElementById('selStudent');
+
+      let filtered = allStudents.filter(s => {
+        let cleanS = String(s.className || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        let cleanC = String(selectedClass || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        return cleanS === cleanC || cleanS.includes(cleanC);
+      });
+
+      let html = '<option value="">-- Chọn học sinh --</option>';
+      filtered.forEach(s => {
+        html += `<option value="${s.id}|${s.name}">[${s.id}] ${s.name}</option>`;
+      });
+      selStudent.innerHTML = html;
+    }
+
+    async function loadLogData() {
+      try {
+        allLateLogs = await callApi('getLatePassLogs2627') || [];
+        renderLogTable();
+      } catch (err) {
+        document.getElementById('logTableBody').innerHTML = `<tr><td colspan="7" class="p-4 text-danger text-center">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderLogTable() {
+      const filterClass = document.getElementById('filterClassLog').value;
+      const tbody = document.getElementById('logTableBody');
+
+      let list = allLateLogs.filter(l => {
+        if (filterClass === 'ALL') return true;
+        let cleanL = String(l.className || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        let cleanF = String(filterClass || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        return cleanL === cleanF;
+      });
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-muted">Không tìm thấy bản ghi cấp giấy nào.</td></tr>';
+        document.getElementById('recordCountLabel').innerText = `0 học sinh`;
+        return;
+      }
+
+      let html = '';
+      list.forEach((l, idx) => {
+        html += `
+          <tr>
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td><span class="badge bg-secondary">${l.className}</span></td>
+            <td class="text-start fw-bold text-dark">${l.studentName}<br><small class="text-muted fw-normal">${l.studentId}</small></td>
+            <td class="fw-bold text-danger">${l.timeIn}</td>
+            <td><span class="badge-lesson">${l.lesson}</span></td>
+            <td class="text-start small">${l.reason}</td>
+            <td>
+              <button onclick="printPass('${l.studentName}', '${l.className}', '${l.lesson}', '${l.reason}', '${l.timeIn}')" class="btn btn-sm btn-outline-primary" title="In phiếu">
+                <i class="fas fa-print"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+      document.getElementById('recordCountLabel').innerText = `${list.length} học sinh`;
+    }
+
+    // LƯU PHIẾU VÀO SHEET GIAY_VAO_LOP
+    async function submitLatePass() {
+      const className = document.getElementById('selClass').value;
+      const studentVal = document.getElementById('selStudent').value;
+      const lesson = document.getElementById('selLesson').value;
+      const inspector = document.getElementById('inpInspector').value.trim();
+      const reason = document.getElementById('inpReasonCustom').value.trim() || "Đi trễ có lý do";
+
+      if (!className) return alert("Vui lòng chọn lớp học!");
+      if (!studentVal) return alert("Vui lòng chọn học sinh đi trễ!");
+
+      let parts = studentVal.split('|');
+      let studentId = parts[0];
+      let studentName = parts[1];
+
+      const item = {
+        className: className,
+        studentId: studentId,
+        studentName: studentName,
+        lesson: lesson,
+        reason: reason,
+        inspector: inspector || "Thầy Giám Thị"
+      };
+
+      const btn = document.getElementById('btnSubmit');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang duyệt...';
+
+      try {
+        const msg = await callApi('saveLatePassRecord2627', item);
+        alert(msg);
+        document.getElementById('inpReasonCustom').value = "";
+        await loadLogData();
+      } catch (err) {
+        alert("Lỗi khi cấp giấy: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    function printPass(name, className, lesson, reason, timeIn) {
+      let win = window.open('', '_blank', 'width=500,height=400');
+      win.document.write(`
+        <html>
+        <head>
+          <title>Phiếu Vào Lớp</title>
+          <style>
+            body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; text-align: center; }
+            .ticket { border: 2px dashed #000; padding: 20px; border-radius: 10px; }
+            h3 { margin-bottom: 5px; color: #b45309; }
+          </style>
+        </head>
+        <body>
+          <div class="ticket">
+            <h3>GIẤY PHÉP VÀO LỚP</h3>
+            <p><b>Trường THCS Bình Tân</b></p>
+            <hr>
+            <p style="text-align: left;">Học sinh: <b>${name}</b> - Lớp: <b>${className}</b></p>
+            <p style="text-align: left;">Được phép vào lớp lúc: <b>${timeIn}</b> (${lesson})</p>
+            <p style="text-align: left;">Lý do: <b>${reason}</b></p>
+            <br><br>
+            <p style="text-align: right;"><b>GIÁM THỊ KÝ DUYỆT</b></p>
+          </div>
+          <script>window.print();<\/script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+  </script>
+</body>
+</html>
