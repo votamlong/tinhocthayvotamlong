@@ -35,6 +35,7 @@
       object-fit: cover;
       border: 4px solid #ffffff;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background: #e2e8f0;
     }
     .avatar-badge-btn {
       position: absolute;
@@ -76,7 +77,6 @@
 
   <div class="container-fluid" style="max-width: 1400px;">
     
-    <!-- TIÊU ĐỀ TRANG -->
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="fw-bold text-dark m-0 text-uppercase">THẦY VÕ TÂM LONG</h4>
       <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Năm học 2026-2027</span>
@@ -84,13 +84,13 @@
 
     <div class="row g-4">
       
-      <!-- CỘT TRÁI: THẺ THÔNG TIN CÁ NHÂN & ẢNH -->
+      <!-- CỘT TRÁI: ẢNH & THÔNG TIN NHANH -->
       <div class="col-lg-4">
         <div class="panel-box text-center">
           
           <div class="avatar-container">
             <img id="imgAvatar" src="https://ui-avatars.com/api/?name=Vo+Tam+Long&background=0D6EFD&color=fff&size=200" class="profile-avatar" alt="Avatar">
-            <label for="inpAvatarUrl" class="avatar-badge-btn" title="Đổi link ảnh">
+            <label for="fileAvatarInput" class="avatar-badge-btn" title="Chọn ảnh từ máy tính">
               <i class="fas fa-camera"></i>
             </label>
           </div>
@@ -119,22 +119,21 @@
             </div>
           </div>
 
-          <div class="d-none">
-            <input type="text" id="inpAvatarUrl" oninput="previewAvatar(this.value)">
-          </div>
-
-          <button onclick="alert('Ảnh đại diện đã được cập nhật hiển thị. Nhấn Lưu thông tin hồ sơ để đồng bộ vào Google Sheet!')" class="btn btn-outline-primary btn-sm w-100 rounded-pill fw-bold shadow-sm">
-            <i class="fas fa-upload me-1"></i> Tải Lên Ảnh Cá Nhân
+          <!-- Nút chọn file ảnh ẩn & nút tải lên -->
+          <input type="file" id="fileAvatarInput" accept="image/*" class="d-none" onchange="handleFileSelect(event)">
+          
+          <button onclick="document.getElementById('fileAvatarInput').click()" class="btn btn-primary btn-sm w-100 rounded-pill fw-bold shadow-sm py-2">
+            <i class="fas fa-upload me-1"></i> Tải Lên Ảnh Cá Nhân (Từ Máy)
           </button>
         </div>
       </div>
 
-      <!-- CỘT PHẢI: FORM CHỈNH SỬA HỒ SƠ & THÔNG TIN LIÊN HỆ -->
+      <!-- CỘT PHẢI: FORM CHỈNH SỬA THÔNG TIN -->
       <div class="col-lg-8">
         <div class="panel-box border-top border-4 border-primary">
           <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
             <div>
-              <h6 class="fw-bold text-primary m-0 text-uppercase"><i class="fas id-card me-1"></i> HỒ SƠ NĂNG LỰC & THÔNG TIN LIÊN HỆ</h6>
+              <h6 class="fw-bold text-primary m-0 text-uppercase"><i class="fas fa-id-card me-1"></i> HỒ SƠ NĂNG LỰC & THÔNG TIN LIÊN HỆ</h6>
               <small class="text-muted">Thông tin cá nhân & Giới thiệu chuyên môn nghiệp vụ</small>
             </div>
             <span class="badge bg-success bg-opacity-10 text-success px-3 py-1">Năm học 2026-2027</span>
@@ -189,6 +188,8 @@
       ? window.parent.API_URL 
       : "https://script.google.com/macros/s/AKfycbxeonjAlSL7MLfYNXzgzE1kjdw47LlJOHCh5IoBN8TUWPZBj7h6sigAcrgGKU7XIj2EzQ/exec";
 
+    let base64Avatar = "";
+
     async function callApi(fn, ...args) {
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -211,7 +212,7 @@
           document.getElementById('inpSchool').value = profile.school || "";
           document.getElementById('inpBio').value = profile.bio || "";
           if (profile.avatar) {
-            document.getElementById('inpAvatarUrl').value = profile.avatar;
+            base64Avatar = profile.avatar;
             document.getElementById('imgAvatar').src = profile.avatar;
           }
 
@@ -224,10 +225,21 @@
       }
     };
 
-    function previewAvatar(url) {
-      if (url.trim()) {
-        document.getElementById('imgAvatar').src = url.trim();
+    // XỬ LÝ CHỌN FILE ẢNH TỪ MÁY TÍNH & ÉP THÀNH BASE64
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.size > 1024 * 1024 * 2) {
+        return alert("Kích thước ảnh quá lớn! Vui lòng chọn ảnh dưới 2MB.");
       }
+
+      const reader = new FileReader();
+      reader.onload = function(uploadEvt) {
+        base64Avatar = uploadEvt.target.result;
+        document.getElementById('imgAvatar').src = base64Avatar;
+      };
+      reader.readAsDataURL(file);
     }
 
     async function saveProfile() {
@@ -238,7 +250,7 @@
         role: document.getElementById('inpRole').value.trim(),
         school: document.getElementById('inpSchool').value.trim(),
         bio: document.getElementById('inpBio').value.trim(),
-        avatar: document.getElementById('inpAvatarUrl').value.trim() || document.getElementById('imgAvatar').src
+        avatar: base64Avatar || document.getElementById('imgAvatar').src
       };
 
       const btn = document.getElementById('btnSave');
