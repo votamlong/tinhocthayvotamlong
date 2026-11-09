@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thi Đua Đa Năng - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-card {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .rank-1 { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4); }
+    .rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: white; box-shadow: 0 2px 6px rgba(148, 163, 184, 0.4); }
+    .rank-3 { background: linear-gradient(135deg, #b45309, #92400e); color: white; box-shadow: 0 2px 6px rgba(180, 83, 9, 0.4); }
+    .rank-other { background: #e2e8f0; color: #334155; }
+    .table-thidua thead th {
+      background-color: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      padding: 12px 8px;
+    }
+    .table-thidua td {
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      vertical-align: middle;
+      padding: 12px 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- TIÊU ĐỀ & BỘ LỌC -->
+    <div class="header-card mb-4 d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="bg-primary bg-opacity-10 text-primary rounded-4 p-3 fs-3">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <div>
+          <h4 class="fw-bold text-dark m-0">BẢNG XẾP HẠNG THI ĐUA NỀN NẾP TOÀN TRƯỜNG</h4>
+          <small class="text-muted">Chọn "Toàn trường" để xếp hạng các lớp, hoặc chọn 1 Lớp cụ thể để xem chi tiết</small>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <div class="d-flex align-items-center bg-light border rounded-pill px-3 py-1">
+          <span class="small fw-bold text-secondary me-2">Từ:</span>
+          <input type="date" id="dateFrom" class="form-control form-control-sm border-0 bg-transparent fw-bold" value="2026-10-31">
+        </div>
+        <div class="d-flex align-items-center bg-light border rounded-pill px-3 py-1">
+          <span class="small fw-bold text-secondary me-2">Đến:</span>
+          <input type="date" id="dateTo" class="form-control form-control-sm border-0 bg-transparent fw-bold" value="2026-11-09">
+        </div>
+        <select id="filterScope" class="form-select form-select-sm fw-bold border bg-light rounded-pill px-3" style="width: 140px;" onchange="loadThiDuaData()">
+          <option value="ALL">🏆 Toàn trường</option>
+        </select>
+        <button onclick="loadThiDuaData()" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm">
+          <i class="fas fa-sync-alt me-1"></i> Xem Báo Cáo
+        </button>
+      </div>
+    </div>
+
+    <!-- BẢNG XẾP HẠNG ĐẦY ĐỦ CÁC CỘT -->
+    <div class="panel-box">
+      <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <h6 class="fw-bold text-dark m-0 text-uppercase">
+          <i class="fas fa-medal text-warning me-1"></i> Kết Quả Xếp Hạng Thi Đua Giữa Các Lớp
+        </h6>
+        <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-1 fw-bold" id="totalClassesBadge">Toàn trường: 0 lớp</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 table-thidua">
+          <thead>
+            <tr>
+              <th style="width: 110px;">Hạng</th>
+              <th style="width: 120px;">Lớp</th>
+              <th style="width: 100px;">Điểm Gốc</th>
+              <th class="text-start ps-3">Chi Tiết Lỗi Vi Phạm (DISCIPLINE)</th>
+              <th style="width: 90px;">Tổng Trừ</th>
+              <th style="width: 220px;" class="text-success">Chi Tiết Điểm Cộng (LOG_DIEMCONG)</th>
+              <th style="width: 90px;" class="text-success">Tổng Cộng</th>
+              <th style="width: 110px;" class="text-primary">Điểm Tổng</th>
+            </tr>
+          </thead>
+          <tbody id="rankingTableBody">
+            <tr><td colspan="8" class="p-5 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tổng hợp dữ liệu từ các sheet...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbzJgWqWxIjlsWG2zxUTUL2sw0ImGERsEWfnHzjxK97go58GOhQRSbjQLcfW9rOMzCSRig/exec";
+
+    let rankingData = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      await loadThiDuaData();
+    };
+
+    async function loadThiDuaData() {
+      const tbody = document.getElementById('rankingTableBody');
+      tbody.innerHTML = '<tr><td colspan="8" class="p-5 text-center text-muted"><i class="fas fa-sync fa-spin me-2"></i>Đang tính toán bảng xếp hạng...</td></tr>';
+
+      try {
+        const res = await callApi('getThiDuaRankingData2627');
+        if (!res || res.error) throw new Error(res ? res.error : "Không có dữ liệu!");
+
+        rankingData = res.ranking || [];
+        document.getElementById('totalClassesBadge').innerText = `Toàn trường: ${rankingData.length} lớp`;
+
+        let scopeSel = document.getElementById('filterScope');
+        let selVal = scopeSel.value;
+        let scopeHtml = '<option value="ALL">🏆 Toàn trường</option>';
+        (res.classes || []).forEach(c => scopeHtml += `<option value="${c}">Lớp ${c}</option>`);
+        scopeSel.innerHTML = scopeHtml;
+        scopeSel.value = selVal;
+
+        renderRankingTable();
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-danger text-center">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderRankingTable() {
+      const scope = document.getElementById('filterScope').value;
+      const tbody = document.getElementById('rankingTableBody');
+
+      let list = rankingData.filter(r => {
+        if (scope === 'ALL') return true;
+        return r.className === scope;
+      });
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-muted">Không có dữ liệu thi đua.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      list.forEach((r, idx) => {
+        let rankClass = 'rank-other';
+        let rankText = `Hạng ${idx + 1}`;
+        if (idx === 0) { rankClass = 'rank-1'; rankText = `<i class="fas fa-medal me-1"></i> Hạng 1`; }
+        else if (idx === 1) { rankClass = 'rank-2'; rankText = `<i class="fas fa-medal me-1"></i> Hạng 2`; }
+        else if (idx === 2) { rankClass = 'rank-3'; rankText = `<i class="fas fa-medal me-1"></i> Hạng 3`; }
+
+        html += `
+          <tr>
+            <td><span class="rank-badge ${rankClass}">${rankText}</span></td>
+            <td class="fw-bold text-dark">Lớp ${r.className}</td>
+            <td class="fw-bold text-success">${r.baseScore} đ</td>
+            <td class="text-start ps-3 text-secondary small">${r.viPhamText}</td>
+            <td class="fw-bold text-danger">-${r.minusScore}</td>
+            <td class="text-success small text-start ps-2">${r.plusText}</td>
+            <td class="fw-bold text-success">+${r.plusScore}</td>
+            <td class="fw-bold text-primary fs-6">${r.totalFinal} đ</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
