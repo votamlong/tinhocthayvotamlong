@@ -85,7 +85,7 @@
           <span class="small fw-bold text-secondary me-2">Đến:</span>
           <input type="date" id="dateTo" class="form-control form-control-sm border-0 bg-transparent fw-bold" value="2026-11-09">
         </div>
-        <select id="filterScope" class="form-select form-select-sm fw-bold border bg-light rounded-pill px-3" style="width: 140px;" onchange="loadThiDuaData()">
+        <select id="filterScope" class="form-select form-select-sm fw-bold border bg-light rounded-pill px-3" style="width: 150px;" onchange="loadThiDuaData()">
           <option value="ALL">🏆 Toàn trường</option>
         </select>
         <button onclick="loadThiDuaData()" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm">
@@ -94,7 +94,7 @@
       </div>
     </div>
 
-    <!-- BẢNG XẾP HẠNG ĐẦY ĐỦ CÁC CỘT -->
+    <!-- BẢNG XẾP HẠNG THI ĐUA -->
     <div class="panel-box">
       <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
         <h6 class="fw-bold text-dark m-0 text-uppercase">
@@ -107,18 +107,18 @@
         <table class="table table-hover align-middle mb-0 table-thidua">
           <thead>
             <tr>
-              <th style="width: 110px;">Hạng</th>
+              <th style="width: 100px;">Hạng</th>
               <th style="width: 120px;">Lớp</th>
-              <th style="width: 100px;">Điểm Gốc</th>
+              <th style="width: 95px;">Điểm Gốc</th>
               <th class="text-start ps-3">Chi Tiết Lỗi Vi Phạm (DISCIPLINE)</th>
-              <th style="width: 90px;">Tổng Trừ</th>
-              <th style="width: 220px;" class="text-success">Chi Tiết Điểm Cộng (LOG_DIEMCONG)</th>
-              <th style="width: 90px;" class="text-success">Tổng Cộng</th>
-              <th style="width: 110px;" class="text-primary">Điểm Tổng</th>
+              <th style="width: 85px;">Tổng Trừ</th>
+              <th style="width: 200px;" class="text-success">Chi Tiết Điểm Cộng (LOG_DIEMCONG)</th>
+              <th style="width: 85px;" class="text-success">Tổng Cộng</th>
+              <th style="width: 100px;" class="text-primary">Điểm Tổng</th>
             </tr>
           </thead>
           <tbody id="rankingTableBody">
-            <tr><td colspan="8" class="p-5 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tổng hợp dữ liệu từ các sheet...</td></tr>
+            <tr><td colspan="8" class="p-5 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tổng hợp dữ liệu từ sheet DISCIPLINE...</td></tr>
           </tbody>
         </table>
       </div>
@@ -129,7 +129,7 @@
   <script>
     const API_URL = (window.parent && window.parent.API_URL) 
       ? window.parent.API_URL 
-      : "https://script.google.com/macros/s/AKfycbzJgWqWxIjlsWG2zxUTUL2sw0ImGERsEWfnHzjxK97go58GOhQRSbjQLcfW9rOMzCSRig/exec";
+      : "https://script.google.com/macros/s/AKfycbzZwi5dzuIiIxV6e8SoZBnHX25x1M5BxxlR-ZgT6fjSOC6w1Pxnrs7LY4Dec7bzi2igIQ/exec";
 
     let rankingData = [];
 
@@ -194,12 +194,16 @@
         else if (idx === 1) { rankClass = 'rank-2'; rankText = `<i class="fas fa-medal me-1"></i> Hạng 2`; }
         else if (idx === 2) { rankClass = 'rank-3'; rankText = `<i class="fas fa-medal me-1"></i> Hạng 3`; }
 
+        let viPhamContent = r.viPhamText === 'Không có vi phạm' 
+          ? '<span class="text-muted">Không có vi phạm</span>' 
+          : `<span class="text-danger fw-bold">${r.viPhamText}</span>`;
+
         html += `
           <tr>
             <td><span class="rank-badge ${rankClass}">${rankText}</span></td>
             <td class="fw-bold text-dark">Lớp ${r.className}</td>
             <td class="fw-bold text-success">${r.baseScore} đ</td>
-            <td class="text-start ps-3 text-secondary small">${r.viPhamText}</td>
+            <td class="text-start ps-3 small">${viPhamContent}</td>
             <td class="fw-bold text-danger">-${r.minusScore}</td>
             <td class="text-success small text-start ps-2">${r.plusText}</td>
             <td class="fw-bold text-success">+${r.plusScore}</td>
