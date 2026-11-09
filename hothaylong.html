@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thầy Võ Tâm Long - Hồ Sơ Năng Lực</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 24px;
+    }
+    .avatar-container {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 15px auto;
+    }
+    .profile-avatar {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #ffffff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .avatar-badge-btn {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 36px;
+      height: 36px;
+      background: #0284c7;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid white;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .subject-tag {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 50px;
+      margin: 2px;
+    }
+    .info-card-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1400px;">
+    
+    <!-- TIÊU ĐỀ TRANG -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark m-0 text-uppercase">THẦY VÕ TÂM LONG</h4>
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Năm học 2026-2027</span>
+    </div>
+
+    <div class="row g-4">
+      
+      <!-- CỘT TRÁI: THẺ THÔNG TIN CÁ NHÂN & ẢNH -->
+      <div class="col-lg-4">
+        <div class="panel-box text-center">
+          
+          <div class="avatar-container">
+            <img id="imgAvatar" src="https://ui-avatars.com/api/?name=Vo+Tam+Long&background=0D6EFD&color=fff&size=200" class="profile-avatar" alt="Avatar">
+            <label for="inpAvatarUrl" class="avatar-badge-btn" title="Đổi link ảnh">
+              <i class="fas fa-camera"></i>
+            </label>
+          </div>
+
+          <h4 class="fw-bold text-dark mb-1" id="displayName">Võ Tâm Long</h4>
+          <div class="mb-3">
+            <span class="subject-tag">Giáo viên Tin học</span>
+            <span class="subject-tag">Tin học QT</span>
+            <span class="subject-tag">GD Địa Phương</span>
+          </div>
+
+          <div class="info-card-item text-start">
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <div class="text-success fs-5"><i class="fas fa-phone-alt"></i></div>
+              <div>
+                <div class="small text-muted fw-bold">SỐ ĐIỆN THOẠI / ZALO:</div>
+                <div class="fw-bold text-dark" id="displayPhone">0366504862</div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+              <div class="text-primary fs-5"><i class="fas fa-envelope"></i></div>
+              <div>
+                <div class="small text-muted fw-bold">HỘP THƯ EMAIL:</div>
+                <div class="fw-bold text-dark small" id="displayEmail">votamlong@gmail.com</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-none">
+            <input type="text" id="inpAvatarUrl" oninput="previewAvatar(this.value)">
+          </div>
+
+          <button onclick="alert('Ảnh đại diện đã được cập nhật hiển thị. Nhấn Lưu thông tin hồ sơ để đồng bộ vào Google Sheet!')" class="btn btn-outline-primary btn-sm w-100 rounded-pill fw-bold shadow-sm">
+            <i class="fas fa-upload me-1"></i> Tải Lên Ảnh Cá Nhân
+          </button>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: FORM CHỈNH SỬA HỒ SƠ & THÔNG TIN LIÊN HỆ -->
+      <div class="col-lg-8">
+        <div class="panel-box border-top border-4 border-primary">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <div>
+              <h6 class="fw-bold text-primary m-0 text-uppercase"><i class="fas id-card me-1"></i> HỒ SƠ NĂNG LỰC & THÔNG TIN LIÊN HỆ</h6>
+              <small class="text-muted">Thông tin cá nhân & Giới thiệu chuyên môn nghiệp vụ</small>
+            </div>
+            <span class="badge bg-success bg-opacity-10 text-success px-3 py-1">Năm học 2026-2027</span>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="small fw-bold text-secondary mb-1">HỌ VÀ TÊN GIÁO VIÊN</label>
+              <input type="text" id="inpFullName" class="form-control form-control-sm fw-bold" placeholder="Võ Tâm Long">
+            </div>
+            <div class="col-md-6">
+              <label class="small fw-bold text-danger mb-1">SỐ ĐIỆN THOẠI LIÊN LẠC (ZALO)</label>
+              <input type="text" id="inpPhone" class="form-control form-control-sm fw-bold text-danger" placeholder="0366504862">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="small fw-bold text-secondary mb-1">EMAIL CÔNG TÁC</label>
+              <input type="email" id="inpEmail" class="form-control form-control-sm fw-bold" placeholder="votamlong@gmail.com">
+            </div>
+            <div class="col-md-6">
+              <label class="small fw-bold text-secondary mb-1">NHIỆM VỤ / CHUYÊN MÔN</label>
+              <input type="text" id="inpRole" class="form-control form-control-sm fw-bold" placeholder="Giáo viên Tin học...">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">ĐƠN VỊ CÔNG TÁC</label>
+            <input type="text" id="inpSchool" class="form-control form-control-sm fw-bold" value="Trường THCS Bình Tân - TP. Hồ Chí Minh">
+          </div>
+
+          <div class="mb-4">
+            <label class="small fw-bold text-secondary mb-1">GIỚI THIỆU BẢN THÂN & ĐỊNH HƯỚNG GIẢNG DẠY</label>
+            <textarea id="inpBio" class="form-control form-control-sm font-monospace" rows="6" style="font-size: 12.5px;"></textarea>
+          </div>
+
+          <div class="text-end">
+            <button onclick="saveProfile()" id="btnSave" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm">
+              <i class="fas fa-save me-1"></i> LƯU THÔNG TIN HỒ SƠ
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbxeonjAlSL7MLfYNXzgzE1kjdw47LlJOHCh5IoBN8TUWPZBj7h6sigAcrgGKU7XIj2EzQ/exec";
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      try {
+        const profile = await callApi('getTeacherProfile2627');
+        if (profile && !profile.error) {
+          document.getElementById('inpFullName').value = profile.fullName || "";
+          document.getElementById('inpPhone').value = profile.phone || "";
+          document.getElementById('inpEmail').value = profile.email || "";
+          document.getElementById('inpRole').value = profile.role || "";
+          document.getElementById('inpSchool').value = profile.school || "";
+          document.getElementById('inpBio').value = profile.bio || "";
+          if (profile.avatar) {
+            document.getElementById('inpAvatarUrl').value = profile.avatar;
+            document.getElementById('imgAvatar').src = profile.avatar;
+          }
+
+          document.getElementById('displayName').innerText = profile.fullName || "Võ Tâm Long";
+          document.getElementById('displayPhone').innerText = profile.phone || "0366504862";
+          document.getElementById('displayEmail').innerText = profile.email || "votamlong@gmail.com";
+        }
+      } catch (err) {
+        console.error("Lỗi tải hồ sơ:", err);
+      }
+    };
+
+    function previewAvatar(url) {
+      if (url.trim()) {
+        document.getElementById('imgAvatar').src = url.trim();
+      }
+    }
+
+    async function saveProfile() {
+      const item = {
+        fullName: document.getElementById('inpFullName').value.trim(),
+        phone: document.getElementById('inpPhone').value.trim(),
+        email: document.getElementById('inpEmail').value.trim(),
+        role: document.getElementById('inpRole').value.trim(),
+        school: document.getElementById('inpSchool').value.trim(),
+        bio: document.getElementById('inpBio').value.trim(),
+        avatar: document.getElementById('inpAvatarUrl').value.trim() || document.getElementById('imgAvatar').src
+      };
+
+      const btn = document.getElementById('btnSave');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      try {
+        const msg = await callApi('saveTeacherProfile2627', item);
+        alert(msg);
+        document.getElementById('displayName').innerText = item.fullName;
+        document.getElementById('displayPhone').innerText = item.phone;
+        document.getElementById('displayEmail').innerText = item.email;
+      } catch (err) {
+        alert("Lỗi khi lưu hồ sơ: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+  </script>
+</body>
+</html>
