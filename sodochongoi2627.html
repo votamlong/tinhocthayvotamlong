@@ -13,15 +13,8 @@
       background-color: #f8fafc;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #1e293b;
-      padding: 18px;
+      padding: 16px;
       user-select: none;
-    }
-    .panel-box {
-      background: #ffffff;
-      border-radius: 18px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-      padding: 20px;
     }
     .header-banner {
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
@@ -30,17 +23,16 @@
       padding: 18px 24px;
       box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
     }
-    /* SÂN KHẤU SƠ ĐỒ LỚP HỌC */
     .classroom-stage {
       background: #ffffff;
       border-radius: 18px;
       border: 2px dashed #cbd5e1;
-      padding: 26px 20px;
+      padding: 24px 20px;
       min-height: 560px;
     }
     .teacher-desk {
       width: 280px;
-      margin: 0 auto 30px auto;
+      margin: 0 auto 25px auto;
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       color: #fff;
       padding: 10px 20px;
@@ -50,19 +42,19 @@
       letter-spacing: 1px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
-    /* LƯỚI BÀN HỌC SINH 6 CỘT */
+    /* LƯỚI 6 CỘT CHUẨN ĐÚNG BẢN ĐỒ LỚP */
     .seats-grid {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
-      gap: 14px;
+      gap: 12px;
       max-width: 1250px;
       margin: 0 auto;
     }
     .seat-card {
       background: #ffffff;
       border: 2px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 10px 8px;
+      border-radius: 12px;
+      padding: 10px 6px;
       text-align: center;
       transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
@@ -78,7 +70,7 @@
       font-size: 10px;
       font-weight: 800;
       color: #94a3b8;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
     .seat-name {
       font-size: 13px;
@@ -95,34 +87,12 @@
       color: #2563eb;
       font-weight: 700;
     }
-    .seat-call-badge {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      background: #ef4444;
-      color: white;
-      font-size: 10px;
-      font-weight: 800;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #fff;
-    }
-    /* HIỆU ỨNG CHỌN ĐỂ ĐỔI CHỖ */
     .seat-selected {
       background: #fef08a !important;
       border-color: #eab308 !important;
       transform: scale(1.06);
       box-shadow: 0 0 16px #facc15;
-      animation: pulse-swap 0.8s infinite alternate;
       z-index: 10;
-    }
-    @keyframes pulse-swap {
-      from { transform: scale(1.03); }
-      to { transform: scale(1.08); }
     }
 
     @media print {
@@ -141,7 +111,7 @@
 
   <div class="container-fluid" style="max-width: 1350px;">
     
-    <!-- THANH TIÊU ĐỀ & ĐIỀU HƯỚNG (ẨN KHI IN) -->
+    <!-- THANH TIÊU ĐỀ & BỘ LỌC -->
     <div class="header-banner mb-3 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
       <div>
         <div class="d-flex align-items-center gap-2 mb-1">
@@ -154,7 +124,7 @@
       <div class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
         <span class="small fw-bold text-dark ps-2">Lớp:</span>
         <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-primary" style="width: 130px;" onchange="onClassChange()">
-          <option value="">-- Chọn lớp --</option>
+          <option value="">-- Nạp lớp... --</option>
         </select>
 
         <button onclick="saveSeatingSchedule()" id="btnSave" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm">
@@ -171,11 +141,11 @@
       </div>
     </div>
 
-    <!-- HƯỚNG DẪN ĐỔI CHỖ NHANH (ẨN KHI IN) -->
-    <div class="alert alert-info py-2 px-3 rounded-3 small mb-3 no-print d-flex justify-content-between align-items-center" id="swapInstruction">
-      <span>
+    <!-- KHUNG HƯỚNG DẪN ĐỔI CHỖ -->
+    <div class="alert alert-info py-2 px-3 rounded-3 small mb-3 no-print d-flex justify-content-between align-items-center">
+      <span id="swapInstructionText">
         <i class="fas fa-mouse-pointer me-1 text-primary"></i>
-        <b>Cách đổi chỗ ngồi:</b> Nhấp chuột vào em <b>thứ nhất</b>, sau đó nhấp chuột vào em <b>thứ hai</b> để tự động hoán đổi vị trí chỗ ngồi cho nhau.
+        <b>Cách đổi chỗ:</b> Nhấp vào em <b>thứ nhất</b>, sau đó nhấp vào em <b>thứ hai</b> để tự động hoán đổi vị trí chỗ ngồi cho nhau.
       </span>
       <span class="badge bg-primary px-3 py-1" id="studentCountBadge">0 học sinh</span>
     </div>
@@ -197,7 +167,7 @@
       <hr>
     </div>
 
-    <!-- KHUNG LỚP HỌC TRỰC QUAN -->
+    <!-- KHUNG SƠ ĐỒ LỚP HỌC -->
     <div class="classroom-stage">
       <div class="teacher-desk text-center">
         <i class="fas fa-chalkboard-teacher me-2"></i>BỤC GIẢNG & BÀN GIÁO VIÊN
@@ -208,7 +178,7 @@
       </div>
     </div>
 
-    <!-- KHUNG CHỮ KÝ BGH VÀ GVCN (CHỈ HIỆN KHI IN) -->
+    <!-- KHUNG CHỮ KÝ KHI IN -->
     <div class="row mt-5 pt-4 text-center print-footer d-none">
       <div class="col-6">
         <p class="fw-bold mb-1">BAN GIÁM HIỆU DUYỆT</p>
@@ -224,10 +194,13 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxlKahe8G6EpCo3HI5vLmaV56IoxjpfR5bye-ndkXz3ePAvfTst85mibPwub8E9R68mzQ/exec";
+    // Tự động nhận link API đang hoạt động từ trang mẹ index.html
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbxK2mv0VfcMD2OiulVJ44cls7X-DGmpNQ5Yyj68-IlX-F0x1hLpWHmfSn-gNKOuH_dNhQ/exec";
 
     let seatList = [];
-    let selectedFirstIndex = -1; // Vị trí học sinh thứ nhất được chọn để đổi chỗ
+    let selectedFirstIndex = -1;
 
     async function callApi(fn, ...args) {
       const response = await fetch(API_URL, {
@@ -251,11 +224,13 @@
         selC.innerHTML = hC;
 
         if (classes && classes.length > 0) {
-          selC.value = classes[0];
+          // Ưu tiên chọn lớp 67.GDĐP hoặc 67.GDDP nếu có trong danh sách
+          let defaultClass = classes.find(c => c.includes("67") || c.includes("GDDP") || c.includes("GDĐP")) || classes[0];
+          selC.value = defaultClass;
           await onClassChange();
         }
       } catch (e) {
-        console.error("Lỗi nạp lớp:", e);
+        document.getElementById('seatsContainer').innerHTML = `<div class="col-12 text-danger p-4 text-center">Lỗi tải danh sách lớp: ${e.message}</div>`;
       }
     };
 
@@ -265,10 +240,16 @@
 
       document.getElementById('printClassName').innerText = className;
       document.getElementById('seatsContainer').innerHTML = '<div class="col-12 text-center text-muted p-5"><i class="fas fa-sync fa-spin me-2"></i>Đang tải sơ đồ lớp ' + className + ' từ Sheet SO_DO_NGAU_NHIEN_2627...</div>';
-      cancelSwapSelection();
+      
+      selectedFirstIndex = -1;
+      const btnCancel = document.getElementById('btnCancelSwap');
+      if (btnCancel) btnCancel.classList.add('d-none');
 
       try {
-        seatList = await callApi('getSeatingChartData2627', className) || [];
+        let res = await callApi('getSeatingChartData2627', className);
+        if (res && res.error) throw new Error(res.error);
+
+        seatList = res || [];
         renderSeats();
       } catch (err) {
         document.getElementById('seatsContainer').innerHTML = `<div class="col-12 text-danger p-4 text-center">Lỗi: ${err.message}</div>`;
@@ -277,27 +258,25 @@
 
     function renderSeats() {
       const container = document.getElementById('seatsContainer');
-      document.getElementById('studentCountBadge').innerText = seatList.length + " học sinh";
+      const countBadge = document.getElementById('studentCountBadge');
+      if (countBadge) countBadge.innerText = seatList.length + " học sinh";
 
       if (!seatList || seatList.length === 0) {
-        container.innerHTML = '<div class="col-12 text-center text-muted p-5">Chưa có học sinh nào trong lớp này.</div>';
+        container.innerHTML = '<div class="col-12 text-center text-muted p-5">Chưa có học sinh nào trong lớp này trên Sheet SO_DO_NGAU_NHIEN_2627.</div>';
         return;
       }
 
-      // Sắp xếp học sinh theo thứ tự Hàng (row) rồi đến Cột (col)
-      seatList.sort((a, b) => (a.row - b.row) || (a.col - b.col));
+      // Sắp xếp thứ tự theo Hàng rồi đến Cột
+      seatList.sort((a, b) => (Number(a.row) - Number(b.row)) || (Number(a.col) - Number(b.col)));
 
       let html = '';
       seatList.forEach((s, idx) => {
         let isSelected = (idx === selectedFirstIndex);
-        let badgeCall = s.calledCount > 0 ? `<span class="seat-call-badge" title="Đã gọi ${s.calledCount} lần">${s.calledCount}</span>` : '';
-
         html += `
           <div class="seat-card ${isSelected ? 'seat-selected' : ''}" 
                id="seatCard_${idx}" 
                onclick="handleSeatClick(${idx})" 
                title="Bấm để chọn đổi chỗ cho em ${s.name}">
-            ${badgeCall}
             <div class="seat-num-tag">HÀNG ${s.row} - DÃY ${s.col}</div>
             <div class="seat-name">${s.name}</div>
             <div class="seat-id">${s.id}</div>
@@ -308,63 +287,52 @@
       container.innerHTML = html;
     }
 
-    // XỬ LÝ HOÁN ĐỔI VỊ TRÍ 2 HỌC SINH 1-CHẠM
+    // ĐỔI CHỖ 2 HỌC SINH 1-CHẠM
     function handleSeatClick(idx) {
+      const insText = document.getElementById('swapInstructionText');
+      const btnCancel = document.getElementById('btnCancelSwap');
+
       if (selectedFirstIndex === -1) {
-        // Chọn học sinh thứ nhất
         selectedFirstIndex = idx;
-        document.getElementById('btnCancelSwap').classList.remove('d-none');
-        document.getElementById('swapInstruction').innerHTML = `
-          <span>
-            <i class="fas fa-exchange-alt me-1 text-warning"></i>
-            Đang chọn em: <b>${seatList[idx].name}</b> [Hàng ${seatList[idx].row} - Dãy ${seatList[idx].col}]. Hãy nhấp tiếp vào em thứ hai để đổi chỗ!
-          </span>
-          <span class="badge bg-warning text-dark px-3 py-1">Đang chọn</span>
-        `;
+        if (btnCancel) btnCancel.classList.remove('d-none');
+        if (insText) {
+          insText.innerHTML = `<i class="fas fa-hand-point-right text-warning me-1"></i>Đang chọn: <b>${seatList[idx].name}</b> [Hàng ${seatList[idx].row} - Dãy ${seatList[idx].col}]. Hãy nhấp tiếp vào em thứ hai để đổi chỗ!`;
+        }
         renderSeats();
       } else if (selectedFirstIndex === idx) {
-        // Bấm lại chính em đó -> hủy chọn
         cancelSwapSelection();
       } else {
-        // Chọn học sinh thứ hai -> thực hiện hoán đổi tọa độ Hàng và Cột
+        // Hoán đổi vị trí hàng và cột của 2 học sinh
         const s1 = seatList[selectedFirstIndex];
         const s2 = seatList[idx];
 
         let tempRow = s1.row;
         let tempCol = s1.col;
-
         s1.row = s2.row;
         s1.col = s2.col;
-
         s2.row = tempRow;
         s2.col = tempCol;
 
         const name1 = s1.name;
         const name2 = s2.name;
 
-        cancelSwapSelection();
+        selectedFirstIndex = -1;
+        if (btnCancel) btnCancel.classList.add('d-none');
+        if (insText) {
+          insText.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i><b>Đã đổi chỗ:</b> Em <b>${name1}</b> và em <b>${name2}</b> đã hoán đổi vị trí. Nhấn <b>"Lưu Vào Sheet"</b> để cập nhật!`;
+        }
         renderSeats();
-
-        document.getElementById('swapInstruction').innerHTML = `
-          <span>
-            <i class="fas fa-check-circle me-1 text-success"></i>
-            <b>Đã đổi chỗ thành công:</b> Em <b>${name1}</b> và em <b>${name2}</b> đã tráo đổi vị trí cho nhau. Hãy nhấn nút <b>"Lưu Vào Sheet"</b> để ghi nhớ!
-          </span>
-          <span class="badge bg-success px-3 py-1">Đã hoán đổi</span>
-        `;
       }
     }
 
     function cancelSwapSelection() {
       selectedFirstIndex = -1;
-      document.getElementById('btnCancelSwap').classList.add('d-none');
-      document.getElementById('swapInstruction').innerHTML = `
-        <span>
-          <i class="fas fa-mouse-pointer me-1 text-primary"></i>
-          <b>Cách đổi chỗ ngồi:</b> Nhấp chuột vào em <b>thứ nhất</b>, sau đó nhấp chuột vào em <b>thứ hai</b> để tự động hoán đổi vị trí chỗ ngồi cho nhau.
-        </span>
-        <span class="badge bg-primary px-3 py-1">${seatList.length} học sinh</span>
-      `;
+      const btnCancel = document.getElementById('btnCancelSwap');
+      if (btnCancel) btnCancel.classList.add('d-none');
+      const insText = document.getElementById('swapInstructionText');
+      if (insText) {
+        insText.innerHTML = `<i class="fas fa-mouse-pointer me-1 text-primary"></i><b>Cách đổi chỗ:</b> Nhấp vào em <b>thứ nhất</b>, sau đó nhấp vào em <b>thứ hai</b> để tự động hoán đổi vị trí chỗ ngồi cho nhau.`;
+      }
       renderSeats();
     }
 
@@ -372,7 +340,7 @@
     async function saveSeatingSchedule() {
       const className = document.getElementById('selClass').value;
       if (!className) return alert("Vui lòng chọn lớp!");
-      if (!seatList || seatList.length === 0) return alert("Chưa có học sinh để lưu!");
+      if (!seatList || seatList.length === 0) return alert("Chưa có dữ liệu để lưu!");
 
       const btn = document.getElementById('btnSave');
       const oldHtml = btn.innerHTML;
