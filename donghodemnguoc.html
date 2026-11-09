@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đồng Hồ & Đếm Ngược</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #0f172a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f8fafc;
+      padding: 16px;
+      user-select: none;
+      min-height: 100vh;
+    }
+    .panel-box {
+      background: #1e293b;
+      border-radius: 20px;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      padding: 24px;
+    }
+    .nav-mode-btn {
+      border: none;
+      background: #334155;
+      color: #94a3b8;
+      font-weight: 700;
+      padding: 10px 22px;
+      border-radius: 50px;
+      transition: all 0.2s;
+    }
+    .nav-mode-btn.active {
+      background: #3b82f6;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    .huge-digits {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: clamp(4.5rem, 13vw, 9.5rem);
+      font-weight: 900;
+      letter-spacing: 4px;
+      line-height: 1;
+      text-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+    }
+    .timer-danger {
+      color: #ef4444 !important;
+      text-shadow: 0 0 35px rgba(239, 68, 68, 0.6) !important;
+      animation: pulse-danger 0.6s infinite alternate;
+    }
+    @keyframes pulse-danger {
+      from { transform: scale(1); }
+      to { transform: scale(1.02); }
+    }
+    .preset-btn {
+      background: #334155;
+      color: #e2e8f0;
+      border: 1px solid #475569;
+      border-radius: 12px;
+      font-weight: 700;
+      padding: 8px 16px;
+      transition: all 0.15s;
+    }
+    .preset-btn:hover {
+      background: #0284c7;
+      color: white;
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+    }
+    .progress-bar-custom {
+      height: 12px;
+      background: #334155;
+      border-radius: 50px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #10b981, #06b6d4);
+      transition: width 1s linear, background 0.3s;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1050px;">
+    
+    <!-- THANH CHUYỂN CHẾ ĐỘ & FULLSCREEN -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div class="d-flex gap-2 bg-black bg-opacity-40 p-1 rounded-pill border border-secondary border-opacity-25">
+        <button class="nav-mode-btn active" id="btnModeTimer" onclick="switchMode('TIMER')">
+          <i class="fas fa-hourglass-half me-2"></i>Đếm Ngược
+        </button>
+        <button class="nav-mode-btn" id="btnModeClock" onclick="switchMode('CLOCK')">
+          <i class="fas fa-clock me-2"></i>Đồng Hồ Số
+        </button>
+        <button class="nav-mode-btn" id="btnModeStopwatch" onclick="switchMode('STOPWATCH')">
+          <i class="fas fa-stopwatch me-2"></i>Bấm Giây
+        </button>
+      </div>
+
+      <button onclick="toggleFullScreen()" class="btn btn-outline-light rounded-pill px-4 fw-bold">
+        <i class="fas fa-expand me-2"></i>Toàn Màn Hình
+      </button>
+    </div>
+
+    <!-- 1. GIAO DIỆN ĐẾM NGƯỢC -->
+    <div id="viewTimer" class="panel-box text-center">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="badge bg-primary bg-opacity-20 text-info fw-bold px-3 py-2 border border-info border-opacity-25">
+          <i class="fas fa-bullhorn me-1"></i> THỜI GIAN LÀM BÀI / THẢO LUẬN
+        </span>
+        <span id="timerStatusBadge" class="badge bg-secondary px-3 py-2">Đang chờ</span>
+      </div>
+
+      <div class="py-4">
+        <div class="huge-digits text-info" id="timerDisplay">15:00</div>
+      </div>
+
+      <div class="progress-bar-custom mb-4">
+        <div id="timerProgress" class="progress-fill"></div>
+      </div>
+
+      <div class="d-flex justify-content-center gap-3 mb-4">
+        <button onclick="startTimer()" id="btnStartTimer" class="btn btn-success btn-lg rounded-pill px-5 fw-bold shadow">
+          <i class="fas fa-play me-2"></i>BẮT ĐẦU
+        </button>
+        <button onclick="pauseTimer()" id="btnPauseTimer" class="btn btn-warning btn-lg rounded-pill px-4 fw-bold shadow d-none">
+          <i class="fas fa-pause me-2"></i>TẠM DỪNG
+        </button>
+        <button onclick="resetTimer()" class="btn btn-outline-secondary btn-lg rounded-pill px-4 fw-bold">
+          <i class="fas fa-redo-alt me-2"></i>LÀM LẠI
+        </button>
+      </div>
+
+      <div class="pt-3 border-top border-secondary border-opacity-25">
+        <div class="small text-secondary fw-bold mb-2 text-uppercase">Chọn nhanh thời gian:</div>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+          <button class="preset-btn" onclick="setTimerMinutes(1)">1 Phút</button>
+          <button class="preset-btn" onclick="setTimerMinutes(2)">2 Phút</button>
+          <button class="preset-btn" onclick="setTimerMinutes(3)">3 Phút</button>
+          <button class="preset-btn" onclick="setTimerMinutes(5)">5 Phút</button>
+          <button class="preset-btn" onclick="setTimerMinutes(10)">10 Phút</button>
+          <button class="preset-btn" onclick="setTimerMinutes(15)">15 Phút</button>
+          <button class="preset-btn" onclick="setTimerMinutes(20)">20 Phút</button>
+          <button class="preset-btn" onclick="setTimerMinutes(45)">45 Phút (1 Tiết)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. GIAO DIỆN ĐỒNG HỒ SỐ -->
+    <div id="viewClock" class="panel-box text-center d-none">
+      <div class="text-secondary small fw-bold text-uppercase mb-2" id="clockGreeting">GIỜ CHUẨN LỚP HỌC</div>
+      <div class="py-4">
+        <div class="huge-digits text-warning" id="clockDigits">00:00:00</div>
+      </div>
+      <div class="fs-4 fw-bold text-light mt-2" id="clockDateString">Thứ Hai, 09/11/2026</div>
+    </div>
+
+    <!-- 3. GIAO DIỆN BẤM GIÂY -->
+    <div id="viewStopwatch" class="panel-box text-center d-none">
+      <span class="badge bg-warning text-dark fw-bold px-3 py-2 mb-2">ĐỒNG HỒ BẤM GIÂY THI ĐUA</span>
+      <div class="py-4">
+        <div class="huge-digits text-success" id="stopwatchDisplay">00:00.00</div>
+      </div>
+
+      <div class="d-flex justify-content-center gap-3 mb-4">
+        <button onclick="startStopwatch()" id="btnStartSW" class="btn btn-success btn-lg rounded-pill px-5 fw-bold">
+          <i class="fas fa-play me-2"></i>BẮT ĐẦU
+        </button>
+        <button onclick="pauseStopwatch()" id="btnPauseSW" class="btn btn-warning btn-lg rounded-pill px-4 fw-bold d-none">
+          <i class="fas fa-pause me-2"></i>TẠM DỪNG
+        </button>
+        <button onclick="recordLapSW()" id="btnLapSW" class="btn btn-info text-white btn-lg rounded-pill px-4 fw-bold d-none">
+          <i class="fas fa-flag me-2"></i>GHI VÒNG
+        </button>
+        <button onclick="resetStopwatch()" class="btn btn-outline-secondary btn-lg rounded-pill px-4 fw-bold">
+          <i class="fas fa-redo-alt me-2"></i>LÀM LẠI
+        </button>
+      </div>
+
+      <div class="overflow-auto text-start mx-auto" style="max-width: 480px; max-height: 180px;" id="swLapsContainer"></div>
+    </div>
+
+  </div>
+
+  <script>
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playTick() {
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.setValueAtTime(800, ctx.currentTime);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.06);
+      } catch(e) {}
+    }
+
+    function playSchoolBell() {
+      try {
+        const ctx = getAudioContext();
+        [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.15);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.15);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.15 + 1.2);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + i * 0.15);
+          osc.stop(ctx.currentTime + i * 0.15 + 1.3);
+        });
+      } catch(e) {}
+    }
+
+    function switchMode(mode) {
+      document.querySelectorAll('.nav-mode-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('viewTimer').classList.add('d-none');
+      document.getElementById('viewClock').classList.add('d-none');
+      document.getElementById('viewStopwatch').classList.add('d-none');
+
+      if (mode === 'TIMER') {
+        document.getElementById('btnModeTimer').classList.add('active');
+        document.getElementById('viewTimer').classList.remove('d-none');
+      } else if (mode === 'CLOCK') {
+        document.getElementById('btnModeClock').classList.add('active');
+        document.getElementById('viewClock').classList.remove('d-none');
+      } else {
+        document.getElementById('btnModeStopwatch').classList.add('active');
+        document.getElementById('viewStopwatch').classList.remove('d-none');
+      }
+    }
+
+    // ĐẾM NGƯỢC
+    let totalSeconds = 15 * 60;
+    let remainSeconds = totalSeconds;
+    let timerInterval = null;
+
+    function setTimerMinutes(m) {
+      pauseTimer();
+      totalSeconds = m * 60;
+      remainSeconds = totalSeconds;
+      updateTimerDisplay();
+      document.getElementById('timerStatusBadge').innerText = "Đã đặt " + m + " phút";
+    }
+
+    function updateTimerDisplay() {
+      const min = Math.floor(remainSeconds / 60);
+      const sec = remainSeconds % 60;
+      const el = document.getElementById('timerDisplay');
+      el.innerText = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+
+      const pct = (remainSeconds / totalSeconds) * 100;
+      const bar = document.getElementById('timerProgress');
+      bar.style.width = pct + '%';
+
+      if (remainSeconds <= 10 && remainSeconds > 0) {
+        el.className = 'huge-digits timer-danger';
+        bar.style.background = '#ef4444';
+        playTick();
+      } else if (pct < 30) {
+        el.className = 'huge-digits text-warning';
+        bar.style.background = '#f59e0b';
+      } else {
+        el.className = 'huge-digits text-info';
+        bar.style.background = 'linear-gradient(90deg, #10b981, #06b6d4)';
+      }
+    }
+
+    function startTimer() {
+      if (timerInterval || remainSeconds <= 0) return;
+      getAudioContext();
+
+      document.getElementById('btnStartTimer').classList.add('d-none');
+      document.getElementById('btnPauseTimer').classList.remove('d-none');
+      document.getElementById('timerStatusBadge').className = 'badge bg-success px-3 py-2';
+      document.getElementById('timerStatusBadge').innerText = 'Đang đếm ngược...';
+
+      timerInterval = setInterval(() => {
+        remainSeconds--;
+        updateTimerDisplay();
+
+        if (remainSeconds <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          document.getElementById('timerDisplay').innerText = "HẾT GIỜ!";
+          document.getElementById('timerStatusBadge').className = 'badge bg-danger px-3 py-2';
+          document.getElementById('timerStatusBadge').innerText = 'HẾT THỜI GIAN LÀM BÀI';
+          document.getElementById('btnStartTimer').classList.remove('d-none');
+          document.getElementById('btnPauseTimer').classList.add('d-none');
+          playSchoolBell();
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      document.getElementById('btnStartTimer').classList.remove('d-none');
+      document.getElementById('btnPauseTimer').classList.add('d-none');
+      document.getElementById('timerStatusBadge').className = 'badge bg-warning text-dark px-3 py-2';
+      document.getElementById('timerStatusBadge').innerText = 'Đang tạm dừng';
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      remainSeconds = totalSeconds;
+      updateTimerDisplay();
+      document.getElementById('timerStatusBadge').className = 'badge bg-secondary px-3 py-2';
+      document.getElementById('timerStatusBadge').innerText = 'Đã đặt lại';
+    }
+
+    // ĐỒNG HỒ
+    const DAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clockDigits').innerText = `${h}:${m}:${s}`;
+
+      const dayName = DAYS[now.getDay()];
+      const d = String(now.getDate()).padStart(2, '0');
+      const mo = String(now.getMonth() + 1).padStart(2, '0');
+      const y = now.getFullYear();
+      document.getElementById('clockDateString').innerText = `${dayName}, Ngày ${d}/${mo}/${y}`;
+
+      const hr = now.getHours();
+      document.getElementById('clockGreeting').innerText = 
+        hr < 12 ? 'BUỔI SÁNG TÍCH CỰC & NĂNG ĐỘNG' : (hr < 18 ? 'BUỔI CHIỀU TẬP TRUNG HỌC TẬP' : 'BUỔI TỐI ÔN TẬP VÀ NGHỈ NGƠI');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // STOPWATCH
+    let swStartTime = 0, swElapsedTime = 0, swInterval = null, swLapCount = 0;
+
+    function formatSW(ms) {
+      let m = Math.floor(ms / 60000);
+      let s = Math.floor((ms % 60000) / 1000);
+      let cs = Math.floor((ms % 1000) / 10);
+      return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
+    }
+
+    function startStopwatch() {
+      if (swInterval) return;
+      swStartTime = performance.now() - swElapsedTime;
+      document.getElementById('btnStartSW').classList.add('d-none');
+      document.getElementById('btnPauseSW').classList.remove('d-none');
+      document.getElementById('btnLapSW').classList.remove('d-none');
+
+      swInterval = setInterval(() => {
+        swElapsedTime = performance.now() - swStartTime;
+        document.getElementById('stopwatchDisplay').innerText = formatSW(swElapsedTime);
+      }, 30);
+    }
+
+    function pauseStopwatch() {
+      clearInterval(swInterval);
+      swInterval = null;
+      document.getElementById('btnStartSW').classList.remove('d-none');
+      document.getElementById('btnPauseSW').classList.add('d-none');
+    }
+
+    function resetStopwatch() {
+      pauseStopwatch();
+      swElapsedTime = 0;
+      swLapCount = 0;
+      document.getElementById('stopwatchDisplay').innerText = "00:00.00";
+      document.getElementById('btnLapSW').classList.add('d-none');
+      document.getElementById('swLapsContainer').innerHTML = "";
+    }
+
+    function recordLapSW() {
+      swLapCount++;
+      const timeStr = formatSW(swElapsedTime);
+      const container = document.getElementById('swLapsContainer');
+      const item = document.createElement('div');
+      item.className = 'd-flex justify-content-between p-2 border-bottom border-secondary border-opacity-25 small';
+      item.innerHTML = `<span class="text-secondary fw-bold">Vòng #${swLapCount}</span><span class="text-warning fw-bold">${timeStr}</span>`;
+      container.prepend(item);
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+  </script>
+</body>
+</html>
