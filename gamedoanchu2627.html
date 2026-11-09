@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Đoán Chữ - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25);
+    }
+    .team-card {
+      border-radius: 14px;
+      padding: 16px;
+      border: 2px solid #e2e8f0;
+      background: #fff;
+      transition: all 0.2s;
+    }
+    .team-card.active-blue {
+      border-color: #0284c7;
+      box-shadow: 0 0 15px rgba(2, 132, 199, 0.2);
+      background: #f0f9ff;
+    }
+    .team-card.active-red {
+      border-color: #e11d48;
+      box-shadow: 0 0 15px rgba(225, 29, 72, 0.2);
+      background: #fff1f2;
+    }
+    .letter-box {
+      width: 42px;
+      height: 48px;
+      font-size: 22px;
+      font-weight: 800;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      margin: 3px;
+      color: #334155;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .letter-box.revealed {
+      background: #ecfdf5;
+      border-color: #10b981;
+      color: #047857;
+    }
+    .letter-box.space {
+      width: 20px;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+    }
+    .keyboard-btn {
+      width: 48px;
+      height: 48px;
+      font-weight: 700;
+      font-size: 16px;
+      border-radius: 10px;
+      margin: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1400px;">
+    
+    <!-- THANH TIÊU ĐỀ -->
+    <div class="header-banner mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-gamepad me-1"></i>GAME SHOW 2627</span>
+          <span class="opacity-75 small">Lưu kết quả vào Sheet: <b>GAME_DOAN_CHU_2627</b></span>
+        </div>
+        <h4 class="fw-bold mb-0">GAME ĐOÁN CHỮ Ô CHÍNH XÁC</h4>
+      </div>
+      <div class="badge bg-white text-primary px-3 py-2 fw-bold fs-6 shadow-sm">
+        Năm học 2026 - 2027
+      </div>
+    </div>
+
+    <div class="row g-3">
+      
+      <!-- CỘT TRÁI: CÀI ĐẶT TỪ KHÓA & VÒNG QUAY -->
+      <div class="col-lg-4">
+        <div class="panel-box mb-3">
+          <h6 class="fw-bold text-primary mb-3 text-uppercase"><i class="fas fa-cog me-1"></i> 1. Cài Đặt Từ Khóa</h6>
+          
+          <div class="mb-2">
+            <label class="small fw-bold text-secondary mb-1">Từ khóa đầy đủ (Không dấu hoặc có dấu):</label>
+            <input type="text" id="inpKeyword" class="form-control form-control-sm fw-bold" placeholder="Vd: THUAT TOAN TIN HOC">
+          </div>
+
+          <div class="mb-2">
+            <label class="small fw-bold text-secondary mb-1">Chủ đề / Gợi ý câu hỏi:</label>
+            <input type="text" id="inpHint" class="form-control form-control-sm" placeholder="Vd: Các bước giải quyết vấn đề bằng máy tính...">
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Thời gian/Lượt:</label>
+              <select id="selTime" class="form-select form-select-sm fw-bold">
+                <option value="20">20 giây</option>
+                <option value="30" selected>30 giây</option>
+                <option value="45">45 giây</option>
+                <option value="60">60 giây</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Số mạng tối đa:</label>
+              <input type="number" id="inpLives" class="form-control form-control-sm fw-bold text-center" value="6" min="1" max="10">
+            </div>
+          </div>
+
+          <button onclick="startNewGame()" class="btn btn-success btn-sm w-100 fw-bold rounded-pill py-2 shadow-sm">
+            <i class="fas fa-play me-1"></i> BẮT ĐẦU VÁN MỚI
+          </button>
+        </div>
+
+        <!-- VÒNG QUAY MAY MẮN THƯỞNG ĐIỂM -->
+        <div class="panel-box text-center">
+          <h6 class="fw-bold text-warning mb-3 text-uppercase"><i class="fas fa-dharmachakra me-1"></i> Vòng Quay Điểm Thưởng</h6>
+          <div class="p-3 bg-light rounded-4 border border-warning mb-2">
+            <h2 class="fw-bold text-dark mb-1" id="wheelResultDisplay">?</h2>
+            <small class="text-secondary" id="wheelSubText">Bấm quay để nhận điểm hoặc thử thách</small>
+          </div>
+          <button onclick="spinWheel()" id="btnSpinWheel" class="btn btn-warning btn-sm w-100 fw-bold rounded-pill py-2 text-dark shadow-sm">
+            <i class="fas fa-sync-alt me-1"></i> QUAY ĐIỂM LƯỢT NÀY
+          </button>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: MÀN HÌNH CHƠI CHÍNH -->
+      <div class="col-lg-8">
+        <div class="panel-box mb-3">
+          
+          <!-- BẢNG ĐIỂM 2 ĐỘI & ĐỒNG HỒ LƯỢT -->
+          <div class="row g-3 mb-4 align-items-center">
+            
+            <!-- ĐỘI XANH -->
+            <div class="col-4">
+              <div class="team-card text-center active-blue" id="cardBlue">
+                <div class="small fw-bold text-primary text-uppercase mb-1"><i class="fas fa-shield-alt me-1"></i> Đội Xanh</div>
+                <h2 class="fw-bold text-primary mb-2" id="scoreBlue">0</h2>
+                <div class="d-flex justify-content-center gap-1">
+                  <button onclick="adjustScore('blue', 10)" class="btn btn-sm btn-outline-primary py-0 px-2 fw-bold">+10</button>
+                  <button onclick="adjustScore('blue', -10)" class="btn btn-sm btn-outline-secondary py-0 px-2">-10</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- THỜI GIAN LƯỢT -->
+            <div class="col-4 text-center">
+              <div class="p-3 bg-light rounded-4 border">
+                <div class="small text-muted fw-bold text-uppercase">Thời gian</div>
+                <h2 class="fw-bold text-danger mb-0" id="timerDisplay">30s</h2>
+                <button onclick="toggleTurn()" class="btn btn-sm btn-outline-dark rounded-pill px-3 mt-1 fw-bold" style="font-size: 11px;">
+                  <i class="fas fa-exchange-alt me-1"></i> Đổi lượt
+                </button>
+              </div>
+            </div>
+
+            <!-- ĐỘI ĐỎ -->
+            <div class="col-4">
+              <div class="team-card text-center" id="cardRed">
+                <div class="small fw-bold text-danger text-uppercase mb-1"><i class="fas fa-flag me-1"></i> Đội Đỏ</div>
+                <h2 class="fw-bold text-danger mb-2" id="scoreRed">0</h2>
+                <div class="d-flex justify-content-center gap-1">
+                  <button onclick="adjustScore('red', 10)" class="btn btn-sm btn-outline-danger py-0 px-2 fw-bold">+10</button>
+                  <button onclick="adjustScore('red', -10)" class="btn btn-sm btn-outline-secondary py-0 px-2">-10</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- KHUNG HIỂN THỊ GỢI Ý & MẠNG SỐNG -->
+          <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 mb-3 border">
+            <div>
+              <span class="small text-secondary fw-bold text-uppercase me-2">Chủ đề gợi ý:</span>
+              <span class="fw-bold text-dark fs-6" id="hintDisplay">Chưa bắt đầu ván mới...</span>
+            </div>
+            <div>
+              <span class="small text-secondary fw-bold text-uppercase me-2">Mạng còn lại:</span>
+              <span class="fs-5" id="livesDisplay">❤️❤️❤️❤️❤️❤️</span>
+            </div>
+          </div>
+
+          <!-- KHUNG Ô CHỮ BÍ MẬT -->
+          <div class="text-center p-4 bg-white rounded-4 border border-2 mb-4 min-vh-25 d-flex align-items-center justify-content-center flex-wrap" id="wordBoardContainer" style="min-height: 140px;">
+            <span class="text-muted fst-italic">Nhập từ khóa và bấm "BẮT ĐẦU VÁN MỚI" để chơi game đoán chữ.</span>
+          </div>
+
+          <!-- BÀN PHÍM CHỮ CÁI (A-Z) -->
+          <div class="text-center mb-3" id="keyboardContainer">
+            <!-- Render tự động qua JS -->
+          </div>
+
+          <!-- NÚT ĐIỀU KHIỂN DƯỚI CÙNG -->
+          <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+            <span class="small fw-bold text-primary" id="turnIndicator">Lượt đoán: Đội Xanh</span>
+            <div class="d-flex gap-2">
+              <button onclick="revealAll()" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold">
+                <i class="fas fa-eye me-1"></i> Mở Đáp Án
+              </button>
+              <button onclick="saveGameToSheet()" class="btn btn-sm btn-success rounded-pill px-3 fw-bold shadow-sm">
+                <i class="fas fa-cloud-upload-alt me-1"></i> Lưu kết quả vào Sheet
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbz0kGZXs_zMyIaxDe7Knj1kFYhHI-wso4bP9hpcBGObxmDszIWaoeSGFjYUjTkv_ERCFQ/exec";
+
+    let gameData = {
+      keyword: "",
+      hint: "",
+      maxTime: 30,
+      timeLeft: 30,
+      lives: 6,
+      maxLives: 6,
+      scoreBlue: 0,
+      scoreRed: 0,
+      currentTeam: 'blue', // 'blue' hoặc 'red'
+      guessedLetters: [],
+      timerInterval: null,
+      wheelPoints: 0
+    };
+
+    const WHEEL_PRIZES = ["+10 Điểm", "+20 Điểm", "+30 Điểm", "+50 Điểm", "X2 Điểm", "-10 Điểm", "Mất Lượt", "May Mắn"];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = function() {
+      renderKeyboard();
+    };
+
+    function renderKeyboard() {
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+      let html = '';
+      letters.forEach(l => {
+        html += `<button onclick="guessLetter('${l}', this)" id="key_${l}" class="btn btn-outline-dark keyboard-btn shadow-sm">${l}</button>`;
+      });
+      document.getElementById('keyboardContainer').innerHTML = html;
+    }
+
+    function startNewGame() {
+      const kw = document.getElementById('inpKeyword').value.trim().toUpperCase();
+      const hint = document.getElementById('inpHint').value.trim();
+      const t = parseInt(document.getElementById('selTime').value) || 30;
+      const l = parseInt(document.getElementById('inpLives').value) || 6;
+
+      if (!kw) return alert("Vui lòng nhập từ khóa đầy đủ!");
+
+      gameData.keyword = kw;
+      gameData.hint = hint || "Không có gợi ý";
+      gameData.maxTime = t;
+      gameData.timeLeft = t;
+      gameData.lives = l;
+      gameData.maxLives = l;
+      gameData.guessedLetters = [];
+      gameData.scoreBlue = 0;
+      gameData.scoreRed = 0;
+      gameData.currentTeam = 'blue';
+
+      document.getElementById('hintDisplay').innerText = gameData.hint;
+      document.getElementById('scoreBlue').innerText = 0;
+      document.getElementById('scoreRed').innerText = 0;
+
+      updateLivesUI();
+      renderBoard();
+      resetKeyboard();
+      startTimer();
+      updateTeamActiveUI();
+    }
+
+    function renderBoard() {
+      const container = document.getElementById('wordBoardContainer');
+      let html = '';
+      for (let i = 0; i < gameData.keyword.length; i++) {
+        let char = gameData.keyword[i];
+        if (char === ' ') {
+          html += `<div class="letter-box space"></div>`;
+        } else {
+          let revealed = gameData.guessedLetters.includes(char);
+          html += `<div class="letter-box ${revealed ? 'revealed' : ''}" id="letter_${i}">${revealed ? char : '_'}</div>`;
+        }
+      }
+      container.innerHTML = html;
+    }
+
+    function resetKeyboard() {
+      document.querySelectorAll('.keyboard-btn').forEach(btn => {
+        btn.disabled = false;
+        btn.className = "btn btn-outline-dark keyboard-btn shadow-sm";
+      });
+    }
+
+    function startTimer() {
+      clearInterval(gameData.timerInterval);
+      gameData.timeLeft = gameData.maxTime;
+      document.getElementById('timerDisplay').innerText = gameData.timeLeft + "s";
+
+      gameData.timerInterval = setInterval(() => {
+        gameData.timeLeft--;
+        document.getElementById('timerDisplay').innerText = gameData.timeLeft + "s";
+        if (gameData.timeLeft <= 0) {
+          clearInterval(gameData.timerInterval);
+          alert("Hết giờ lượt đoán! Chuyển lượt sang đội đối phương.");
+          toggleTurn();
+        }
+      }, 1000);
+    }
+
+    function toggleTurn() {
+      gameData.currentTeam = gameData.currentTeam === 'blue' ? 'red' : 'blue';
+      updateTeamActiveUI();
+      startTimer();
+    }
+
+    function updateTeamActiveUI() {
+      const cardBlue = document.getElementById('cardBlue');
+      const cardRed = document.getElementById('cardRed');
+      const indicator = document.getElementById('turnIndicator');
+
+      if (gameData.currentTeam === 'blue') {
+        cardBlue.className = 'team-card text-center active-blue';
+        cardRed.className = 'team-card text-center';
+        indicator.innerText = "Lượt đoán: Đội Xanh";
+      } else {
+        cardBlue.className = 'team-card text-center';
+        cardRed.className = 'team-card text-center active-red';
+        indicator.innerText = "Lượt đoán: Đội Đỏ";
+      }
+    }
+
+    function guessLetter(letter, btn) {
+      if (!gameData.keyword) return alert("Vui lòng bắt đầu ván mới trước!");
+      btn.disabled = true;
+      gameData.guessedLetters.push(letter);
+
+      if (gameData.keyword.includes(letter)) {
+        btn.className = "btn btn-success keyboard-btn text-white fw-bold shadow-sm";
+        renderBoard();
+
+        // Cộng điểm thưởng
+        let addPts = gameData.wheelPoints > 0 ? gameData.wheelPoints : 10;
+        if (gameData.currentTeam === 'blue') gameData.scoreBlue += addPts;
+        else gameData.scoreRed += addPts;
+
+        document.getElementById('scoreBlue').innerText = gameData.scoreBlue;
+        document.getElementById('scoreRed').innerText = gameData.scoreRed;
+        gameData.wheelPoints = 0; // Reset điểm vòng quay sau khi đoán đúng
+
+        // Kiểm tra xem đã đoán hết từ khóa chưa
+        checkWinCondition();
+      } else {
+        btn.className = "btn btn-danger keyboard-btn text-white fw-bold shadow-sm";
+        gameData.lives--;
+        updateLivesUI();
+
+        if (gameData.lives <= 0) {
+          clearInterval(gameData.timerInterval);
+          alert("💥 HẾT MẠNG! Trò chơi kết thúc.");
+          revealAll();
+        } else {
+          toggleTurn();
+        }
+      }
+    }
+
+    function updateLivesUI() {
+      let hearts = "";
+      for (let i = 0; i < gameData.maxLives; i++) {
+        hearts += i < gameData.lives ? "❤️" : "🖤";
+      }
+      document.getElementById('livesDisplay').innerText = hearts;
+    }
+
+    function checkWinCondition() {
+      let win = true;
+      for (let i = 0; i < gameData.keyword.length; i++) {
+        let char = gameData.keyword[i];
+        if (char !== ' ' && !gameData.guessedLetters.includes(char)) {
+          win = false;
+          break;
+        }
+      }
+
+      if (win) {
+        clearInterval(gameData.timerInterval);
+        if (typeof confetti === 'function') confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+        alert("🎉 CHÚC MỪNG! Đã giải mã thành công từ khóa!");
+      }
+    }
+
+    function revealAll() {
+      for (let i = 0; i < gameData.keyword.length; i++) {
+        let char = gameData.keyword[i];
+        if (char !== ' ' && !gameData.guessedLetters.includes(char)) {
+          gameData.guessedLetters.push(char);
+        }
+      }
+      renderBoard();
+      clearInterval(gameData.timerInterval);
+    }
+
+    function adjustScore(team, pts) {
+      if (team === 'blue') {
+        gameData.scoreBlue = Math.max(0, gameData.scoreBlue + pts);
+        document.getElementById('scoreBlue').innerText = gameData.scoreBlue;
+      } else {
+        gameData.scoreRed = Math.max(0, gameData.scoreRed + pts);
+        document.getElementById('scoreRed').innerText = gameData.scoreRed;
+      }
+    }
+
+    function spinWheel() {
+      const resDisplay = document.getElementById('wheelResultDisplay');
+      const subText = document.getElementById('wheelSubText');
+      
+      let count = 0;
+      let iv = setInterval(() => {
+        let randPrize = WHEEL_PRIZES[Math.floor(Math.random() * WHEEL_PRIZES.length)];
+        resDisplay.innerText = randPrize;
+        if (++count > 15) {
+          clearInterval(iv);
+          let finalPrize = WHEEL_PRIZES[Math.floor(Math.random() * WHEEL_PRIZES.length)];
+          resDisplay.innerText = finalPrize;
+
+          if (finalPrize.includes("Điểm")) {
+            gameData.wheelPoints = parseInt(finalPrize);
+            subText.innerText = "Đoán đúng chữ cái tiếp theo sẽ nhận " + finalPrize;
+          } else if (finalPrize === "X2 Điểm") {
+            if (gameData.currentTeam === 'blue') gameData.scoreBlue *= 2;
+            else gameData.scoreRed *= 2;
+            document.getElementById('scoreBlue').innerText = gameData.scoreBlue;
+            document.getElementById('scoreRed').innerText = gameData.scoreRed;
+            subText.innerText = "Điểm số đội hiện tại đã được nhân đôi!";
+          } else if (finalPrize === "Mất Lượt") {
+            subText.innerText = "Rất tiếc, mất lượt đoán!";
+            toggleTurn();
+          } else {
+            subText.innerText = "May mắn lần sau!";
+          }
+        }
+      }, 70);
+    }
+
+    // LƯU KẾT QUẢ VÁN ĐẤU VÀO GOOGLE SHEETS
+    async function saveGameToSheet() {
+      if (!gameData.keyword) return alert("Chưa có dữ liệu ván đấu!");
+
+      let winner = "Hòa";
+      if (gameData.scoreBlue > gameData.scoreRed) winner = "Đội Xanh Thắng";
+      else if (gameData.scoreRed > gameData.scoreBlue) winner = "Đội Đỏ Thắng";
+
+      const item = {
+        keyword: gameData.keyword,
+        hint: gameData.hint,
+        scoreBlue: gameData.scoreBlue,
+        scoreRed: gameData.scoreRed,
+        winner: winner
+      };
+
+      try {
+        const res = await callApi('saveGameDoanChuRecord2627', item);
+        alert("✅ Đã lưu kết quả ván đấu [Mã: " + res.id + "] vào Sheet GAME_DOAN_CHU_2627 thành công!");
+      } catch (err) {
+        alert("Lỗi lưu sheet: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
