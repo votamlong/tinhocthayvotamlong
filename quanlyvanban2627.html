@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Văn Bản - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+      color: #1e293b;
+      padding: 16px;
+      text-transform: none !important;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .kpi-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 16px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .kpi-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .type-btn {
+      border: 2px solid #cbd5e1;
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      border-radius: 12px;
+      padding: 10px;
+      transition: all 0.2s;
+    }
+    .type-btn.active-den {
+      background: #e0f2fe !important;
+      border-color: #0284c7 !important;
+      color: #0369a1 !important;
+    }
+    .type-btn.active-di {
+      background: #f0fdf4 !important;
+      border-color: #10b981 !important;
+      color: #15803d !important;
+    }
+    .badge-den { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: 700; padding: 4px 10px; border-radius: 6px; font-size: 11.5px; }
+    .badge-di { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; font-weight: 700; padding: 4px 10px; border-radius: 6px; font-size: 11.5px; }
+    .badge-status-done { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-weight: 700; padding: 4px 10px; border-radius: 50px; font-size: 11.5px; }
+    .badge-status-process { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; font-weight: 700; padding: 4px 10px; border-radius: 50px; font-size: 11.5px; }
+    input, select, textarea, button, label, span, h4, h6 {
+      text-transform: none !important;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- TIÊU ĐỀ & NĂM HỌC -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark m-0">QUẢN LÝ VĂN BẢN</h4>
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Năm học 2026-2027</span>
+    </div>
+
+    <!-- 4 THẺ KPI TỔNG QUAN -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">TỔNG SỐ VĂN BẢN</div>
+            <h3 class="fw-bold text-primary mb-0" id="statTotal">0</h3>
+            <small class="text-muted" style="font-size: 11px;">Hồ sơ công văn 2627</small>
+          </div>
+          <div class="kpi-icon bg-primary bg-opacity-10 text-primary"><i class="fas fa-archive"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">VĂN BẢN ĐẾN</div>
+            <h3 class="fw-bold text-info mb-0" id="statDen">0</h3>
+            <small class="text-info fw-semibold" style="font-size: 11px;">Công văn tiếp nhận</small>
+          </div>
+          <div class="kpi-icon bg-info bg-opacity-10 text-info"><i class="fas fa-inbox"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">VĂN BẢN ĐI</div>
+            <h3 class="fw-bold text-success mb-0" id="statDi">0</h3>
+            <small class="text-success fw-semibold" style="font-size: 11px;">Công văn phát hành</small>
+          </div>
+          <div class="kpi-icon bg-success bg-opacity-10 text-success"><i class="fas fa-paper-plane"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">ĐANG CHỜ XỬ LÝ</div>
+            <h3 class="fw-bold text-warning mb-0" id="statProcess">0</h3>
+            <small class="text-warning fw-semibold" style="font-size: 11px;">Chưa hoàn thành</small>
+          </div>
+          <div class="kpi-icon bg-warning bg-opacity-10 text-warning"><i class="fas fa-clock"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NỘI DUNG CHÍNH: 2 CỘT -->
+    <div class="row g-4">
+      
+      <!-- CỘT TRÁI: FORM LƯU TRỮ VĂN BẢN -->
+      <div class="col-lg-5">
+        <div class="panel-box border-top border-4 border-info">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="badge bg-info px-2 py-1 text-white"><i class="fas fa-file-alt"></i></span>
+            <h6 class="fw-bold text-info m-0">VĂN THƯ LƯU TRỮ</h6>
+            <span class="badge bg-secondary ms-auto">2627</span>
+          </div>
+          <p class="text-muted small mb-3">Nhập hồ sơ văn bản đến & văn bản đi</p>
+
+          <!-- 1. LOẠI VĂN BẢN -->
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">1. Loại văn bản</label>
+            <div class="row g-2">
+              <div class="col-6">
+                <button type="button" id="btnTypeDen" onclick="setDocType('VĂN BẢN ĐẾN')" class="type-btn active-den w-100">
+                  <i class="fas fa-inbox me-1"></i> VĂN BẢN ĐẾN
+                </button>
+              </div>
+              <div class="col-6">
+                <button type="button" id="btnTypeDi" onclick="setDocType('VĂN BẢN ĐI')" class="type-btn w-100">
+                  <i class="fas fa-paper-plane me-1"></i> VĂN BẢN ĐI
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. SỐ / KÝ HIỆU VB -->
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Số / Ký hiệu VB</label>
+              <input type="text" id="inpCode" class="form-control form-control-sm fw-bold" placeholder="Vd: 125/PGDĐT-THCS">
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Ngày ban hành / Đến</label>
+              <input type="date" id="inpDate" class="form-control form-control-sm fw-bold">
+            </div>
+          </div>
+
+          <!-- 3. CƠ QUAN BAN HÀNH -->
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">Cơ quan ban hành / Nơi nhận</label>
+            <input type="text" id="inpOrg" class="form-control form-control-sm" placeholder="Vd: Phòng GD&ĐT, UBND Quận, Sở GD&ĐT...">
+          </div>
+
+          <!-- 4. TRÍCH YẾU NỘI DUNG -->
+          <div class="mb-3">
+            <label class="small fw-bold text-danger mb-1">Trích yếu nội dung văn bản</label>
+            <textarea id="inpSummary" class="form-control form-control-sm" rows="3" placeholder="Tóm tắt ngắn gọn nội dung công văn, kế hoạch, thông báo..."></textarea>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Người ký / Duyệt</label>
+              <input type="text" id="inpSigner" class="form-control form-control-sm" placeholder="Vd: Hiệu trưởng...">
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Bộ phận / Người xử lý</label>
+              <input type="text" id="inpHandler" class="form-control form-control-sm" placeholder="Vd: Tổ Tin học, GVCN...">
+            </div>
+          </div>
+
+          <div class="row g-2 mb-4">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Hạn xử lý (nếu có)</label>
+              <input type="date" id="inpDueDate" class="form-control form-control-sm">
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Trạng thái</label>
+              <select id="inpStatus" class="form-select form-select-sm fw-bold">
+                <option value="Đang xử lý">Đang xử lý</option>
+                <option value="Đã hoàn thành">Đã hoàn thành</option>
+              </select>
+            </div>
+          </div>
+
+          <button onclick="submitDocument()" id="btnSubmit" class="btn btn-primary w-100 fw-bold rounded-pill py-2 shadow-sm">
+            <i class="fas fa-save me-1"></i> LƯU VÀO SHEET VAN_BAN_2627
+          </button>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: SỔ ĐĂNG KÝ VĂN BẢN -->
+      <div class="col-lg-7">
+        <div class="panel-box">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <h6 class="fw-bold text-dark m-0">
+              <i class="fas fa-book text-info me-1"></i> Sổ Đăng Ký Văn Bản
+            </h6>
+            <div class="d-flex align-items-center gap-2">
+              <select id="filterType" class="form-select form-select-sm border-secondary fw-bold" style="width: 130px;" onchange="renderDocTable()">
+                <option value="ALL">Tất cả loại</option>
+                <option value="VĂN BẢN ĐẾN">Văn bản đến</option>
+                <option value="VĂN BẢN ĐI">Văn bản đi</option>
+              </select>
+              <select id="filterStatus" class="form-select form-select-sm border-secondary fw-bold" style="width: 130px;" onchange="renderDocTable()">
+                <option value="ALL">Mọi trạng thái</option>
+                <option value="Đang xử lý">Đang xử lý</option>
+                <option value="Đã hoàn thành">Đã hoàn thành</option>
+              </select>
+              <button onclick="loadDocData()" class="btn btn-outline-secondary btn-sm fw-bold" title="Làm mới">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+            <table class="table table-hover align-middle mb-0 small text-center">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 45px;">STT</th>
+                  <th style="width: 100px;">Loại</th>
+                  <th style="width: 130px;">Số Ký Hiệu</th>
+                  <th style="width: 95px;">Ngày</th>
+                  <th class="text-start">Trích Yếu Nội Dung</th>
+                  <th style="width: 130px;">Cơ Quan / Nơi Nhận</th>
+                  <th style="width: 110px;">Trạng Thái</th>
+                  <th style="width: 50px;">Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="docTableBody">
+                <tr><td colspan="8" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu văn bản từ Sheet...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-footer bg-light py-2 px-3 mt-3 rounded-3 border d-flex justify-content-between align-items-center small text-muted">
+            <span><i class="fas fa-database text-info me-1"></i> Đồng bộ trực tiếp sheet <b>VAN_BAN_2627</b></span>
+            <span id="recordCountLabel">Hiển thị: 0 văn bản</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbzxg3p6AuL6GRFMyv7rNqd0JDyldJh0vOcFq6K1ebEjCWvz2L8u_J3qJuYxMJJRWhahUQ/exec";
+
+    let allDocuments = [];
+    let currentType = 'VĂN BẢN ĐẾN';
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      document.getElementById('inpDate').value = new Date().toISOString().split('T')[0];
+      await loadDocData();
+    };
+
+    function setDocType(type) {
+      currentType = type;
+      const btnDen = document.getElementById('btnTypeDen');
+      const btnDi = document.getElementById('btnTypeDi');
+      if (type === 'VĂN BẢN ĐẾN') {
+        btnDen.className = 'type-btn active-den w-100';
+        btnDi.className = 'type-btn w-100';
+      } else {
+        btnDen.className = 'type-btn w-100';
+        btnDi.className = 'type-btn active-di w-100';
+      }
+    }
+
+    async function loadDocData() {
+      try {
+        allDocuments = await callApi('getDocumentLogs2627') || [];
+        updateStats();
+        renderDocTable();
+      } catch (err) {
+        document.getElementById('docTableBody').innerHTML = `<tr><td colspan="8" class="p-4 text-danger text-center">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    function updateStats() {
+      let total = allDocuments.length;
+      let den = 0, di = 0, process = 0;
+
+      allDocuments.forEach(d => {
+        if (d.type.includes('ĐẾN')) den++;
+        else di++;
+        if (d.status === 'Đang xử lý') process++;
+      });
+
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statDen').innerText = den;
+      document.getElementById('statDi').innerText = di;
+      document.getElementById('statProcess').innerText = process;
+    }
+
+    function renderDocTable() {
+      const filterType = document.getElementById('filterType').value;
+      const filterStatus = document.getElementById('filterStatus').value;
+      const tbody = document.getElementById('docTableBody');
+
+      let list = allDocuments.filter(d => {
+        let matchType = (filterType === 'ALL' || d.type === filterType);
+        let matchStatus = (filterStatus === 'ALL' || d.status === filterStatus);
+        return matchType && matchStatus;
+      });
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-muted">Không tìm thấy văn bản nào phù hợp.</td></tr>';
+        document.getElementById('recordCountLabel').innerText = `Hiển thị: 0 / ${allDocuments.length} văn bản`;
+        return;
+      }
+
+      let html = '';
+      list.forEach((d, idx) => {
+        let isDen = d.type.includes('ĐẾN');
+        let isDone = d.status === 'Đã hoàn thành';
+
+        html += `
+          <tr>
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td><span class="${isDen ? 'badge-den' : 'badge-di'}">${d.type}</span></td>
+            <td class="fw-bold text-dark">${d.code}<br><small class="text-muted fw-normal">${d.id}</small></td>
+            <td class="small text-secondary">${d.date}</td>
+            <td class="text-start fw-semibold text-dark">${d.summary} ${d.handler ? '<br><small class="text-primary fw-normal"><i class="fas fa-user-tie me-1"></i>Xử lý: ' + d.handler + (d.dueDate ? ' (Hạn: ' + d.dueDate + ')' : '') + '</small>' : ''}</td>
+            <td class="small text-muted">${d.org || '---'}</td>
+            <td><span class="${isDone ? 'badge-status-done' : 'badge-status-process'}">${d.status}</span></td>
+            <td>
+              <button onclick="deleteDoc(${d.rowIdx})" class="btn btn-sm text-danger" title="Xóa văn bản">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+      document.getElementById('recordCountLabel').innerText = `Hiển thị: ${list.length} / ${allDocuments.length} văn bản`;
+    }
+
+    // LƯU VĂN BẢN VÀO SHEET VAN_BAN_2627
+    async function submitDocument() {
+      const code = document.getElementById('inpCode').value.trim();
+      const date = document.getElementById('inpDate').value;
+      const org = document.getElementById('inpOrg').value.trim();
+      const summary = document.getElementById('inpSummary').value.trim();
+      const signer = document.getElementById('inpSigner').value.trim();
+      const handler = document.getElementById('inpHandler').value.trim();
+      const dueDate = document.getElementById('inpDueDate').value;
+      const status = document.getElementById('inpStatus').value;
+
+      if (!code) return alert("Vui lòng nhập số / ký hiệu văn bản!");
+      if (!summary) return alert("Vui lòng nhập trích yếu nội dung văn bản!");
+
+      const item = {
+        type: currentType,
+        code: code,
+        date: date,
+        org: org,
+        summary: summary,
+        signer: signer,
+        handler: handler,
+        dueDate: dueDate,
+        status: status
+      };
+
+      const btn = document.getElementById('btnSubmit');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu vào Sheet...';
+
+      try {
+        const msg = await callApi('saveDocumentRecord2627', item);
+        alert(msg);
+        document.getElementById('inpCode').value = "";
+        document.getElementById('inpOrg').value = "";
+        document.getElementById('inpSummary').value = "";
+        document.getElementById('inpSigner').value = "";
+        document.getElementById('inpHandler').value = "";
+        document.getElementById('inpDueDate').value = "";
+        await loadDocData();
+      } catch (err) {
+        alert("Lỗi khi lưu văn bản: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    async function deleteDoc(rowIdx) {
+      if (!confirm("Bạn có chắc chắn muốn xóa văn bản này không?")) return;
+      try {
+        const msg = await callApi('deleteDocumentRecord2627', rowIdx);
+        alert(msg);
+        await loadDocData();
+      } catch (err) {
+        alert("Lỗi khi xóa: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
