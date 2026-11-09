@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sức Khỏe & Y Tế 2627 - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 15px rgba(225, 29, 72, 0.25);
+    }
+    .stat-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 14px 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .badge-status {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 50px;
+    }
+    .status-resting { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .status-back { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .status-home { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+
+    .tag-symptom {
+      display: inline-block;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-size: 12px;
+      cursor: pointer;
+      margin: 2px;
+      transition: all 0.15s;
+    }
+    .tag-symptom:hover {
+      background: #fee2e2;
+      border-color: #f87171;
+      color: #b91c1c;
+    }
+
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      vertical-align: middle;
+      padding: 9px 6px;
+    }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .print-footer { display: flex !important; }
+      .panel-box { border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; }
+      @page { size: landscape; margin: 8mm; }
+    }
+    .print-header { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1400px;">
+    
+    <!-- THANH TIÊU ĐỀ & LỌC LỚP (ẨN KHI IN) -->
+    <div class="header-banner mb-3 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-white text-danger fw-bold px-2 py-1"><i class="fas fa-heartbeat me-1"></i>SCHOOL HEALTHCARE 2627</span>
+          <span class="opacity-75 small">Đồng bộ Sheet: <b>SO_Y_TE_2627</b></span>
+        </div>
+        <h4 class="fw-bold mb-0">QUẢN LÝ SỨC KHỎE HỌC SINH & PHÒNG Y TẾ</h4>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-danger" style="width: 130px;" onchange="onClassChange()">
+          <option value="">-- Tất cả lớp --</option>
+        </select>
+
+        <button onclick="loadMedicalData()" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold shadow-sm">
+          <i class="fas fa-sync-alt me-1"></i> Làm mới
+        </button>
+
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In sổ Y tế
+        </button>
+      </div>
+    </div>
+
+    <!-- THẺ THỐNG KÊ NHANH TÌNH TRẠNG (ẨN KHI IN) -->
+    <div class="row g-3 mb-3 no-print">
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-danger bg-opacity-10 text-danger"><i class="fas fa-clinic-medical"></i></div>
+          <div>
+            <div class="small text-muted fw-bold">TỔNG CA TIẾP NHẬN</div>
+            <h4 class="fw-bold text-dark mb-0" id="statTotal">0</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-warning bg-opacity-10 text-warning"><i class="fas fa-bed"></i></div>
+          <div>
+            <div class="small text-muted fw-bold">ĐANG THEO DÕI</div>
+            <h4 class="fw-bold text-warning mb-0" id="statResting">0</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-success bg-opacity-10 text-success"><i class="fas fa-user-check"></i></div>
+          <div>
+            <div class="small text-muted fw-bold">ĐÃ VỀ LẠI LỚP</div>
+            <h4 class="fw-bold text-success mb-0" id="statBack">0</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-secondary bg-opacity-10 text-secondary"><i class="fas fa-phone-alt"></i></div>
+          <div>
+            <div class="small text-muted fw-bold">PHỤ HUYNH ĐÓN VỀ</div>
+            <h4 class="fw-bold text-danger mb-0" id="statHome">0</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KHUNG LẬP PHIẾU CHUYỂN Y TẾ MỚI (ẨN KHI IN) -->
+    <div class="panel-box mb-4 no-print border-start border-4 border-danger">
+      <h6 class="fw-bold text-danger mb-3 text-uppercase">
+        <i class="fas fa-plus-circle me-1"></i> Lập Phiếu Chuyển Học Sinh Xuống Phòng Y Tế (Sheet: SO_Y_TE_2627)
+      </h6>
+
+      <div class="row g-2 align-items-end mb-2">
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">1. Lớp học</label>
+          <select id="inpClass" class="form-select form-select-sm fw-bold border-danger" onchange="onInpClassChange()">
+            <option value="">-- Chọn lớp --</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="small fw-bold text-secondary mb-1">2. Học sinh</label>
+          <select id="inpStudent" class="form-select form-select-sm fw-bold">
+            <option value="">-- Vui lòng chọn lớp --</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="small fw-bold text-secondary mb-1">3. Giáo viên cho phép xuống</label>
+          <input type="text" id="inpTeacher" class="form-control form-control-sm fw-bold" value="Võ Tâm Long">
+        </div>
+        <div class="col-md-2">
+          <label class="small fw-bold text-secondary mb-1">4. Trạng thái tiếp nhận</label>
+          <select id="inpStatus" class="form-select form-select-sm fw-bold text-warning">
+            <option value="ĐANG NẰM NGHỈ / THEO DÕI">ĐANG NẰM NGHỈ</option>
+            <option value="ĐÃ ỔN ĐỊNH - VỀ LẠI LỚP">VỀ LẠI LỚP</option>
+            <option value="ĐÃ LIÊN HỆ PH ĐÓN VỀ">PH ĐÓN VỀ</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button onclick="submitMedicalSlip()" id="btnSubmit" class="btn btn-danger btn-sm w-100 fw-bold rounded-pill shadow-sm">
+            <i class="fas fa-paper-plane me-1"></i> GỬI XUỐNG Y TẾ
+          </button>
+        </div>
+
+        <div class="col-md-6 mt-2">
+          <label class="small fw-bold text-secondary mb-1">5. Triệu chứng / Lý do xuống y tế:</label>
+          <input type="text" id="inpSymptom" class="form-control form-control-sm" placeholder="Nhập triệu chứng cụ thể...">
+          <div class="mt-1">
+            <span class="tag-symptom" onclick="addTag('Sốt nóng, ớn lạnh')">🌡️ Sốt nóng</span>
+            <span class="tag-symptom" onclick="addTag('Đau đầu, chóng mặt')">😵 Đau đầu</span>
+            <span class="tag-symptom" onclick="addTag('Đau bụng, buồn nôn')">🤢 Đau bụng</span>
+            <span class="tag-symptom" onclick="addTag('Mệt mỏi / Choáng váng')">💤 Choáng váng</span>
+            <span class="tag-symptom" onclick="addTag('Trầy xước / Chấn thương nhẹ')">🩹 Trầy xước</span>
+          </div>
+        </div>
+
+        <div class="col-md-6 mt-2">
+          <label class="small fw-bold text-secondary mb-1">6. Biện pháp xử lý / Thuốc đã cấp (Nếu có):</label>
+          <input type="text" id="inpSolution" class="form-control form-control-sm" placeholder="Vd: Đo nhiệt độ (38.5°C), uống nước ấm, nằm nghỉ...">
+        </div>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header text-center mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">Lớp theo dõi: <b class="text-dark fs-5" id="printClassName">Tất cả các lớp</b></div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+          <div class="small fst-italic">Sổ theo dõi sức khỏe học sinh</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">SỔ THEO DÕI TIẾP NHẬN PHÒNG Y TẾ</h3>
+      <p class="text-secondary small fst-italic">Trích xuất ngày: <b class="text-dark" id="printTodayDate">...</b> | Cán bộ Y tế / GVCN: <b>Thầy Võ Tâm Long</b></p>
+      <hr>
+    </div>
+
+    <!-- BẢNG THEO DÕI SỔ Y TẾ ĐỦ 9 CỘT (A - I) -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center no-print">
+        <span class="small fw-bold text-secondary text-uppercase">
+          <i class="fas fa-list-ul me-1 text-danger"></i> Nhật ký tiếp nhận phòng y tế học đường
+        </span>
+        <div class="d-flex gap-2">
+          <select id="filterStatus" class="form-select form-select-sm border-secondary fw-bold" style="width: 220px;" onchange="renderTable()">
+            <option value="ALL">-- Tất cả trạng thái --</option>
+            <option value="ĐANG NẰM NGHỈ / THEO DÕI">Đang nằm nghỉ / Theo dõi</option>
+            <option value="ĐÃ ỔN ĐỊNH - VỀ LẠI LỚP">Đã ổn định - Về lại lớp</option>
+            <option value="ĐÃ LIÊN HỆ PH ĐÓN VỀ">Đã liên hệ PH đón về</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle mb-0 text-center small" id="medicalTable">
+          <thead>
+            <tr>
+              <th style="width: 135px;">MÃ PHIẾU (A)</th>
+              <th style="width: 140px;">THỜI GIAN (B)</th>
+              <th style="width: 80px;">LỚP (C)</th>
+              <th style="width: 80px;">MÃ HS (D)</th>
+              <th class="text-start ps-3" style="width: 170px;">HỌ VÀ TÊN (E)</th>
+              <th class="text-start ps-3">TRIỆU CHỨNG / LÝ DO (F)</th>
+              <th style="width: 130px;">GV CHO PHÉP (G)</th>
+              <th style="width: 180px;">TRẠNG THÁI TIẾP NHẬN (H)</th>
+              <th class="text-start ps-3" style="width: 210px;">XỬ LÝ / THUỐC ĐÃ CHO (I)</th>
+            </tr>
+          </thead>
+          <tbody id="medicalTableBody">
+            <tr><td colspan="9" class="p-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu từ Sheet SO_Y_TE_2627...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHỮ KÝ XÁC NHẬN KHI IN (CHỈ HIỆN KHI IN) -->
+    <div class="row mt-4 pt-3 text-center print-footer d-none">
+      <div class="col-6">
+        <p class="fw-bold mb-1">CÁN BỘ PHÒNG Y TẾ</p>
+        <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+      </div>
+      <div class="col-6">
+        <p class="fw-bold mb-1">BAN GIÁM HIỆU DUYỆT</p>
+        <small class="text-muted">(Ký và đóng dấu)</small>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Nhận link API trực tiếp từ hệ thống
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbwtHUAhlJOo3_tigcy-dZiK6K5S_HWC1YLWevRb_x4LIKuE0pwMm0sjJBeW5nBvoiUvSQ/exec";
+
+    let allMedicalRecords = [];
+    let currentClassStudents = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('vi-VN');
+
+      try {
+        // Nạp danh sách lớp từ cột A sheet GVCN
+        let classes = await callApi('getClassesFromGVCN');
+        if (!classes || classes.length === 0) classes = await callApi('getAllClasses');
+
+        const selC = document.getElementById('selClass');
+        const inpC = document.getElementById('inpClass');
+
+        let hC = '<option value="">-- Tất cả lớp --</option>';
+        let hInp = '<option value="">-- Chọn lớp --</option>';
+
+        (classes || []).forEach(c => {
+          hC += `<option value="${c}">${c}</option>`;
+          hInp += `<option value="${c}">${c}</option>`;
+        });
+
+        selC.innerHTML = hC;
+        inpC.innerHTML = hInp;
+
+        if (classes && classes.length > 0) {
+          inpC.value = classes[0];
+          await onInpClassChange();
+        }
+
+        await loadMedicalData();
+      } catch (e) {
+        console.error("Lỗi khởi tạo:", e);
+      }
+    };
+
+    function addTag(text) {
+      const inp = document.getElementById('inpSymptom');
+      inp.value = inp.value ? (inp.value + ", " + text) : text;
+    }
+
+    async function onInpClassChange() {
+      const className = document.getElementById('inpClass').value;
+      const stdSelect = document.getElementById('inpStudent');
+
+      if (!className) {
+        stdSelect.innerHTML = '<option value="">-- Vui lòng chọn lớp --</option>';
+        return;
+      }
+
+      stdSelect.innerHTML = '<option value="">Đang nạp học sinh...</option>';
+
+      try {
+        currentClassStudents = await callApi('getStudentList', className) || [];
+        let html = '<option value="">-- Chọn học sinh --</option>';
+        currentClassStudents.forEach(s => {
+          html += `<option value="${s.id}|${s.name}">${s.id} - ${s.name}</option>`;
+        });
+        stdSelect.innerHTML = html;
+      } catch (err) {
+        stdSelect.innerHTML = '<option value="">Lỗi nạp danh sách học sinh</option>';
+      }
+    }
+
+    function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      document.getElementById('printClassName').innerText = className || "Tất cả các lớp";
+      loadMedicalData();
+    }
+
+    // TẢI DỮ LIỆU TỪ SHEET SO_Y_TE_2627
+    async function loadMedicalData() {
+      const className = document.getElementById('selClass').value;
+      const body = document.getElementById('medicalTableBody');
+      body.innerHTML = '<tr><td colspan="9" class="p-4 text-muted"><i class="fas fa-sync fa-spin me-2"></i>Đang tải dữ liệu từ Sheet SO_Y_TE_2627...</td></tr>';
+
+      try {
+        allMedicalRecords = await callApi('getMedicalRecords2627', className) || [];
+        updateStats();
+        renderTable();
+      } catch (err) {
+        body.innerHTML = `<tr><td colspan="9" class="p-4 text-danger">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    function updateStats() {
+      let total = allMedicalRecords.length;
+      let resting = 0, back = 0, home = 0;
+
+      allMedicalRecords.forEach(r => {
+        let st = String(r.status || '').toUpperCase();
+        if (st.includes('NGHỈ') || st.includes('THEO DÕI')) resting++;
+        else if (st.includes('LẠI LỚP') || st.includes('ỔN ĐỊNH')) back++;
+        else if (st.includes('ĐÓN VỀ') || st.includes('LIÊN HỆ')) home++;
+      });
+
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statResting').innerText = resting;
+      document.getElementById('statBack').innerText = back;
+      document.getElementById('statHome').innerText = home;
+    }
+
+    function renderTable() {
+      const body = document.getElementById('medicalTableBody');
+      const filter = document.getElementById('filterStatus').value;
+
+      let list = allMedicalRecords.filter(r => {
+        if (filter === 'ALL') return true;
+        return String(r.status || '').trim().toUpperCase() === filter;
+      });
+
+      if (list.length === 0) {
+        body.innerHTML = '<tr><td colspan="9" class="p-4 text-muted">Không có bản ghi y tế nào phù hợp.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      list.forEach(r => {
+        let st = String(r.status || '').toUpperCase();
+        let badgeClass = 'status-resting';
+        if (st.includes('LẠI LỚP')) badgeClass = 'status-back';
+        else if (st.includes('ĐÓN VỀ')) badgeClass = 'status-home';
+
+        html += `
+          <tr>
+            <td class="fw-bold text-muted">${r.id}</td>
+            <td class="small text-secondary">${r.timeIn}</td>
+            <td class="fw-bold text-primary">${r.className}</td>
+            <td class="fw-bold text-secondary">${r.studentId}</td>
+            <td class="text-start ps-3 fw-bold text-dark">${r.studentName}</td>
+            <td class="text-start ps-3 text-danger fw-semibold">${r.symptom}</td>
+            <td class="small">${r.teacher}</td>
+            <td>
+              <select onchange="updateRecordStatus('${r.id}', this.value)" class="form-select form-select-sm border-0 fw-bold ${badgeClass}">
+                <option value="ĐANG NẰM NGHỈ / THEO DÕI" ${st.includes('NGHỈ') ? 'selected' : ''}>Đang nằm nghỉ / Theo dõi</option>
+                <option value="ĐÃ ỔN ĐỊNH - VỀ LẠI LỚP" ${st.includes('LẠI LỚP') ? 'selected' : ''}>Đã ổn định - Về lại lớp</option>
+                <option value="ĐÃ LIÊN HỆ PH ĐÓN VỀ" ${st.includes('ĐÓN VỀ') ? 'selected' : ''}>Đã liên hệ PH đón về</option>
+              </select>
+            </td>
+            <td class="text-start ps-2">
+              <input type="text" class="form-control form-control-sm border-0 bg-transparent text-secondary" 
+                     value="${r.solution || ''}" 
+                     placeholder="Ghi biện pháp..." 
+                     onchange="updateRecordSolution('${r.id}', this.value)">
+            </td>
+          </tr>
+        `;
+      });
+
+      body.innerHTML = html;
+    }
+
+    // GỬI PHIẾU Y TẾ MỚI VÀO SHEET SO_Y_TE_2627
+    async function submitMedicalSlip() {
+      const cls = document.getElementById('inpClass').value;
+      const stdVal = document.getElementById('inpStudent').value;
+      const teacher = document.getElementById('inpTeacher').value.trim();
+      const status = document.getElementById('inpStatus').value;
+      const symptom = document.getElementById('inpSymptom').value.trim();
+      const solution = document.getElementById('inpSolution').value.trim();
+
+      if (!cls) return alert("Vui lòng chọn lớp học!");
+      if (!stdVal) return alert("Vui lòng chọn học sinh!");
+      if (!symptom) return alert("Vui lòng nhập lý do / triệu chứng xuống phòng Y tế!");
+
+      const parts = stdVal.split('|');
+      const item = {
+        className: cls,
+        studentId: parts[0],
+        studentName: parts[1],
+        teacher: teacher,
+        status: status,
+        symptom: symptom,
+        solution: solution
+      };
+
+      const btn = document.getElementById('btnSubmit');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang gửi...';
+
+      try {
+        const msg = await callApi('saveMedicalRecord2627', item);
+        alert(msg);
+        document.getElementById('inpSymptom').value = "";
+        document.getElementById('inpSolution').value = "";
+        await loadMedicalData();
+      } catch (err) {
+        alert("Lỗi lưu phiếu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    // CẬP NHẬT TRẠNG THÁI TIẾP NHẬN TRỰC TIẾP
+    async function updateRecordStatus(ticketId, newStatus) {
+      try {
+        await callApi('updateMedicalStatus2627', ticketId, newStatus, null);
+        const item = allMedicalRecords.find(x => x.id === ticketId);
+        if (item) item.status = newStatus;
+        updateStats();
+        renderTable();
+      } catch (e) {
+        alert("Lỗi cập nhật: " + e.message);
+      }
+    }
+
+    // CẬP NHẬT BIỆN PHÁP XỬ LÝ TRỰC TIẾP
+    async function updateRecordSolution(ticketId, newSol) {
+      try {
+        await callApi('updateMedicalStatus2627', ticketId, null, newSol);
+      } catch (e) {
+        console.error("Lỗi cập nhật xử lý:", e);
+      }
+    }
+  </script>
+</body>
+</html>
