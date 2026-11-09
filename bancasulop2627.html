@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ban Cán Sự Lớp 2627 - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 18px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 15px rgba(8, 145, 178, 0.2);
+    }
+    /* THẺ CHỨC VỤ */
+    .role-card {
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      background: #ffffff;
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.03);
+      transition: all 0.2s ease;
+    }
+    .role-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    }
+    .role-header {
+      padding: 12px 18px;
+      font-weight: 800;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .role-body {
+      padding: 16px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #ffffff;
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #475569;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      border-bottom: 2px solid #cbd5e1;
+    }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .print-footer { display: flex !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; }
+      @page { size: landscape; margin: 10mm; }
+    }
+    .print-header { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1350px;">
+    
+    <!-- THANH TIÊU ĐỀ & BỘ LỌC (ẨN KHI IN) -->
+    <div class="header-banner mb-4 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-user-shield me-1"></i>CLASS LEADERSHIP</span>
+          <span class="opacity-75 small">Đồng bộ Sheet: <b>BAN_CAN_SU_2627</b></span>
+        </div>
+        <h4 class="fw-bold mb-0">DANH SÁCH BAN CÁN SỰ & BAN CHỈ HUY CHI ĐỘI</h4>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-cyan" style="width: 130px; color: #0891b2;" onchange="onClassChange()">
+          <option value="">-- Chọn lớp --</option>
+        </select>
+
+        <button onclick="saveCadreToSheet()" id="btnSave" class="btn btn-info btn-sm rounded-pill px-3 fw-bold text-white shadow-sm">
+          <i class="fas fa-save me-1"></i> Lưu Vào Sheet
+        </button>
+
+        <button onclick="openAddRoleModal()" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-plus me-1"></i> Thêm chức vụ
+        </button>
+
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In danh sách A4
+        </button>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header text-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">Lớp: <b class="text-dark fs-5" id="printClassName">...</b></div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+          <div class="small fst-italic">Hồ sơ tổ chức & Điều hành lớp</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">DANH SÁCH BAN CÁN SỰ LỚP</h3>
+      <p class="text-secondary small fst-italic">Cập nhật: <b class="text-dark" id="printTodayDate">...</b> | GVCN: <b>Thầy Võ Tâm Long</b></p>
+      <hr>
+    </div>
+
+    <!-- KHU VỰC THẺ CÁC VỊ TRÍ CHỦ CHỐT -->
+    <div class="row g-3 mb-4" id="cadreCardsContainer">
+      <div class="col-12 text-center text-muted p-5"><i class="fas fa-spinner fa-spin me-2"></i>Đang nạp dữ liệu Ban cán sự...</div>
+    </div>
+
+    <!-- BẢNG TỔNG KẾT CHI TIẾT ĐẦY ĐỦ CÁC CỘT (IN RA A4 HOÀN HẢO) -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center no-print">
+        <h6 class="fw-bold text-dark m-0 text-uppercase">
+          <i class="fas fa-list-alt text-info me-2"></i>Bảng Phân Công Nhiệm Vụ Chi Tiết
+        </h6>
+        <span class="badge bg-secondary text-white" id="cadreCountBadge">0 thành viên</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle mb-0 text-center small" id="cadreTable">
+          <thead>
+            <tr>
+              <th style="width: 50px;">STT</th>
+              <th style="width: 170px;">CHỨC VỤ</th>
+              <th style="width: 90px;">MÃ HS</th>
+              <th class="text-start ps-3" style="width: 220px;">HỌ VÀ TÊN</th>
+              <th style="width: 140px;">ĐIỆN THOẠI PH</th>
+              <th class="text-start ps-3">NHIỆM VỤ PHỤ TRÁCH</th>
+              <th style="width: 50px;" class="no-print">XÓA</th>
+            </tr>
+          </thead>
+          <tbody id="cadreTableBody">
+            <tr><td colspan="7" class="p-4 text-muted">Chưa có thành viên nào.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHỮ KÝ GVCN KHI IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="row mt-5 pt-4 text-center print-footer d-none">
+      <div class="col-6">
+        <p class="fw-bold mb-1">HIỆU TRƯỞNG DUYỆT</p>
+        <small class="text-muted">(Ký và đóng dấu)</small>
+      </div>
+      <div class="col-6">
+        <p class="fw-bold mb-1">GIÁO VIÊN CHỦ NHIỆM</p>
+        <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+        <div class="mt-5 fw-bold">Thầy Võ Tâm Long</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL THÊM CHỨC VỤ MỚI -->
+  <div class="modal fade no-print" id="modalAddRole" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title fw-bold"><i class="fas fa-user-plus me-2"></i>Thêm Vị Trí Cán Sự Mới</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">Tên chức vụ mới:</label>
+            <input type="text" id="newRoleName" class="form-control" placeholder="Vd: Lớp phó Đời sống, Ủy viên BCH...">
+          </div>
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">Nhiệm vụ phụ trách:</label>
+            <textarea id="newRoleDuty" class="form-control" rows="2" placeholder="Vd: Theo dõi vệ sinh, cơ sở vật chất phòng học..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary rounded-pill px-3" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" onclick="submitNewRole()" class="btn btn-info rounded-pill px-4 text-white fw-bold">Thêm ngay</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxjUQx9fLWTtfsdJOzrxfYQdoIQ6e7exSiZTGfRxVv-H8oHehfCriWEMX3UXSJwTrkXIw/exec";
+
+    let studentList = [];
+    let currentCadres = [];
+
+    // MẪU 9 VỊ TRÍ CHUẨN KHI LỚP CHƯA CÓ DỮ LIỆU
+    const DEFAULT_ROLES = [
+      { roleName: "Lớp trưởng", icon: "fa-crown", color: "#f59e0b", duty: "Quản lý chung toàn diện lớp học, đôn đốc các phó và tổ trưởng" },
+      { roleName: "Lớp phó Học tập", icon: "fa-book-reader", color: "#3b82f6", duty: "Theo dõi bài vở 15 phút đầu giờ, tổ chức đôi bạn cùng tiến" },
+      { roleName: "Lớp phó Kỷ luật", icon: "fa-shield-alt", color: "#ef4444", duty: "Theo dõi nề nếp, điểm danh, ghi nhận học sinh vi phạm vào sổ" },
+      { roleName: "Lớp phó Phong trào", icon: "fa-running", color: "#10b981", duty: "Phụ trách thể dục giữa giờ, văn nghệ, giải đấu thể thao chi đội" },
+      { roleName: "Thủ quỹ lớp", icon: "fa-wallet", color: "#06b6d4", duty: "Quản lý quỹ lớp, công khai thu chi dưới sự giám sát của GVCN" },
+      { roleName: "Tổ trưởng Tổ 1", icon: "fa-users", color: "#6366f1", duty: "Theo dõi chuyên cần, đồng phục, trực nhật của Tổ 1" },
+      { roleName: "Tổ trưởng Tổ 2", icon: "fa-users", color: "#8b5cf6", duty: "Theo dõi chuyên cần, đồng phục, trực nhật của Tổ 2" },
+      { roleName: "Tổ trưởng Tổ 3", icon: "fa-users", color: "#ec4899", duty: "Theo dõi chuyên cần, đồng phục, trực nhật của Tổ 3" },
+      { roleName: "Tổ trưởng Tổ 4", icon: "fa-users", color: "#14b8a6", duty: "Theo dõi chuyên cần, đồng phục, trực nhật của Tổ 4" }
+    ];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('vi-VN');
+
+      try {
+        const classes = await callApi('getAllClasses');
+        const selC = document.getElementById('selClass');
+        let hC = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => hC += `<option value="${c}">${c}</option>`);
+        selC.innerHTML = hC;
+
+        if (classes && classes.length > 0) {
+          selC.value = classes[0];
+          await onClassChange();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      document.getElementById('printClassName').innerText = className;
+      document.getElementById('cadreCardsContainer').innerHTML = '<div class="col-12 text-center text-muted p-5"><i class="fas fa-sync fa-spin me-2"></i>Đang tải dữ liệu học sinh & ban cán sự...</div>';
+
+      try {
+        // Nạp danh sách học sinh của lớp để hiển thị trong ô select
+        studentList = await callApi('getStudentList', className) || [];
+
+        // Nạp danh sách ban cán sự đã lưu trong sheet BAN_CAN_SU_2627
+        const saved = await callApi('getBanCanSuData2627', className);
+        if (saved && saved.length > 0) {
+          currentCadres = saved;
+        } else {
+          // Khởi tạo khung mẫu 9 vị trí mặc định
+          currentCadres = DEFAULT_ROLES.map(r => ({
+            roleName: r.roleName,
+            studentId: "",
+            studentName: "",
+            phone: "",
+            duty: r.duty
+          }));
+        }
+
+        renderUI();
+      } catch (err) {
+        document.getElementById('cadreCardsContainer').innerHTML = `<div class="col-12 text-danger p-4 text-center">Lỗi: ${err.message}</div>`;
+      }
+    }
+
+    function renderUI() {
+      const cardsContainer = document.getElementById('cadreCardsContainer');
+      const tableBody = document.getElementById('cadreTableBody');
+      document.getElementById('cadreCountBadge').innerText = currentCadres.length + " thành viên";
+
+      if (currentCadres.length === 0) {
+        cardsContainer.innerHTML = '<div class="col-12 text-center text-muted p-4">Chưa có chức vụ nào. Bấm "Thêm chức vụ" để tạo mới.</div>';
+        tableBody.innerHTML = '<tr><td colspan="7" class="p-3 text-muted">Trống.</td></tr>';
+        return;
+      }
+
+      // 1. Render Thẻ chức vụ
+      let cHtml = '';
+      currentCadres.forEach((c, idx) => {
+        const def = DEFAULT_ROLES.find(r => r.roleName === c.roleName) || { icon: "fa-user-tag", color: "#0891b2" };
+        
+        let studentOptions = '<option value="">-- Chọn học sinh --</option>';
+        studentList.forEach(s => {
+          let isSel = (s.id === c.studentId || s.name === c.studentName) ? 'selected' : '';
+          studentOptions += `<option value="${s.id}|${s.name}" ${isSel}>${s.id} - ${s.name}</option>`;
+        });
+
+        cHtml += `
+          <div class="col-md-6 col-lg-4">
+            <div class="role-card">
+              <div class="role-header" style="background-color: ${def.color};">
+                <span><i class="fas ${def.icon} me-2"></i>${c.roleName}</span>
+                <span class="badge bg-white text-dark small">${c.studentId || 'Chưa gán'}</span>
+              </div>
+              <div class="role-body">
+                <div>
+                  <div class="mb-2">
+                    <label class="small text-secondary fw-bold">Học sinh đảm nhiệm:</label>
+                    <select class="form-select form-select-sm fw-bold border-secondary" 
+                            onchange="onSelectStudent(${idx}, this.value)">
+                      ${studentOptions}
+                    </select>
+                  </div>
+                  <div class="mb-2">
+                    <label class="small text-secondary fw-bold">Số điện thoại PH:</label>
+                    <input type="text" class="form-control form-control-sm" value="${c.phone || ''}" 
+                           placeholder="Vd: 0908123456" onchange="currentCadres[${idx}].phone = this.value; renderTableOnly();">
+                  </div>
+                  <div class="mb-1">
+                    <label class="small text-secondary fw-bold">Nhiệm vụ phụ trách:</label>
+                    <textarea class="form-control form-control-sm" rows="2" 
+                              onchange="currentCadres[${idx}].duty = this.value; renderTableOnly();">${c.duty || ''}</textarea>
+                  </div>
+                </div>
+                <div class="text-end mt-2 no-print">
+                  <button onclick="removeCadreRole(${idx})" class="btn btn-sm btn-link text-danger p-0 text-decoration-none" title="Xóa chức vụ này">
+                    <i class="fas fa-trash-alt me-1"></i>Xóa
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      cardsContainer.innerHTML = cHtml;
+
+      // 2. Render Bảng chi tiết
+      renderTableOnly();
+    }
+
+    function renderTableOnly() {
+      const tableBody = document.getElementById('cadreTableBody');
+      let tHtml = '';
+      currentCadres.forEach((c, idx) => {
+        tHtml += `
+          <tr>
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td class="fw-bold text-cyan text-start ps-3" style="color: #0891b2;">${c.roleName}</td>
+            <td class="fw-bold text-secondary">${c.studentId || '—'}</td>
+            <td class="text-start ps-3 fw-bold text-dark">${c.studentName || '<span class="text-muted fst-italic">Chưa chỉ định</span>'}</td>
+            <td>${c.phone || '—'}</td>
+            <td class="text-start ps-3 text-secondary" style="font-size: 12px;">${c.duty || '—'}</td>
+            <td class="no-print">
+              <button onclick="removeCadreRole(${idx})" class="btn btn-sm btn-link text-danger p-0">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      tableBody.innerHTML = tHtml || '<tr><td colspan="7" class="p-3 text-muted">Trống.</td></tr>';
+    }
+
+    function onSelectStudent(cadreIdx, val) {
+      if (!val) {
+        currentCadres[cadreIdx].studentId = "";
+        currentCadres[cadreIdx].studentName = "";
+      } else {
+        const parts = val.split('|');
+        currentCadres[cadreIdx].studentId = parts[0];
+        currentCadres[cadreIdx].studentName = parts[1];
+      }
+      renderTableOnly();
+    }
+
+    function removeCadreRole(idx) {
+      if (!confirm(`Xóa vị trí [${currentCadres[idx].roleName}] khỏi danh sách ban cán sự?`)) return;
+      currentCadres.splice(idx, 1);
+      renderUI();
+    }
+
+    function openAddRoleModal() {
+      document.getElementById('newRoleName').value = "";
+      document.getElementById('newRoleDuty').value = "";
+      new bootstrap.Modal(document.getElementById('modalAddRole')).show();
+    }
+
+    function submitNewRole() {
+      const name = document.getElementById('newRoleName').value.trim();
+      const duty = document.getElementById('newRoleDuty').value.trim();
+      if (!name) return alert("Vui lòng nhập tên chức vụ!");
+
+      currentCadres.push({
+        roleName: name,
+        studentId: "",
+        studentName: "",
+        phone: "",
+        duty: duty || "Phụ trách nhiệm vụ theo phân công của GVCN"
+      });
+
+      bootstrap.Modal.getInstance(document.getElementById('modalAddRole')).hide();
+      renderUI();
+    }
+
+    // LƯU DANH SÁCH VÀO SHEET BAN_CAN_SU_2627
+    async function saveCadreToSheet() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return alert("Vui lòng chọn lớp!");
+
+      const btn = document.getElementById('btnSave');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      try {
+        const msg = await callApi('saveBanCanSuData2627', className, currentCadres);
+        alert(msg);
+      } catch (err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+  </script>
+</body>
+</html>
