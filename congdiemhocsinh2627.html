@@ -185,7 +185,7 @@
   <script>
     const API_URL = (window.parent && window.parent.API_URL) 
       ? window.parent.API_URL 
-      : "https://script.google.com/macros/s/AKfycbzIRDhNmd5T-zure66K_Ax0mRKgr2lPbKldLssBrAecswpaBKEz34FhJ6Kfrwjx4Xk9ZQ/exec";
+      : "https://script.google.com/macros/s/AKfycbwuY76YTbIaaDYXaV3sqhWqV0AUGFzMm03DOCGoDFdVK4YGFK3CiMVVnwmpDgLWNm_Cyg/exec";
 
     let allStudents = [];
     let historyRecords = [];
@@ -204,29 +204,19 @@
 
     window.onload = async function() {
       try {
-        // 1. Nạp danh sách lớp từ GVCN hoặc TKB hoặc trích xuất từ STUDENTS
-        let classes = await callApi('getClassesFromGVCN');
-        if (!classes || classes.length === 0) classes = await callApi('getAllClasses');
-
-        // 2. Nạp toàn bộ học sinh từ sheet STUDENTS
+        // Nạp danh sách học sinh từ hàm getAllStudents2627 vừa tạo
         allStudents = await callApi('getAllStudents2627') || [];
-        if (allStudents.length === 0) {
-          let stData = await callApi('getAllStudents');
-          allStudents = (stData || []).map(s => ({ id: s.id, name: s.name, className: s.className }));
-        }
 
-        // Nếu danh sách lớp rỗng, tự động quét các lớp có trong STUDENTS
-        if (!classes || classes.length === 0) {
-          let setC = new Set();
-          allStudents.forEach(s => { if (s.className) setC.add(s.className); });
-          classes = Array.from(setC);
-        }
+        // Trích xuất danh sách lớp tự động từ dữ liệu học sinh
+        let setC = new Set();
+        allStudents.forEach(s => { if (s.className) setC.add(s.className); });
+        let classes = Array.from(setC);
 
         let classOpts = '';
-        (classes || ["6A3"]).forEach(c => classOpts += `<option value="${c}">Lớp ${c}</option>`);
-        document.getElementById('headerClassSelect').innerHTML = classOpts || '<option value="6A3">Lớp 6A3</option>';
+        classes.forEach(c => classOpts += `<option value="${c}">Lớp ${c}</option>`);
+        document.getElementById('headerClassSelect').innerHTML = classOpts || '<option value="">-- Không có lớp --</option>';
 
-        if (classes && classes.length > 0) {
+        if (classes.length > 0) {
           document.getElementById('headerClassSelect').value = classes[0];
           document.getElementById('lblCurrentClass').innerText = classes[0];
         }
@@ -253,7 +243,6 @@
 
       let filtered = allStudents.filter(s => {
         let cleanStudentClass = cleanClassName(s.className);
-        // Khớp chính xác hoặc chứa tên lớp
         let matchClass = cleanStudentClass === cleanCurrent || cleanStudentClass.includes(cleanCurrent) || cleanCurrent.includes(cleanStudentClass);
         let matchName = !keyword || s.name.toLowerCase().includes(keyword) || s.id.toLowerCase().includes(keyword);
         return matchClass && matchName;
