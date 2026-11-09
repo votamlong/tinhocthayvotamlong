@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sổ Liên Lạc Điện Tử 2627 - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.2);
+    }
+    /* TRANG IN SỔ LIÊN LẠC A4 TIÊU CHUẨN */
+    .report-paper {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #cbd5e1;
+      padding: 35px 40px;
+      max-width: 960px;
+      margin: 0 auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    .paper-header-title {
+      color: #0369a1;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .info-table td {
+      padding: 4px 10px;
+      font-size: 13.5px;
+    }
+    .score-table th {
+      background-color: #f8fafc;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      text-align: center;
+      vertical-align: middle;
+      border: 1px solid #94a3b8;
+    }
+    .score-table td {
+      border: 1px solid #cbd5e1;
+      font-size: 12.5px;
+      padding: 6px 4px;
+      vertical-align: middle;
+    }
+    .section-box-title {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #0369a1;
+      border-bottom: 2px solid #bae6fd;
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+    }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .report-paper { border: none !important; box-shadow: none !important; padding: 0 !important; max-width: 100% !important; }
+      .score-table th, .score-table td { border: 1px solid #000 !important; color: #000 !important; }
+      @page { size: portrait; margin: 12mm; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1200px;">
+    
+    <!-- THANH ĐIỀU HƯỚNG BỘ LỌC (ẨN KHI IN) -->
+    <div class="header-banner mb-3 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-comment-dots me-1"></i>E-REPORT CARD 2627</span>
+          <span class="opacity-75 small">Liên kết trực tiếp: Điểm số, Chuyên cần, Nề nếp & Y tế</span>
+        </div>
+        <h4 class="fw-bold mb-0">SỔ LIÊN LẠC ĐIỆN TỬ HỌC SINH 2026 - 2027</h4>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-primary" style="width: 120px;" onchange="onClassChange()">
+          <option value="">-- Đang tải... --</option>
+        </select>
+
+        <span class="small fw-bold text-dark ps-2">Học sinh:</span>
+        <select id="selStudent" class="form-select form-select-sm border-0 fw-bold text-dark" style="width: 200px;" onchange="loadStudentReport()">
+          <option value="">-- Chọn học sinh --</option>
+        </select>
+
+        <button onclick="loadStudentReport()" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm">
+          <i class="fas fa-sync-alt me-1"></i> Làm mới
+        </button>
+
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In phiếu A4 gửi PH
+        </button>
+      </div>
+    </div>
+
+    <!-- NỘI DUNG PHIẾU BÁO ĐIỂM SỔ LIÊN LẠC A4 TIÊU CHUẨN -->
+    <div class="report-paper" id="reportCardArea">
+      
+      <!-- PHẦN ĐẦU TRANG -->
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div class="text-center" style="width: 40%;">
+          <div class="fw-bold text-uppercase small" style="font-size: 12px;">SỞ GIÁO DỤC VÀ ĐÀO TẠO TP. HỒ CHÍ MINH</div>
+          <div class="fw-bold text-uppercase text-primary" style="font-size: 13px;">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small fst-italic" style="font-size: 11px;">Phường An Lạc, Quận Bình Tân</div>
+        </div>
+        <div class="text-center" style="width: 50%;">
+          <div class="fw-bold text-uppercase" style="font-size: 12px;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+          <div class="fw-bold small" style="font-size: 11px;">Độc lập - Tự do - Hạnh phúc</div>
+          <div class="small text-muted" style="font-size: 10px;">---o0o---</div>
+        </div>
+      </div>
+
+      <div class="text-center my-3">
+        <h3 class="paper-header-title text-uppercase mb-1">PHIẾU BÁO ĐIỂM & SỔ LIÊN LẠC ĐIỆN TỬ</h3>
+        <p class="small text-muted fst-italic mb-0">Năm học 2026 - 2027 | Trích xuất ngày: <span id="lblPrintDate">...</span></p>
+      </div>
+
+      <!-- I. THÔNG TIN HỌC SINH -->
+      <div class="mb-3">
+        <div class="section-box-title"><i class="fas fa-id-card me-2"></i>I. THÔNG TIN HỌC SINH</div>
+        <table class="w-100 info-table">
+          <tr>
+            <td style="width: 15%;" class="fw-bold text-secondary">Họ và tên:</td>
+            <td style="width: 35%;" class="fw-bold fs-6 text-primary" id="lblStudentName">...</td>
+            <td style="width: 15%;" class="fw-bold text-secondary">Mã định danh:</td>
+            <td style="width: 35%;" class="fw-bold" id="lblStudentId">...</td>
+          </tr>
+          <tr>
+            <td class="fw-bold text-secondary">Lớp học:</td>
+            <td class="fw-bold" id="lblClassName">...</td>
+            <td class="fw-bold text-secondary">Ngày sinh:</td>
+            <td class="fw-bold" id="lblStudentDob">...</td>
+          </tr>
+          <tr>
+            <td class="fw-bold text-secondary">GV Chủ nhiệm:</td>
+            <td class="fw-bold text-dark" id="lblTeacherName">Thầy Võ Tâm Long</td>
+            <td class="fw-bold text-secondary">Học lực / Hạnh kiểm:</td>
+            <td class="fw-bold"><span class="badge bg-success bg-opacity-10 text-success" id="lblAcademic">Đạt</span> / <span class="badge bg-primary bg-opacity-10 text-primary" id="lblConduct">Tốt</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- II. KẾT QUẢ ĐÁNH GIÁ MÔN HỌC -->
+      <div class="mb-3">
+        <div class="section-box-title"><i class="fas fa-award me-2"></i>II. KẾT QUẢ HỌC TẬP CÁC MÔN</div>
+        <table class="table table-bordered score-table text-center mb-1">
+          <thead>
+            <tr>
+              <th rowspan="2" class="text-start ps-2" style="width: 160px;">MÔN HỌC</th>
+              <th colspan="4">ĐÁNH GIÁ THƯỜNG XUYÊN</th>
+              <th rowspan="2" style="width: 60px;">GIỮA KỲ</th>
+              <th rowspan="2" style="width: 60px;">CUỐI KỲ</th>
+              <th rowspan="2" style="width: 60px;" class="text-primary">ĐTB MÔN</th>
+              <th rowspan="2" class="text-start ps-2">NHẬN XÉT CỦA GIÁO VIÊN BỘ MÔN</th>
+            </tr>
+            <tr style="font-size: 10px;">
+              <th style="width: 45px;">TX1</th><th style="width: 45px;">TX2</th><th style="width: 45px;">TX3</th><th style="width: 45px;">TX4</th>
+            </tr>
+          </thead>
+          <tbody id="scoreTableBody">
+            <tr><td colspan="9" class="p-3 text-muted">Vui lòng chọn học sinh để nạp bảng điểm...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- III. CHUYÊN CẦN, NỀ NẾP & KHEN THƯỞNG -->
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <div class="section-box-title"><i class="fas fa-user-clock me-2"></i>III. CHUYÊN CẦN & NỀ NẾP</div>
+          <div class="p-2 border rounded-3 bg-light" style="font-size: 12px; min-height: 110px;">
+            <div class="mb-1"><b>Số buổi nghỉ học:</b> <span class="badge bg-danger" id="badgeAbsentCount">0 buổi</span></div>
+            <div id="absentDetailsList" class="text-secondary small ps-2 fst-italic mb-2">Không có ghi nhận nghỉ học.</div>
+            
+            <div class="border-top pt-1 mt-1">
+              <b>Vi phạm nề nếp cần lưu ý:</b>
+              <div id="disciplineList" class="text-danger small ps-2 mt-1">Chấp hành tốt nội quy lớp học.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="section-box-title"><i class="fas fa-star me-2"></i>IV. KHEN THƯỞNG & SỨC KHỎE</div>
+          <div class="p-2 border rounded-3 bg-light" style="font-size: 12px; min-height: 110px;">
+            <div class="mb-1"><b>Điểm cộng tích cực:</b> <span class="badge bg-success" id="badgeBonusPoints">+0 điểm</span></div>
+            <div id="bonusList" class="text-success small ps-2 mb-2">Chưa có bản ghi điểm cộng.</div>
+
+            <div class="border-top pt-1 mt-1">
+              <b>Sức khỏe y tế học đường:</b>
+              <div id="healthList" class="text-muted small ps-2 mt-1">Sức khỏe bình thường.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- V. Ý KIẾN & NHẬN XÉT CỦA GIÁO VIÊN CHỦ NHIỆM -->
+      <div class="mb-4">
+        <div class="section-box-title"><i class="fas fa-comment-medical me-2"></i>V. NHẬN XÉT CỦA GIÁO VIÊN CHỦ NHIỆM</div>
+        <div class="p-3 border rounded-3 bg-light text-dark" style="min-height: 70px; font-size: 13px;" id="gvcnCommentBox">
+          Em chăm ngoan, lễ phép, có ý thức học tập tốt và tích cực tham gia các phong trào của lớp.
+        </div>
+      </div>
+
+      <!-- CHỮ KÝ 3 BÊN -->
+      <div class="row mt-4 pt-2 text-center" style="font-size: 13px;">
+        <div class="col-4">
+          <p class="fw-bold mb-1">Ý KIẾN PHỤ HUYNH</p>
+          <small class="text-muted">(Ký và ghi rõ họ tên)</small>
+          <div style="height: 65px;"></div>
+        </div>
+        <div class="col-4">
+          <p class="fw-bold mb-1">GIÁO VIÊN CHỦ NHIỆM</p>
+          <small class="text-muted">(Ký và ghi rõ họ tên)</small>
+          <div style="height: 65px;"></div>
+          <div class="fw-bold text-dark" id="lblTeacherSign">Thầy Võ Tâm Long</div>
+        </div>
+        <div class="col-4">
+          <p class="fw-bold mb-1">HIỆU TRƯỞNG DUYỆT</p>
+          <small class="text-muted">(Ký và đóng dấu)</small>
+          <div style="height: 65px;"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbzUdvWoSnlU4jztEe-O0E7eCpdCh_TDbiIQQSQTNaY2MffWytQOHCoI8cRjbxB0LwZ4tA/exec";
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      document.getElementById('lblPrintDate').innerText = new Date().toLocaleDateString('vi-VN');
+
+      try {
+        let classes = await callApi('getClassesFromGVCN');
+        if (!classes || classes.length === 0) classes = await callApi('getAllClasses');
+
+        const selC = document.getElementById('selClass');
+        let hC = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => hC += `<option value="${c}">${c}</option>`);
+        selC.innerHTML = hC;
+
+        if (classes && classes.length > 0) {
+          selC.value = classes[0];
+          await onClassChange();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      const selS = document.getElementById('selStudent');
+      if (!className) return;
+
+      selS.innerHTML = '<option value="">Đang nạp học sinh...</option>';
+
+      try {
+        const students = await callApi('getStudentList', className) || [];
+        let html = '<option value="">-- Chọn học sinh --</option>';
+        students.forEach(s => {
+          html += `<option value="${s.id}">${s.id} - ${s.name}</option>`;
+        });
+        selS.innerHTML = html;
+
+        if (students.length > 0) {
+          selS.value = students[0].id;
+          await loadStudentReport();
+        }
+      } catch (err) {
+        selS.innerHTML = '<option value="">Lỗi nạp học sinh</option>';
+      }
+    }
+
+    async function loadStudentReport() {
+      const className = document.getElementById('selClass').value;
+      const studentId = document.getElementById('selStudent').value;
+      if (!className || !studentId) return;
+
+      try {
+        const data = await callApi('getSLL2627StudentReport', studentId, className);
+        if (!data || data.error) return alert(data ? data.error : "Lỗi nạp phiếu!");
+
+        renderReportUI(data);
+      } catch (err) {
+        alert("Lỗi kết nối: " + err.message);
+      }
+    }
+
+    function renderReportUI(d) {
+      const st = d.student || {};
+      document.getElementById('lblStudentName').innerText = st.name || '---';
+      document.getElementById('lblStudentId').innerText = st.id || '---';
+      document.getElementById('lblClassName').innerText = st.className || '---';
+      document.getElementById('lblStudentDob').innerText = st.dob || '---';
+      document.getElementById('lblAcademic').innerText = st.academic || 'Đạt';
+      document.getElementById('lblConduct').innerText = st.conduct || 'Tốt';
+
+      const gvcn = d.teacher || 'Thầy Võ Tâm Long';
+      document.getElementById('lblTeacherName').innerText = gvcn;
+      document.getElementById('lblTeacherSign').innerText = gvcn;
+
+      // 1. Render Bảng điểm các môn
+      const sBody = document.getElementById('scoreTableBody');
+      let sHtml = '';
+      (d.scores || []).forEach(sc => {
+        sHtml += `
+          <tr>
+            <td class="text-start ps-2 fw-bold text-dark">${sc.subject}</td>
+            <td>${sc.tx1 || '-'}</td><td>${sc.tx2 || '-'}</td><td>${sc.tx3 || '-'}</td><td>${sc.tx4 || '-'}</td>
+            <td class="fw-bold">${sc.gk || '-'}</td>
+            <td class="fw-bold">${sc.ck || '-'}</td>
+            <td class="fw-bold text-primary fs-6">${sc.dtb}</td>
+            <td class="text-start ps-2 text-secondary">${sc.comment || '—'}</td>
+          </tr>
+        `;
+      });
+      sBody.innerHTML = sHtml || '<tr><td colspan="9" class="p-3 text-muted">Chưa có dữ liệu điểm môn học.</td></tr>';
+
+      // 2. Render Chuyên cần
+      const att = d.attendance || { totalAbsent: 0, list: [] };
+      document.getElementById('badgeAbsentCount').innerText = `${att.totalAbsent} buổi`;
+      let attHtml = '';
+      if (att.list && att.list.length > 0) {
+        attHtml = att.list.map(a => `• Ngày ${a.date} (${a.period}): ${a.reason}`).join('<br>');
+      } else {
+        attHtml = 'Đi học đầy đủ, đúng giờ.';
+      }
+      document.getElementById('absentDetailsList').innerHTML = attHtml;
+
+      // 3. Render Vi phạm nề nếp
+      const disc = d.discipline || { totalViolations: 0, list: [] };
+      let discHtml = '';
+      if (disc.list && disc.list.length > 0) {
+        discHtml = disc.list.map(v => `• [${v.date}] ${v.errorType} ${v.note ? `(${v.note})` : ''}`).join('<br>');
+      } else {
+        discHtml = 'Chấp hành nghiêm túc nội quy nhà trường.';
+      }
+      document.getElementById('disciplineList').innerHTML = discHtml;
+
+      // 4. Render Điểm cộng khen thưởng
+      const bon = d.bonus || { totalPoints: 0, list: [] };
+      document.getElementById('badgeBonusPoints').innerText = `+${bon.totalPoints} điểm`;
+      let bonHtml = '';
+      if (bon.list && bon.list.length > 0) {
+        bonHtml = bon.list.map(b => `• ${b.content} (+${b.points}đ)`).join('<br>');
+      } else {
+        bonHtml = 'Tích cực tham gia các hoạt động lớp.';
+      }
+      document.getElementById('bonusList').innerHTML = bonHtml;
+
+      // 5. Render Sức khỏe Y tế
+      let medHtml = '';
+      if (d.health && d.health.length > 0) {
+        medHtml = d.health.map(m => `• [${m.date}] ${m.symptom} (${m.status})`).join('<br>');
+      } else {
+        medHtml = 'Sức khỏe tốt, không có lưu ý y tế đặc biệt.';
+      }
+      document.getElementById('healthList').innerHTML = medHtml;
+
+      // 6. Nhận xét của GVCN
+      let gvcnComment = 'Em chăm ngoan, lễ phép, chấp hành tốt nội quy lớp học và tích cực trong học tập.';
+      if (d.homeroomNotes && d.homeroomNotes.length > 0) {
+        gvcnComment = d.homeroomNotes.map(n => n.content).join('; ');
+      }
+      document.getElementById('gvcnCommentBox').innerText = gvcnComment;
+    }
+  </script>
+</body>
+</html>
