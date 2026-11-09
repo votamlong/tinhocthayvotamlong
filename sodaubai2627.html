@@ -96,8 +96,8 @@
 
       <div class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
         <span class="small fw-bold text-dark ps-2">Lớp:</span>
-        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-success" style="width: 120px;" onchange="loadSODB()">
-          <option value="">-- Chọn lớp --</option>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-success" style="width: 130px;" onchange="onClassChange()">
+          <option value="">-- Đang nạp... --</option>
         </select>
 
         <span class="small fw-bold text-dark ps-2">Ngày:</span>
@@ -105,9 +105,9 @@
 
         <span id="badgeDayOfWeek" class="badge bg-success bg-opacity-10 text-success fw-bold px-2 py-1">Thứ ...</span>
 
-        <div class="input-group input-group-sm" style="width: 120px;">
+        <div class="input-group input-group-sm" style="width: 115px;">
           <span class="input-group-text bg-light border-0 fw-bold small">Tuần</span>
-          <input type="number" id="inpWeek" class="form-control border-0 text-center fw-bold text-danger" min="1" max="35" value="1" onchange="loadSODB()">
+          <input type="number" id="inpWeek" class="form-control border-0 text-center fw-bold text-danger" min="1" max="35" value="10" onchange="loadSODB()">
         </div>
 
         <button onclick="saveSODB()" id="btnSave" class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm">
@@ -125,15 +125,15 @@
       <div class="d-flex justify-content-between align-items-center mb-2">
         <div class="text-start">
           <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
-          <div class="small">Lớp: <b class="text-dark fs-5" id="printClassName">...</b></div>
+          <div class="small">Lớp học: <b class="text-dark fs-5" id="printClassName">...</b></div>
         </div>
         <div class="text-end">
           <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
-          <div class="small fst-italic">Tuần: <b class="text-dark" id="printWeekNum">1</b> | <span id="printDayOfWeek">Thứ Hai</span></div>
+          <div class="small fst-italic">Tuần: <b class="text-dark" id="printWeekNum">10</b> | <span id="printDayOfWeek">Thứ Hai</span></div>
         </div>
       </div>
       <h3 class="fw-bold text-uppercase text-dark mb-1">SỔ GHI ĐẦU BÀI GIẢNG DẠY</h3>
-      <p class="text-secondary small fst-italic">Ngày thực hiện: <b class="text-dark" id="printFormattedDate">...</b> | GVCN: <b>Thầy Võ Tâm Long</b></p>
+      <p class="text-secondary small fst-italic">Ngày thực hiện: <b class="text-dark" id="printFormattedDate">...</b> | GVCN: <b class="text-dark" id="printTeacherName">...</b></p>
       <hr>
     </div>
 
@@ -173,7 +173,7 @@
       <div class="col-4">
         <p class="fw-bold mb-1">GIÁO VIÊN CHỦ NHIỆM</p>
         <small class="text-muted">(Ký và ghi rõ họ tên)</small>
-        <div class="mt-5 fw-bold">Thầy Võ Tâm Long</div>
+        <div class="mt-5 fw-bold" id="printTeacherSign">...</div>
       </div>
       <div class="col-4">
         <p class="fw-bold mb-1">BAN GIÁM HIỆU DUYỆT</p>
@@ -184,10 +184,10 @@
   </div>
 
   <script>
-    // Nhận link API từ trang mẹ nếu có, hoặc dùng link chính thức
+    // Nhận trực tiếp link API Web App đang hoạt động của hệ thống
     const API_URL = (window.parent && window.parent.API_URL) 
       ? window.parent.API_URL 
-      : "https://script.google.com/macros/s/AKfycbybogfYjelinv875N7G_9UsuhOcLWw9cYJgVFxXCVIYyHPSAL1_vo7j4sfRsqc7h6MFFQ/exec";
+      : "https://script.google.com/macros/s/AKfycbwW1It3cmZ1vYRdMgI20VYax57BVylCRAbH-CbzVpr7T69OFzoF3Igf2EyF5u-Wi167Zw/exec";
 
     const DAY_NAMES = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
 
@@ -203,15 +203,20 @@
     }
 
     window.onload = async function() {
-      // Đặt ngày hôm nay mặc định
+      // Đặt ngày hiện tại mặc định
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('selDate').value = today;
       updateDayAndWeekInfo(today);
 
       renderEmptyGrid();
 
+      // NẠP DANH SÁCH LỚP TỪ SHEET GVCN (CỘT A)
       try {
-        const classes = await callApi('getAllClasses');
+        let classes = await callApi('getClassesFromGVCN');
+        if (!classes || classes.length === 0) {
+          classes = await callApi('getAllClasses'); // Dự phòng nếu hàm chưa kịp cập nhật
+        }
+
         const selC = document.getElementById('selClass');
         let hC = '<option value="">-- Chọn lớp --</option>';
         (classes || []).forEach(c => hC += `<option value="${c}">${c}</option>`);
@@ -219,9 +224,10 @@
 
         if (classes && classes.length > 0) {
           selC.value = classes[0];
-          await loadSODB();
+          await onClassChange();
         }
       } catch (e) {
+        document.getElementById('selClass').innerHTML = '<option value="">Lỗi nạp lớp!</option>';
         console.error("Lỗi nạp lớp:", e);
       }
     };
@@ -231,6 +237,14 @@
       if (!dVal) return;
       updateDayAndWeekInfo(dVal);
       loadSODB();
+    }
+
+    async function onClassChange() {
+      const className = document.getElementById('selClass').value;
+      if (!className) return;
+
+      document.getElementById('printClassName').innerText = className;
+      await loadSODB();
     }
 
     // TÍNH TOÁN THỨ VÀ TUẦN DỰA THEO NGÀY
@@ -243,12 +257,12 @@
       // Ước lượng tuần học bắt đầu từ 01/09
       const startSchool = new Date(d.getFullYear(), 8, 1);
       let diffDays = Math.floor((d - startSchool) / (7 * 24 * 60 * 60 * 1000)) + 1;
-      let weekVal = (diffDays > 0 && diffDays <= 35) ? diffDays : 1;
+      let weekVal = (diffDays > 0 && diffDays <= 35) ? diffDays : 10;
       document.getElementById('inpWeek').value = weekVal;
       document.getElementById('printWeekNum').innerText = weekVal;
 
       let parts = dateStr.split('-');
-      document.getElementById('printFormattedDate').innerText = `${parts[2]}/${p[1]}/${p[0]}`;
+      document.getElementById('printFormattedDate').innerText = `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
     // KHỞI TẠO BẢNG 10 TIẾT
@@ -306,7 +320,12 @@
         const res = await callApi('getSODB2627Data', className, dateVal, weekVal);
         if (!res || res.error) return;
 
-        // Reset về rỗng
+        // Cập nhật tên GVCN
+        const gvcn = res.gvcn || "Thầy Võ Tâm Long";
+        document.getElementById('printTeacherName').innerText = gvcn;
+        document.getElementById('printTeacherSign').innerText = gvcn;
+
+        // Đặt lại các ô về mặc định
         document.querySelectorAll('.sodb-row').forEach(tr => {
           tr.querySelector('.inp-mon').value = "";
           tr.querySelector('.inp-ppct').value = "";
@@ -320,7 +339,7 @@
           tr.querySelector('.inp-ky').value = "Võ Tâm Long";
         });
 
-        // Điền học sinh vắng tự động từ Điểm danh nếu có
+        // Điền học sinh vắng tự động từ Điểm danh
         if (res.absents) {
           document.querySelectorAll('.sodb-row').forEach(tr => {
             let pName = tr.getAttribute('data-period');
@@ -369,7 +388,7 @@
       let rowsToSave = [];
       document.querySelectorAll('.sodb-row').forEach(tr => {
         let mon = tr.querySelector('.inp-mon').value.trim();
-        // Chỉ lưu những tiết có nhập Môn hoặc Nội dung
+        // Lưu những tiết có nhập Môn hoặc Nội dung bài dạy
         if (mon || tr.querySelector('.inp-noidung').value.trim()) {
           rowsToSave.push([
             weekVal,                                         // A: Tuần
@@ -391,7 +410,7 @@
         }
       });
 
-      if (rowsToSave.length === 0) return alert("Thầy chưa nhập môn hoặc nội dung tiết dạy nào!");
+      if (rowsToSave.length === 0) return alert("Thầy chưa nhập môn hoặc nội dung bài dạy nào!");
 
       const btn = document.getElementById('btnSave');
       const oldHtml = btn.innerHTML;
