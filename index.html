@@ -394,6 +394,10 @@
         <div id="tab-group_task_notice" class="content-tab d-none" style="height: 85vh;">
           <iframe id="iframe-tasknotice" src="thongbaoviecto.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
         </div>
+        <!-- TAB HỒ SƠ THẦY VÕ TÂM LONG (NHÚNG hothaylong.html) -->
+        <div id="tab-teacher_profile_long" class="content-tab d-none" style="height: 85vh;">
+          <iframe id="iframe-teacherprofile" src="hothaylong.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
+        </div>
         
 
 
@@ -1359,6 +1363,13 @@
           var menuText = el ? el.innerText.toLowerCase() : '';
           if (id.includes('task') || id.includes('notice') || id.includes('thong_bao') || menuText.includes('thông báo việc tổ')) {
             target = document.getElementById('tab-group_task_notice');
+          }
+        }
+        // TỰ ĐỘNG BẬT TAB THẦY VÕ TÂM LONG
+        if (!target) {
+          var menuText = el ? el.innerText.toLowerCase() : '';
+          if (id.includes('teacher') || id.includes('long') || id.includes('thay_long') || menuText.includes('võ tâm long')) {
+            target = document.getElementById('tab-teacher_profile_long');
           }
         }
         
