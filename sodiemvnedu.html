@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sổ Điểm Điện Tử vnEdu 2627 - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      vertical-align: middle;
+      padding: 8px 4px;
+    }
+    .score-inp {
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      padding: 6px 2px;
+      outline: none;
+      transition: all 0.15s;
+    }
+    .score-inp:focus {
+      background: #ffffff;
+      border-color: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    }
+    .score-comment {
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 4px;
+      font-size: 12.5px;
+      width: 100%;
+      height: 100%;
+      padding: 6px 8px;
+      outline: none;
+      transition: all 0.15s;
+    }
+    .score-comment:focus {
+      background: #ffffff;
+      border-color: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+    }
+    .cell-dtb {
+      font-weight: 800;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .print-footer { display: flex !important; }
+      .panel-box { border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; font-size: 11px !important; }
+      .score-inp, .score-comment { border: none !important; font-size: 11px !important; }
+      @page { size: landscape; margin: 8mm; }
+    }
+    .print-header { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- THANH TIÊU ĐỀ & BỘ LỌC (ẨN KHI IN) -->
+    <div class="header-banner mb-3 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-white text-success fw-bold px-2 py-1"><i class="fas fa-file-excel me-1"></i>VNEDU GRADEBOOK 2627</span>
+          <span class="opacity-75 small">Đồng bộ Sheet: <b>SCORES_V2</b> (9 Cột A - I)</span>
+        </div>
+        <h4 class="fw-bold mb-0">SỔ ĐIỂM CHI TIẾT VNEDU NĂM HỌC 2026 - 2027</h4>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-success" style="width: 125px;" onchange="loadScores()">
+          <option value="">-- Chọn lớp --</option>
+        </select>
+
+        <span class="small fw-bold text-dark ps-2">Môn:</span>
+        <select id="selSubject" class="form-select form-select-sm border-0 fw-bold text-primary" style="width: 160px;" onchange="loadScores()">
+          <option value="Tin học">Tin học</option>
+        </select>
+
+        <button onclick="saveAllScores()" id="btnSave" class="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-sm">
+          <i class="fas fa-save me-1"></i> LƯU SỔ ĐIỂM
+        </button>
+
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In bảng điểm A4
+        </button>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN BẢNG ĐIỂM RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header text-center mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">Lớp học: <b class="text-dark fs-5" id="printClassName">...</b></div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+          <div class="small fst-italic">Môn học: <b class="text-primary fs-5" id="printSubjectName">Tin học</b></div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">BẢNG TỔNG HỢP ĐIỂM ĐÁNH GIÁ MÔN HỌC</h3>
+      <p class="text-secondary small fst-italic">Trích xuất ngày: <b class="text-dark" id="printTodayDate">...</b> | GV Bộ môn: <b>Thầy Võ Tâm Long</b></p>
+      <hr>
+    </div>
+
+    <!-- BẢNG NHẬP ĐIỂM VNEDU 9 CỘT THEO ĐÚNG SHEET SCORES_V2 -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center no-print">
+        <span class="small fw-bold text-secondary text-uppercase">
+          <i class="fas fa-table me-1 text-success"></i> Danh sách học sinh: <span class="badge bg-success px-2 py-1" id="studentCountBadge">0 em</span>
+        </span>
+        <small class="text-muted"><i class="fas fa-calculator me-1"></i>ĐTB Môn được tự động tính tức thì khi Thầy/Cô gõ điểm.</small>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle mb-0 text-center small" id="scoreTable">
+          <thead>
+            <tr>
+              <th rowspan="2" style="width: 45px;">STT</th>
+              <th rowspan="2" style="width: 100px;">MÃ HS (A)</th>
+              <th rowspan="2" class="text-start ps-3" style="min-width: 200px;">HỌ VÀ TÊN HỌC SINH</th>
+              <th colspan="4" class="bg-primary bg-opacity-10 text-primary">ĐÁNH GIÁ THƯỜNG XUYÊN (C - F)</th>
+              <th rowspan="2" style="width: 65px;" class="bg-warning bg-opacity-10 text-dark">GIỮA KỲ (G)</th>
+              <th rowspan="2" style="width: 65px;" class="bg-danger bg-opacity-10 text-danger">CUỐI KỲ (H)</th>
+              <th rowspan="2" style="width: 75px;" class="bg-success bg-opacity-10 text-success">ĐTB MÔN</th>
+              <th rowspan="2" class="text-start ps-3" style="min-width: 230px;">NHẬN XÉT CỦA GIÁO VIÊN (I)</th>
+            </tr>
+            <tr style="font-size: 11px;">
+              <th style="width: 55px;">TX1 (C)</th>
+              <th style="width: 55px;">TX2 (D)</th>
+              <th style="width: 55px;">TX3 (E)</th>
+              <th style="width: 55px;">TX4 (F)</th>
+            </tr>
+          </thead>
+          <tbody id="scoreTableBody">
+            <tr><td colspan="11" class="p-5 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu từ Sheet SCORES_V2...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- KHUNG CHỮ KÝ KHI IN BẢNG ĐIỂM RA A4 (CHỈ HIỆN KHI IN) -->
+    <div class="row mt-5 pt-4 text-center print-footer d-none">
+      <div class="col-6">
+        <p class="fw-bold mb-1">GIÁO VIÊN BỘ MÔN</p>
+        <small class="text-muted">(Ký, ghi rõ họ tên)</small>
+        <div class="mt-5 fw-bold">Thầy Võ Tâm Long</div>
+      </div>
+      <div class="col-6">
+        <p class="fw-bold mb-1">BAN GIÁM HIỆU DUYỆT</p>
+        <small class="text-muted">(Ký và đóng dấu)</small>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbyCWf5JHOI6JHY9odd7f5mCk54rnDpoeHen6B6Tw4W9U_9zrzvodbFe25zaUjd7y6t9Lg/exec";
+
+    let currentScoreList = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      document.getElementById('printTodayDate').innerText = new Date().toLocaleDateString('vi-VN');
+
+      try {
+        // 1. Nạp danh sách môn học
+        const subjects = await callApi('getSubjectsList2627') || [];
+        const selS = document.getElementById('selSubject');
+        let hSub = '';
+        subjects.forEach(s => hSub += `<option value="${s}" ${s === 'Tin học' ? 'selected' : ''}>${s}</option>`);
+        selS.innerHTML = hSub || '<option value="Tin học">Tin học</option>';
+
+        // 2. Nạp danh sách lớp từ sheet GVCN
+        let classes = await callApi('getClassesFromGVCN');
+        if (!classes || classes.length === 0) classes = await callApi('getAllClasses');
+
+        const selC = document.getElementById('selClass');
+        let hClass = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => hClass += `<option value="${c}">${c}</option>`);
+        selC.innerHTML = hClass;
+
+        if (classes && classes.length > 0) {
+          selC.value = classes[0];
+          await loadScores();
+        }
+      } catch (err) {
+        console.error("Lỗi khởi tạo:", err);
+      }
+    };
+
+    // TẢI BẢNG ĐIỂM TỪ SHEET SCORES_V2
+    async function loadScores() {
+      const className = document.getElementById('selClass').value;
+      const subject = document.getElementById('selSubject').value;
+      const body = document.getElementById('scoreTableBody');
+
+      if (!className) return;
+
+      document.getElementById('printClassName').innerText = className;
+      document.getElementById('printSubjectName').innerText = subject;
+      body.innerHTML = '<tr><td colspan="11" class="p-5 text-center text-muted"><i class="fas fa-sync fa-spin me-2"></i>Đang nạp bảng điểm lớp ' + className + ' môn ' + subject + ' từ Sheet SCORES_V2...</td></tr>';
+
+      try {
+        const res = await callApi('getVnEduScores2627', className, subject);
+        if (!res || res.error) throw new Error(res ? res.error : "Không có dữ liệu!");
+
+        currentScoreList = res.list || [];
+        document.getElementById('studentCountBadge').innerText = currentScoreList.length + " em";
+        renderScoreTable();
+      } catch (e) {
+        body.innerHTML = `<tr><td colspan="11" class="p-4 text-danger text-center">Lỗi tải dữ liệu: ${e.message}</td></tr>`;
+      }
+    }
+
+    function renderScoreTable() {
+      const body = document.getElementById('scoreTableBody');
+      if (currentScoreList.length === 0) {
+        body.innerHTML = '<tr><td colspan="11" class="p-4 text-muted text-center">Lớp này chưa có danh sách học sinh trong Sheet STUDENTS.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      currentScoreList.forEach((s, idx) => {
+        html += `
+          <tr data-id="${s.id}">
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td class="fw-bold text-secondary">${s.id}</td>
+            <td class="text-start ps-3 fw-bold text-dark">${s.name}</td>
+            
+            <td class="p-0"><input type="text" class="score-inp inp-tx1" value="${s.tx1 || ''}" oninput="onScoreInput(this)"></td>
+            <td class="p-0"><input type="text" class="score-inp inp-tx2" value="${s.tx2 || ''}" oninput="onScoreInput(this)"></td>
+            <td class="p-0"><input type="text" class="score-inp inp-tx3" value="${s.tx3 || ''}" oninput="onScoreInput(this)"></td>
+            <td class="p-0"><input type="text" class="score-inp inp-tx4" value="${s.tx4 || ''}" oninput="onScoreInput(this)"></td>
+            
+            <td class="p-0 bg-warning bg-opacity-10"><input type="text" class="score-inp inp-gk fw-bold" value="${s.gk || ''}" oninput="onScoreInput(this)"></td>
+            <td class="p-0 bg-danger bg-opacity-10"><input type="text" class="score-inp inp-ck fw-bold text-danger" value="${s.ck || ''}" oninput="onScoreInput(this)"></td>
+            
+            <td class="cell-dtb bg-success bg-opacity-10 text-success">-</td>
+            
+            <td class="p-0 text-start ps-2"><input type="text" class="score-comment" value="${s.comment || ''}" placeholder="Nhận xét..."></td>
+          </tr>
+        `;
+      });
+
+      body.innerHTML = html;
+
+      // Tính lại ĐTB cho toàn bộ các dòng vừa nạp
+      document.querySelectorAll('#scoreTableBody tr').forEach(tr => calcRowGPA(tr));
+    }
+
+    // TÍNH ĐTB MÔN TỨC THÌ THEO CÔNG THỨC VNEDU (TX hệ số 1, GK hệ số 2, CK hệ số 3)
+    function onScoreInput(inp) {
+      let val = inp.value.trim();
+      if (val !== '' && !isNaN(val)) {
+        let num = Number(val);
+        if (num < 0 || num > 10) {
+          inp.style.backgroundColor = '#fee2e2';
+          inp.style.color = '#dc2626';
+        } else {
+          inp.style.backgroundColor = '';
+          inp.style.color = '';
+        }
+      }
+      calcRowGPA(inp.closest('tr'));
+    }
+
+    function calcRowGPA(tr) {
+      const getVal = (cls) => {
+        let v = tr.querySelector('.' + cls).value.trim();
+        return (v !== '' && !isNaN(v)) ? Number(v) : null;
+      };
+
+      let t1 = getVal('inp-tx1'), t2 = getVal('inp-tx2'), t3 = getVal('inp-tx3'), t4 = getVal('inp-tx4');
+      let gk = getVal('inp-gk'), ck = getVal('inp-ck');
+
+      let txArr = [t1, t2, t3, t4].filter(v => v !== null);
+      let hasScore = (txArr.length > 0 || gk !== null || ck !== null);
+
+      let dtbCell = tr.querySelector('.cell-dtb');
+      if (!hasScore) {
+        dtbCell.innerText = '-';
+        return;
+      }
+
+      let sum = txArr.reduce((a, b) => a + b, 0);
+      let count = txArr.length;
+      if (gk !== null) { sum += gk * 2; count += 2; }
+      if (ck !== null) { sum += ck * 3; count += 3; }
+
+      let dtb = (count > 0) ? (sum / count).toFixed(1) : '-';
+      dtbCell.innerText = dtb;
+
+      if (dtb !== '-') {
+        let nDtb = Number(dtb);
+        dtbCell.className = 'cell-dtb bg-success bg-opacity-10 ' + (nDtb >= 8.0 ? 'text-success' : (nDtb >= 6.5 ? 'text-primary' : (nDtb >= 5.0 ? 'text-warning' : 'text-danger')));
+      }
+    }
+
+    // LƯU TOÀN BỘ BẢNG ĐIỂM VÀO SHEET SCORES_V2
+    async function saveAllScores() {
+      const subject = document.getElementById('selSubject').value;
+      const rows = document.querySelectorAll('#scoreTableBody tr');
+
+      if (!subject) return alert("Vui lòng chọn môn học!");
+      if (rows.length === 0) return alert("Không có học sinh nào để lưu điểm!");
+
+      let scoreData = [];
+      rows.forEach(tr => {
+        let sId = tr.getAttribute('data-id');
+        if (sId) {
+          scoreData.push({
+            id: sId,
+            tx1: tr.querySelector('.inp-tx1').value.trim(),
+            tx2: tr.querySelector('.inp-tx2').value.trim(),
+            tx3: tr.querySelector('.inp-tx3').value.trim(),
+            tx4: tr.querySelector('.inp-tx4').value.trim(),
+            gk: tr.querySelector('.inp-gk').value.trim(),
+            ck: tr.querySelector('.inp-ck').value.trim(),
+            comment: tr.querySelector('.score-comment').value.trim()
+          });
+        }
+      });
+
+      const btn = document.getElementById('btnSave');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu vào Sheet SCORES_V2...';
+
+      try {
+        const msg = await callApi('saveVnEduScores2627', subject, scoreData);
+        alert(msg);
+      } catch (err) {
+        alert("Lỗi khi lưu bảng điểm: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+  </script>
+</body>
+</html>
