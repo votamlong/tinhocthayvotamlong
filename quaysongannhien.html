@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quay Số Ngẫu Nhiên Lớp Học</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #0f172a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f8fafc;
+      padding: 16px;
+      user-select: none;
+      min-height: 100vh;
+    }
+    .panel-box {
+      background: #1e293b;
+      border-radius: 20px;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      padding: 24px;
+    }
+    .big-digit-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: clamp(140px, 30vw, 240px);
+      height: clamp(140px, 30vw, 240px);
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      border: 4px solid #38bdf8;
+      border-radius: 28px;
+      box-shadow: 0 0 35px rgba(56, 189, 248, 0.35);
+      margin: 10px;
+      transition: all 0.2s ease;
+    }
+    .digit-text {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: clamp(4.5rem, 16vw, 9.5rem);
+      font-weight: 900;
+      color: #38bdf8;
+      text-shadow: 0 0 25px rgba(56, 189, 248, 0.7);
+      line-height: 1;
+    }
+    .digit-winner {
+      border-color: #facc15 !important;
+      box-shadow: 0 0 50px rgba(250, 204, 21, 0.6) !important;
+      animation: winner-pulse 0.6s infinite alternate;
+    }
+    .digit-winner .digit-text {
+      color: #facc15 !important;
+      text-shadow: 0 0 35px rgba(250, 204, 21, 0.9) !important;
+    }
+    @keyframes winner-pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.05); }
+    }
+    .history-badge {
+      display: inline-block;
+      background: #334155;
+      color: #e2e8f0;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 6px 14px;
+      border-radius: 50px;
+      margin: 4px;
+      border: 1px solid #475569;
+    }
+    .history-badge.latest {
+      background: #facc15;
+      color: #0f172a;
+      border-color: #facc15;
+      font-weight: 800;
+    }
+    .preset-btn {
+      background: #334155;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      border-radius: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .preset-btn:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1050px;">
+    
+    <!-- THANH TIÊU ĐỀ & NÚT TOÀN MÀN HÌNH -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-danger text-white fw-bold px-3 py-1"><i class="fas fa-dice me-1"></i>RANDOM PICKER</span>
+          <span class="text-secondary small">Quay số gọi tên / Bốc thăm trúng thưởng ngẫu nhiên</span>
+        </div>
+        <h4 class="fw-bold mb-0 text-white">QUAY SỐ NGẪU NHIÊN LỚP HỌC</h4>
+      </div>
+
+      <button onclick="toggleFullScreen()" class="btn btn-outline-light rounded-pill px-4 fw-bold">
+        <i class="fas fa-expand me-2"></i>Toàn Màn Hình
+      </button>
+    </div>
+
+    <!-- KHUNG ĐIỀU KHIỂN & KHOẢNG SỐ -->
+    <div class="panel-box mb-4">
+      <div class="row g-3 align-items-end">
+        <div class="col-6 col-md-3">
+          <label class="small text-secondary fw-bold mb-1">Số bắt đầu (Min):</label>
+          <input type="number" id="inpMin" class="form-control form-control-sm bg-dark text-white border-secondary fw-bold text-center" value="1">
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="small text-secondary fw-bold mb-1">Số kết thúc (Max):</label>
+          <input type="number" id="inpMax" class="form-control form-control-sm bg-dark text-white border-secondary fw-bold text-center" value="45">
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+            <span class="small text-muted align-self-center me-1">Nhanh:</span>
+            <button class="preset-btn" onclick="setRange(1, 40)">1 - 40</button>
+            <button class="preset-btn" onclick="setRange(1, 45)">1 - 45</button>
+            <button class="preset-btn" onclick="setRange(1, 50)">1 - 50</button>
+            <button class="preset-btn" onclick="setRange(1, 100)">1 - 100</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary border-opacity-25">
+        <div class="form-check form-switch mb-0">
+          <input class="form-check-input" type="checkbox" id="chkNoRepeat" checked>
+          <label class="form-check-label small fw-bold text-secondary" for="chkNoRepeat">Không trùng lặp lại số đã quay</label>
+        </div>
+        <button onclick="clearHistory()" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-redo-alt me-1"></i> Làm mới lịch sử
+        </button>
+      </div>
+    </div>
+
+    <!-- MÀN HÌNH HIỂN THỊ CON SỐ -->
+    <div class="panel-box text-center py-5 mb-4">
+      <div class="d-flex justify-content-center align-items-center">
+        <div class="big-digit-box" id="digitBox">
+          <span class="digit-text" id="digitDisplay">?</span>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <button onclick="startSpin()" id="btnSpin" class="btn btn-danger btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg fs-5">
+          <i class="fas fa-play me-2"></i> QUAY SỐ NGAY
+        </button>
+      </div>
+    </div>
+
+    <!-- LỊCH SỬ CÁC CON SỐ ĐÃ RA -->
+    <div class="panel-box">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="small fw-bold text-secondary text-uppercase"><i class="fas fa-history me-1"></i> Các con số đã gọi:</span>
+        <span class="badge bg-secondary" id="historyCountBadge">0 số</span>
+      </div>
+      <div id="historyContainer" class="p-2 text-start">
+        <span class="text-secondary small fst-italic">Chưa có lượt quay nào.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    // ÂM THANH TIẾNG QUAY CUỘN SỐ
+    function playRollTick() {
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.setValueAtTime(600 + Math.random() * 300, ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.04);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.05);
+      } catch(e) {}
+    }
+
+    // ÂM THANH KHI CHỐT SỐ CHIẾN THẮNG
+    function playWinSound() {
+      try {
+        const ctx = getAudioContext();
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.6);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + i * 0.1);
+          osc.stop(ctx.currentTime + i * 0.1 + 0.7);
+        });
+      } catch(e) {}
+    }
+
+    let isSpinning = false;
+    let spinInterval = null;
+    let historyNumbers = [];
+
+    function setRange(min, max) {
+      document.getElementById('inpMin').value = min;
+      document.getElementById('inpMax').value = max;
+    }
+
+    function startSpin() {
+      if (isSpinning) return;
+
+      const min = parseInt(document.getElementById('inpMin').value) || 1;
+      const max = parseInt(document.getElementById('inpMax').value) || 45;
+      const noRepeat = document.getElementById('chkNoRepeat').checked;
+
+      if (min >= max) return alert("Số bắt đầu (Min) phải nhỏ hơn số kết thúc (Max)!");
+
+      // Kiểm tra còn số để quay không nếu chọn không lặp lại
+      if (noRepeat) {
+        let availableCount = (max - min + 1);
+        let usedInCurrentRange = historyNumbers.filter(n => n >= min && n <= max).length;
+        if (usedInCurrentRange >= availableCount) {
+          return alert(`Tất cả ${availableCount} số từ ${min} đến ${max} đã được quay hết! Bấm "Làm mới lịch sử" để quay lại từ đầu.`);
+        }
+      }
+
+      getAudioContext();
+      isSpinning = true;
+      document.getElementById('btnSpin').disabled = true;
+
+      const digitBox = document.getElementById('digitBox');
+      const digitDisplay = document.getElementById('digitDisplay');
+      digitBox.classList.remove('digit-winner');
+
+      let spinTime = 0;
+      let totalSpinDuration = 2200 + Math.random() * 800; // Quay trong 2.2s đến 3s
+      let speed = 40;
+
+      function spinLoop() {
+        spinTime += speed;
+        let randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+        digitDisplay.innerText = randomNum;
+        playRollTick();
+
+        if (spinTime >= totalSpinDuration) {
+          // CHỐT CON SỐ CUỐI CÙNG
+          clearInterval(spinInterval);
+          let finalNum;
+          if (noRepeat) {
+            let pool = [];
+            for (let i = min; i <= max; i++) {
+              if (!historyNumbers.includes(i)) pool.push(i);
+            }
+            finalNum = pool[Math.floor(Math.random() * pool.length)];
+          } else {
+            finalNum = randomNum;
+          }
+
+          digitDisplay.innerText = finalNum;
+          digitBox.classList.add('digit-winner');
+          playWinSound();
+
+          historyNumbers.unshift(finalNum);
+          renderHistory();
+
+          isSpinning = false;
+          document.getElementById('btnSpin').disabled = false;
+        } else {
+          speed += 4; // Chậm dần đều
+          clearInterval(spinInterval);
+          spinInterval = setTimeout(spinLoop, speed);
+        }
+      }
+
+      spinInterval = setTimeout(spinLoop, speed);
+    }
+
+    function renderHistory() {
+      const container = document.getElementById('historyContainer');
+      document.getElementById('historyCountBadge').innerText = historyNumbers.length + " số";
+
+      if (historyNumbers.length === 0) {
+        container.innerHTML = '<span class="text-secondary small fst-italic">Chưa có lượt quay nào.</span>';
+        return;
+      }
+
+      let html = '';
+      historyNumbers.forEach((n, idx) => {
+        html += `<span class="history-badge ${idx === 0 ? 'latest' : ''}">${n}</span>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function clearHistory() {
+      if (historyNumbers.length > 0 && !confirm("Xóa toàn bộ lịch sử các số đã quay?")) return;
+      historyNumbers = [];
+      document.getElementById('digitBox').classList.remove('digit-winner');
+      document.getElementById('digitDisplay').innerText = '?';
+      renderHistory();
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+  </script>
+</body>
+</html>
