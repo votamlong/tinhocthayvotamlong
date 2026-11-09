@@ -1467,14 +1467,10 @@
       else if (id === 'sll_2627') {
         // Tự động mở tab hiển thị Sổ Liên Lạc 2627
       }
-      // TỰ ĐỘNG THÊM MENU TỔNG QUAN TOÀN TRƯỜNG CHO ADMIN
-      if (res.role === 'ADMIN' && !dataMenu.some(function(m) { return m.id === 'school_overview'; })) {
-        dataMenu.splice(1, 0, {
-          id: 'school_overview',
-          text: '🏛️ Tổng Quan Toàn Trường',
-          icon: 'fa-school text-primary'
-        });
-      }
+     else if (id === 'school_overview')
+     {
+       // Tự động mở tab menu tong quan toan truong
+     }
   
       
     }
