@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhập Danh Sách Học Sinh Hàng Loạt</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #1e293b;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 22px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 20px 24px;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.2);
+    }
+    .paste-area {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      background: #f8fafc;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 12px;
+      width: 100%;
+      height: 220px;
+      resize: vertical;
+      outline: none;
+    }
+    .paste-area:focus {
+      border-color: #0284c7;
+      background: #ffffff;
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #475569;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      border-bottom: 2px solid #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1350px;">
+    
+    <!-- BANNER TIÊU ĐỀ -->
+    <div class="header-banner mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-file-import me-1"></i>STUDENT BATCH IMPORT</span>
+          <span class="opacity-75 small">Nhập danh sách học sinh hàng loạt vào Sheet <b>STUDENTS</b></span>
+        </div>
+        <h4 class="fw-bold mb-0">NHẬP DANH SÁCH HỌC SINH TỪ EXCEL / WORD</h4>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button onclick="saveStudentsToSheet()" id="btnSave" class="btn btn-warning rounded-pill px-4 fw-bold text-dark shadow-sm">
+          <i class="fas fa-cloud-upload-alt me-1"></i> LƯU VÀO SHEET
+        </button>
+      </div>
+    </div>
+
+    <!-- KHUNG NHẬP LIỆU & BỘ THIẾT LẬP -->
+    <div class="row g-3 mb-3">
+      
+      <!-- CỘT TRÁI: Ô DÁN DANH SÁCH -->
+      <div class="col-lg-7">
+        <div class="panel-box h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="small fw-bold text-primary text-uppercase">
+              <i class="fas fa-paste me-1"></i> Dán danh sách học sinh (Mỗi em 1 dòng)
+            </label>
+            <button onclick="clearInput()" class="btn btn-link btn-sm text-secondary p-0 text-decoration-none">
+              <i class="fas fa-eraser me-1"></i> Xóa bảng dán
+            </button>
+          </div>
+
+          <textarea id="rawText" class="paste-area mb-2" placeholder="Thầy có thể sao chép và dán trực tiếp từ file Excel:&#10;Cách 1: Chỉ dán cột Tên (Vd: Nguyễn Văn A)&#10;Cách 2: Dán đủ cột từ Excel (Mã HS [Tab] Họ Tên [Tab] Ngày Sinh)&#10;&#10;Ví dụ:&#10;HS01	Nguyễn Văn An	15/08/2012&#10;HS02	Trần Thị Bình	20/11/2012"></textarea>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted"><i class="fas fa-lightbulb text-warning me-1"></i>Hỗ trợ copy cả bảng từ Excel gồm nhiều cột hoặc danh sách tên đơn giản.</small>
+            <button onclick="parseAndPreview()" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm">
+              <i class="fas fa-magic me-1"></i> XỬ LÝ & XEM TRƯỚC
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: CẤU HÌNH THÔNG SỐ LỚP & MÃ HỌC SINH -->
+      <div class="col-lg-5">
+        <div class="panel-box h-100 d-flex flex-column justify-content-between">
+          <div>
+            <h6 class="fw-bold text-secondary text-uppercase mb-3">
+              <i class="fas fa-sliders-h me-1"></i> Cấu hình mặc định
+            </h6>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="small fw-bold text-secondary mb-1">Lớp học tiếp nhận:</label>
+                <div class="input-group input-group-sm">
+                  <input type="text" id="targetClass" class="form-control fw-bold text-primary" placeholder="Vd: 6A1, 8A13...">
+                  <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"></button>
+                  <ul class="dropdown-menu dropdown-menu-end" id="classListDropdown"></ul>
+                </div>
+              </div>
+              <div class="col-6">
+                <label class="small fw-bold text-secondary mb-1">Tiền tố Mã HS:</label>
+                <input type="text" id="idPrefix" class="form-control form-control-sm text-center fw-bold" value="HS">
+              </div>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="small fw-bold text-secondary mb-1">Số bắt đầu tự sinh:</label>
+                <input type="number" id="startNumber" class="form-control form-control-sm text-center fw-bold" value="1">
+              </div>
+              <div class="col-6">
+                <label class="small fw-bold text-secondary mb-1">Hạnh kiểm mặc định:</label>
+                <select id="defaultConduct" class="form-select form-select-sm fw-bold">
+                  <option value="Tốt">Tốt</option>
+                  <option value="Khá">Khá</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="bg-light p-3 rounded-3 mb-2 border">
+              <div class="form-check mb-1">
+                <input class="form-check-input" type="checkbox" id="chkBanTru">
+                <label class="form-check-label small fw-bold" for="chkBanTru">Đăng ký ăn Bán trú (Cột G = X)</label>
+              </div>
+              <div class="form-check mb-1">
+                <input class="form-check-input" type="checkbox" id="chkHaiBuoi" checked>
+                <label class="form-check-label small fw-bold" for="chkHaiBuoi">Học 2 buổi / ngày (Cột H = X)</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input text-danger" type="checkbox" id="chkOverwrite">
+                <label class="form-check-label small fw-bold text-danger" for="chkOverwrite">Ghi đè (Xóa sạch danh sách cũ của lớp này)</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="small text-muted fst-italic">
+            <i class="fas fa-check-circle text-success me-1"></i>Hệ thống tự động bỏ qua các dòng trống và chuẩn hóa họ tên học sinh.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BẢNG XEM TRƯỚC DANH SÁCH TRƯỚC KHI GHI VÀO GOOGLE SHEETS -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+        <span class="fw-bold small text-uppercase">
+          <i class="fas fa-table me-1 text-primary"></i> Danh sách xem trước: <span class="badge bg-primary px-3 py-1" id="previewCount">0 học sinh</span>
+        </span>
+        <button onclick="clearPreview()" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-0" style="font-size: 11px;">
+          Xóa bảng xem trước
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle mb-0 text-center small" id="previewTable">
+          <thead>
+            <tr>
+              <th style="width: 50px;">STT</th>
+              <th style="width: 120px;">MÃ ĐỊNH DANH (A)</th>
+              <th class="text-start ps-3">HỌ VÀ TÊN HỌC SINH (B)</th>
+              <th style="width: 90px;">LỚP (C)</th>
+              <th style="width: 130px;">NGÀY SINH (I)</th>
+              <th style="width: 90px;">HẠNH KIỂM (E)</th>
+              <th style="width: 90px;">BÁN TRÚ (G)</th>
+              <th style="width: 90px;">2 BUỔI (H)</th>
+              <th style="width: 50px;">XÓA</th>
+            </tr>
+          </thead>
+          <tbody id="previewBody">
+            <tr><td colspan="9" class="p-4 text-muted">Chưa có dữ liệu xử lý. Vui lòng dán danh sách và bấm "XỬ LÝ & XEM TRƯỚC".</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxs2SVunfDvBeorFkKMSplwU5yQIF03h3JuLfJ7aq3yu7lUgeD16JB25yXbphjM7TTl2A/exec";
+
+    let parsedStudents = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      try {
+        const classes = await callApi('getAllClasses');
+        const listContainer = document.getElementById('classListDropdown');
+        let html = '';
+        (classes || []).forEach(c => {
+          html += `<li><a class="dropdown-item fw-bold" href="javascript:void(0)" onclick="selectClass('${c}')">${c}</a></li>`;
+        });
+        listContainer.innerHTML = html;
+
+        if (classes && classes.length > 0) {
+          selectClass(classes[0]);
+        }
+
+        // Lấy số thứ tự ID lớn nhất hiện tại để gợi ý
+        const maxNum = await callApi('getMaxStudentIdNumber');
+        if (maxNum > 0) {
+          document.getElementById('startNumber').value = maxNum + 1;
+        }
+      } catch (err) {
+        console.error("Lỗi nạp dữ liệu:", err);
+      }
+    };
+
+    function selectClass(className) {
+      document.getElementById('targetClass').value = className;
+    }
+
+    function clearInput() {
+      document.getElementById('rawText').value = "";
+    }
+
+    function clearPreview() {
+      parsedStudents = [];
+      renderPreview();
+    }
+
+    // XỬ LÝ CHUỖI VĂN BẢN TỪ EXCEL / WORD
+    function parseAndPreview() {
+      const text = document.getElementById('rawText').value.trim();
+      const targetClass = document.getElementById('targetClass').value.trim();
+      const prefix = document.getElementById('idPrefix').value.trim() || "HS";
+      let startNum = parseInt(document.getElementById('startNumber').value) || 1;
+      const defaultConduct = document.getElementById('defaultConduct').value;
+      const isBT = document.getElementById('chkBanTru').checked;
+      const is2B = document.getElementById('chkHaiBuoi').checked;
+
+      if (!targetClass) return alert("Vui lòng nhập hoặc chọn Lớp học tiếp nhận!");
+      if (!text) return alert("Vui lòng dán danh sách học sinh vào ô văn bản!");
+
+      const lines = text.split('\n');
+      parsedStudents = [];
+
+      lines.forEach(line => {
+        let cleanLine = line.trim();
+        if (!cleanLine) return;
+
+        // Tách theo phím Tab (khi copy từ Excel) hoặc dấu phẩy
+        let parts = cleanLine.split('\t');
+        if (parts.length === 1) parts = cleanLine.split(',');
+
+        let studentId = "";
+        let studentName = "";
+        let studentDob = "";
+
+        // Nếu copy đủ cột từ Excel (Cột 1: ID, Cột 2: Tên, Cột 3: Ngày sinh...)
+        if (parts.length >= 2 && parts[0].trim().toUpperCase().startsWith('HS')) {
+          studentId = parts[0].trim();
+          studentName = parts[1].trim();
+          if (parts[2]) studentDob = parts[2].trim();
+        } else if (parts.length >= 2 && !isNaN(parts[0].trim())) {
+          // Trường hợp Cột 1 là STT số, Cột 2 là Họ tên, Cột 3 là Ngày sinh
+          studentName = parts[1].trim();
+          if (parts[2]) studentDob = parts[2].trim();
+        } else {
+          // Trường hợp chỉ có mỗi Họ và Tên
+          studentName = parts[0].trim();
+        }
+
+        // Tự sinh mã nếu chưa có
+        if (!studentId) {
+          studentId = prefix + String(startNum).padStart(2, '0');
+          startNum++;
+        }
+
+        if (studentName) {
+          parsedStudents.push({
+            id: studentId,
+            name: studentName,
+            className: targetClass,
+            dob: studentDob,
+            conduct: defaultConduct,
+            academic: "Đạt",
+            isBanTru: isBT,
+            isHaiBuoi: is2B
+          });
+        }
+      });
+
+      renderPreview();
+    }
+
+    function renderPreview() {
+      const body = document.getElementById('previewBody');
+      const countEl = document.getElementById('previewCount');
+      countEl.innerText = parsedStudents.length + " học sinh";
+
+      if (parsedStudents.length === 0) {
+        body.innerHTML = '<tr><td colspan="9" class="p-4 text-muted">Chưa có dữ liệu xử lý. Vui lòng dán danh sách và bấm "XỬ LÝ & XEM TRƯỚC".</td></tr>';
+        return;
+      }
+
+      let html = '';
+      parsedStudents.forEach((s, idx) => {
+        html += `
+          <tr>
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td><input type="text" class="form-control form-control-sm text-center fw-bold text-primary" value="${s.id}" onchange="parsedStudents[${idx}].id = this.value"></td>
+            <td class="text-start ps-3"><input type="text" class="form-control form-control-sm fw-bold text-dark" value="${s.name}" onchange="parsedStudents[${idx}].name = this.value"></td>
+            <td class="fw-bold text-secondary">${s.className}</td>
+            <td><input type="text" class="form-control form-control-sm text-center" value="${s.dob}" placeholder="dd/mm/yyyy" onchange="parsedStudents[${idx}].dob = this.value"></td>
+            <td><span class="badge bg-success bg-opacity-10 text-success">${s.conduct}</span></td>
+            <td>${s.isBanTru ? '<span class="text-primary fw-bold">X</span>' : '—'}</td>
+            <td>${s.isHaiBuoi ? '<span class="text-success fw-bold">X</span>' : '—'}</td>
+            <td>
+              <button onclick="removeRow(${idx})" class="btn btn-sm btn-link text-danger p-0" title="Xóa dòng này">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      body.innerHTML = html;
+    }
+
+    function removeRow(idx) {
+      parsedStudents.splice(idx, 1);
+      renderPreview();
+    }
+
+    // LƯU HÀNG LOẠT VÀO SHEET STUDENTS
+    async function saveStudentsToSheet() {
+      const targetClass = document.getElementById('targetClass').value.trim();
+      const isOverwrite = document.getElementById('chkOverwrite').checked;
+
+      if (!targetClass) return alert("Vui lòng chọn hoặc nhập tên Lớp!");
+      if (parsedStudents.length === 0) return alert("Bảng xem trước chưa có học sinh nào!");
+
+      if (isOverwrite) {
+        if (!confirm(`⚠️ CẢNH BÁO: Thầy đã chọn GHI ĐÈ! Toàn bộ học sinh cũ của lớp [${targetClass}] trong sheet STUDENTS sẽ bị xóa và thay thế bằng danh sách mới này. Thầy có chắc chắn tiếp tục?`)) {
+          return;
+        }
+      }
+
+      const btn = document.getElementById('btnSave');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu vào Sheet...';
+
+      try {
+        const msg = await callApi('saveBatchStudents', targetClass, parsedStudents, isOverwrite);
+        alert(msg);
+        clearInput();
+        clearPreview();
+      } catch (err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+  </script>
+</body>
+</html>
