@@ -414,6 +414,10 @@
         <div id="tab-class_fund_management" class="content-tab d-none" style="height: 85vh;">
           <iframe id="iframe-classfund" src="thuchiquylop2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
         </div>
+        <!-- TAB THIẾT BỊ PHÒNG MÁY (NHÚNG thietbiphongmay2627.html) -->
+        <div id="tab-lab_equipment_manager" class="content-tab d-none" style="height: 85vh;">
+          <iframe id="iframe-labequipment" src="thietbiphongmay2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
+        </div>
         
 
 
@@ -1414,6 +1418,13 @@
           var menuText = el ? el.innerText.toLowerCase() : '';
           if (id.includes('fund') || id.includes('thu_chi') || menuText.includes('thu chi quỹ lớp')) {
             target = document.getElementById('tab-class_fund_management');
+          }
+        }
+        // TỰ ĐỘNG BẬT TAB THIẾT BỊ PHÒNG MÁY
+        if (!target) {
+          var menuText = el ? el.innerText.toLowerCase() : '';
+          if (id.includes('equipment') || id.includes('thiet_bi') || menuText.includes('thiết bị phòng máy')) {
+            target = document.getElementById('tab-lab_equipment_manager');
           }
         }
         
