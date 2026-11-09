@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sổ Đầu Bài 2627 - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 15px rgba(5, 150, 105, 0.2);
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      vertical-align: middle;
+      padding: 8px 4px;
+    }
+    .sodb-input {
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 4px;
+      font-size: 12px;
+      width: 100%;
+      height: 100%;
+      padding: 6px 4px;
+      outline: none;
+      transition: all 0.15s;
+    }
+    .sodb-input:focus {
+      background: #ffffff;
+      border-color: #059669;
+      box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.15);
+    }
+    .score-input {
+      font-weight: 700;
+      text-align: center;
+    }
+    .session-badge {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .print-footer { display: flex !important; }
+      .panel-box { border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; }
+      .sodb-input { border: none !important; font-size: 11px !important; }
+      @page { size: landscape; margin: 8mm; }
+    }
+    .print-header { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- THANH TIÊU ĐỀ & ĐIỀU HƯỚNG BỘ LỌC (ẨN KHI IN) -->
+    <div class="header-banner mb-3 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-book-reader me-1"></i>HỌC KỲ I & II</span>
+          <span class="opacity-75 small">Đồng bộ Sheet: <b>SODB_DATA</b></span>
+        </div>
+        <h4 class="fw-bold mb-0">SỔ ĐẦU BÀI ĐIỆN TỬ NĂM HỌC 2026 - 2027</h4>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Lớp:</span>
+        <select id="selClass" class="form-select form-select-sm border-0 fw-bold text-success" style="width: 120px;" onchange="loadSODB()">
+          <option value="">-- Chọn lớp --</option>
+        </select>
+
+        <span class="small fw-bold text-dark ps-2">Ngày:</span>
+        <input type="date" id="selDate" class="form-control form-control-sm border-0 fw-bold" style="width: 130px;" onchange="onDateChange()">
+
+        <span id="badgeDayOfWeek" class="badge bg-success bg-opacity-10 text-success fw-bold px-2 py-1">Thứ ...</span>
+
+        <div class="input-group input-group-sm" style="width: 120px;">
+          <span class="input-group-text bg-light border-0 fw-bold small">Tuần</span>
+          <input type="number" id="inpWeek" class="form-control border-0 text-center fw-bold text-danger" min="1" max="35" value="1" onchange="loadSODB()">
+        </div>
+
+        <button onclick="saveSODB()" id="btnSave" class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm">
+          <i class="fas fa-save me-1"></i> LƯU SỔ
+        </button>
+
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In sổ A4
+        </button>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN RA GIẤY A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header text-center mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">Lớp: <b class="text-dark fs-5" id="printClassName">...</b></div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+          <div class="small fst-italic">Tuần: <b class="text-dark" id="printWeekNum">1</b> | <span id="printDayOfWeek">Thứ Hai</span></div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">SỔ GHI ĐẦU BÀI GIẢNG DẠY</h3>
+      <p class="text-secondary small fst-italic">Ngày thực hiện: <b class="text-dark" id="printFormattedDate">...</b> | GVCN: <b>Thầy Võ Tâm Long</b></p>
+      <hr>
+    </div>
+
+    <!-- BẢNG NHẬP SỔ ĐẦU BÀI 15 CỘT (A - O) -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle mb-0 text-center" id="sodbTable" style="min-width: 1200px;">
+          <thead>
+            <tr>
+              <th style="width: 65px;">BUỔI</th>
+              <th style="width: 50px;">TIẾT</th>
+              <th style="width: 130px;">MÔN HỌC (F)</th>
+              <th style="width: 60px;">PPCT (G)</th>
+              <th style="width: 160px;">HỌC SINH VẮNG (H)</th>
+              <th class="text-start ps-2" style="width: 250px;">TÊN BÀI DẠY / NỘI DUNG (I)</th>
+              <th class="text-start ps-2">NHẬN XÉT CỦA GIÁO VIÊN (J)</th>
+              <th style="width: 45px;" title="Điểm Học tập">HT</th>
+              <th style="width: 45px;" title="Điểm Kỷ luật">KL</th>
+              <th style="width: 45px;" title="Điểm Vệ sinh">VS</th>
+              <th style="width: 55px;" class="text-primary fw-bold" title="Tổng điểm">TỔNG</th>
+              <th style="width: 110px;">KÝ TÊN (O)</th>
+            </tr>
+          </thead>
+          <tbody id="sodbTableBody">
+            <!-- 10 dòng: 5 Sáng + 5 Chiều -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHỮ KÝ BGH VÀ TỔ TRƯỞNG KHI IN RA A4 (CHỈ HIỆN KHI IN) -->
+    <div class="row mt-4 pt-3 text-center print-footer d-none">
+      <div class="col-4">
+        <p class="fw-bold mb-1">TỔ TRƯỞNG CHUYÊN MÔN</p>
+        <small class="text-muted">(Kiểm tra, ký duyệt)</small>
+      </div>
+      <div class="col-4">
+        <p class="fw-bold mb-1">GIÁO VIÊN CHỦ NHIỆM</p>
+        <small class="text-muted">(Ký và ghi rõ họ tên)</small>
+        <div class="mt-5 fw-bold">Thầy Võ Tâm Long</div>
+      </div>
+      <div class="col-4">
+        <p class="fw-bold mb-1">BAN GIÁM HIỆU DUYỆT</p>
+        <small class="text-muted">(Ký và đóng dấu)</small>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Nhận link API từ trang mẹ nếu có, hoặc dùng link chính thức
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbybogfYjelinv875N7G_9UsuhOcLWw9cYJgVFxXCVIYyHPSAL1_vo7j4sfRsqc7h6MFFQ/exec";
+
+    const DAY_NAMES = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      // Đặt ngày hôm nay mặc định
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('selDate').value = today;
+      updateDayAndWeekInfo(today);
+
+      renderEmptyGrid();
+
+      try {
+        const classes = await callApi('getAllClasses');
+        const selC = document.getElementById('selClass');
+        let hC = '<option value="">-- Chọn lớp --</option>';
+        (classes || []).forEach(c => hC += `<option value="${c}">${c}</option>`);
+        selC.innerHTML = hC;
+
+        if (classes && classes.length > 0) {
+          selC.value = classes[0];
+          await loadSODB();
+        }
+      } catch (e) {
+        console.error("Lỗi nạp lớp:", e);
+      }
+    };
+
+    function onDateChange() {
+      const dVal = document.getElementById('selDate').value;
+      if (!dVal) return;
+      updateDayAndWeekInfo(dVal);
+      loadSODB();
+    }
+
+    // TÍNH TOÁN THỨ VÀ TUẦN DỰA THEO NGÀY
+    function updateDayAndWeekInfo(dateStr) {
+      const d = new Date(dateStr);
+      const dayName = DAY_NAMES[d.getDay()];
+      document.getElementById('badgeDayOfWeek').innerText = dayName;
+      document.getElementById('printDayOfWeek').innerText = dayName;
+
+      // Ước lượng tuần học bắt đầu từ 01/09
+      const startSchool = new Date(d.getFullYear(), 8, 1);
+      let diffDays = Math.floor((d - startSchool) / (7 * 24 * 60 * 60 * 1000)) + 1;
+      let weekVal = (diffDays > 0 && diffDays <= 35) ? diffDays : 1;
+      document.getElementById('inpWeek').value = weekVal;
+      document.getElementById('printWeekNum').innerText = weekVal;
+
+      let parts = dateStr.split('-');
+      document.getElementById('printFormattedDate').innerText = `${parts[2]}/${p[1]}/${p[0]}`;
+    }
+
+    // KHỞI TẠO BẢNG 10 TIẾT
+    function renderEmptyGrid() {
+      const body = document.getElementById('sodbTableBody');
+      let html = '';
+
+      for (let i = 1; i <= 10; i++) {
+        let isMorn = (i <= 5);
+        let tNum = isMorn ? i : (i - 5);
+        let periodName = "Tiết " + tNum + (isMorn ? " sáng" : " chiều");
+
+        html += `
+          <tr class="sodb-row" data-period="${periodName}">
+            ${tNum === 1 ? `<td rowspan="5" class="align-middle fw-bold bg-light session-badge ${isMorn ? 'text-primary' : 'text-danger'}">${isMorn ? 'SÁNG' : 'CHIỀU'}</td>` : ''}
+            <td class="bg-light fw-bold">${tNum}</td>
+            <td class="p-0"><input type="text" class="sodb-input inp-mon text-center fw-bold" placeholder="Môn..."></td>
+            <td class="p-0"><input type="text" class="sodb-input inp-ppct text-center" placeholder="..."></td>
+            <td class="p-0"><textarea class="sodb-input inp-vang text-danger" rows="1" placeholder="Vắng..."></textarea></td>
+            <td class="p-0"><input type="text" class="sodb-input inp-noidung text-start ps-2" placeholder="Tên bài dạy..."></td>
+            <td class="p-0"><input type="text" class="sodb-input inp-nhanxet text-start ps-2" placeholder="Nhận xét tiết học..."></td>
+            <td class="p-0"><input type="number" class="sodb-input score-input inp-ht" value="10" min="0" max="10" oninput="calcRowTotal(this)"></td>
+            <td class="p-0"><input type="number" class="sodb-input score-input inp-kl" value="10" min="0" max="10" oninput="calcRowTotal(this)"></td>
+            <td class="p-0"><input type="number" class="sodb-input score-input inp-vs" value="10" min="0" max="10" oninput="calcRowTotal(this)"></td>
+            <td class="align-middle fw-bold text-primary cell-tong">30</td>
+            <td class="p-0"><input type="text" class="sodb-input inp-ky text-center" value="Võ Tâm Long"></td>
+          </tr>
+        `;
+      }
+
+      body.innerHTML = html;
+    }
+
+    // TÍNH TỔNG ĐIỂM HT + KL + VS
+    function calcRowTotal(el) {
+      const tr = el.closest('tr');
+      const ht = parseInt(tr.querySelector('.inp-ht').value) || 0;
+      const kl = parseInt(tr.querySelector('.inp-kl').value) || 0;
+      const vs = parseInt(tr.querySelector('.inp-vs').value) || 0;
+      tr.querySelector('.cell-tong').innerText = ht + kl + vs;
+    }
+
+    // TẢI DỮ LIỆU TỪ SHEET SODB_DATA
+    async function loadSODB() {
+      const className = document.getElementById('selClass').value;
+      const dateVal = document.getElementById('selDate').value;
+      const weekVal = document.getElementById('inpWeek').value;
+
+      if (!className || !dateVal) return;
+
+      document.getElementById('printClassName').innerText = className;
+      document.getElementById('printWeekNum').innerText = weekVal;
+
+      try {
+        const res = await callApi('getSODB2627Data', className, dateVal, weekVal);
+        if (!res || res.error) return;
+
+        // Reset về rỗng
+        document.querySelectorAll('.sodb-row').forEach(tr => {
+          tr.querySelector('.inp-mon').value = "";
+          tr.querySelector('.inp-ppct').value = "";
+          tr.querySelector('.inp-vang').value = "";
+          tr.querySelector('.inp-noidung').value = "";
+          tr.querySelector('.inp-nhanxet').value = "";
+          tr.querySelector('.inp-ht').value = "10";
+          tr.querySelector('.inp-kl').value = "10";
+          tr.querySelector('.inp-vs').value = "10";
+          tr.querySelector('.cell-tong').innerText = "30";
+          tr.querySelector('.inp-ky').value = "Võ Tâm Long";
+        });
+
+        // Điền học sinh vắng tự động từ Điểm danh nếu có
+        if (res.absents) {
+          document.querySelectorAll('.sodb-row').forEach(tr => {
+            let pName = tr.getAttribute('data-period');
+            if (res.absents[pName]) {
+              tr.querySelector('.inp-vang').value = res.absents[pName].join(', ');
+            }
+          });
+        }
+
+        // Điền các tiết đã lưu trong sheet SODB_DATA
+        (res.saved || []).forEach(r => {
+          document.querySelectorAll('.sodb-row').forEach(tr => {
+            if (tr.getAttribute('data-period') === r.periodName) {
+              tr.querySelector('.inp-mon').value = r.subject || "";
+              tr.querySelector('.inp-ppct').value = r.ppct || "";
+              if (r.absent) tr.querySelector('.inp-vang').value = r.absent;
+              tr.querySelector('.inp-noidung').value = r.lessonName || "";
+              tr.querySelector('.inp-nhanxet').value = r.comment || "";
+              tr.querySelector('.inp-ht').value = r.scoreHT || "10";
+              tr.querySelector('.inp-kl').value = r.scoreKL || "10";
+              tr.querySelector('.inp-vs').value = r.scoreVS || "10";
+              tr.querySelector('.cell-tong').innerText = r.totalScore || "30";
+              tr.querySelector('.inp-ky').value = r.sign || "Võ Tâm Long";
+            }
+          });
+        });
+
+      } catch (err) {
+        console.error("Lỗi nạp SĐB:", err);
+      }
+    }
+
+    // LƯU DỮ LIỆU ĐỦ 15 CỘT A-O VÀO SHEET SODB_DATA
+    async function saveSODB() {
+      const className = document.getElementById('selClass').value;
+      const dateVal = document.getElementById('selDate').value;
+      const weekVal = document.getElementById('inpWeek').value;
+      const dayOfWeek = document.getElementById('badgeDayOfWeek').innerText;
+
+      if (!className) return alert("Vui lòng chọn lớp!");
+      if (!dateVal) return alert("Vui lòng chọn ngày!");
+
+      let p = dateVal.split('-');
+      let formattedDate = `${p[2]}/${p[1]}/${p[0]}`;
+
+      let rowsToSave = [];
+      document.querySelectorAll('.sodb-row').forEach(tr => {
+        let mon = tr.querySelector('.inp-mon').value.trim();
+        // Chỉ lưu những tiết có nhập Môn hoặc Nội dung
+        if (mon || tr.querySelector('.inp-noidung').value.trim()) {
+          rowsToSave.push([
+            weekVal,                                         // A: Tuần
+            dayOfWeek,                                       // B: Thứ
+            formattedDate,                                   // C: Ngay
+            className,                                       // D: Lop
+            tr.getAttribute('data-period'),                  // E: Tiet
+            mon,                                             // F: Mon
+            tr.querySelector('.inp-ppct').value.trim(),      // G: PPCT
+            tr.querySelector('.inp-vang').value.trim(),      // H: Vang
+            tr.querySelector('.inp-noidung').value.trim(),   // I: NoiDung
+            tr.querySelector('.inp-nhanxet').value.trim(),   // J: NhanXet
+            tr.querySelector('.inp-ht').value,               // K: Diem_HT
+            tr.querySelector('.inp-kl').value,               // L: Diem_KL
+            tr.querySelector('.inp-vs').value,               // M: Diem_VS
+            tr.querySelector('.cell-tong').innerText,        // N: Tong
+            tr.querySelector('.inp-ky').value.trim()         // O: KyTen
+          ]);
+        }
+      });
+
+      if (rowsToSave.length === 0) return alert("Thầy chưa nhập môn hoặc nội dung tiết dạy nào!");
+
+      const btn = document.getElementById('btnSave');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      try {
+        const msg = await callApi('saveSODB2627Data', rowsToSave);
+        alert(msg);
+        await loadSODB();
+      } catch (err) {
+        alert("Lỗi khi lưu: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+  </script>
+</body>
+</html>
