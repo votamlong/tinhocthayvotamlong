@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Ô Chữ Kỳ Diệu - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
+    }
+    .puzzle-grid {
+      display: inline-grid;
+      gap: 4px;
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 14px;
+      border: 2px solid #cbd5e1;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .grid-cell {
+      width: 38px;
+      height: 38px;
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.1s;
+    }
+    .grid-cell:hover {
+      background: #e0f2fe;
+      border-color: #0284c7;
+    }
+    .grid-cell.selected {
+      background: #bae6fd !important;
+      border-color: #0284c7 !important;
+      color: #0369a1 !important;
+    }
+    .grid-cell.found {
+      background: #dcfce7 !important;
+      border-color: #10b981 !important;
+      color: #15803d !important;
+    }
+    .task-badge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .task-badge.done {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #047857;
+      text-decoration: line-through;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- TIÊU ĐỀ -->
+    <div class="header-banner mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-white text-dark fw-bold px-2 py-1"><i class="fas fa-puzzle-piece me-1"></i>WORD SEARCH</span>
+          <span class="opacity-75 small">Lưu kết quả vào Sheet: <b>GAME_O_CHU_KY_DIEU_2627</b></span>
+        </div>
+        <h4 class="fw-bold mb-0">GAME Ô CHỮ KỲ DIỆU (TÌM TỪ ẨN)</h4>
+      </div>
+      <div class="badge bg-white text-dark px-3 py-2 fw-bold fs-6 shadow-sm">
+        Năm học 2026 - 2027
+      </div>
+    </div>
+
+    <div class="row g-3">
+      
+      <!-- CỘT TRÁI: CÀI ĐẶT & DANH SÁCH TỪ KHÓA -->
+      <div class="col-lg-4">
+        <div class="panel-box mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold text-dark m-0 text-uppercase"><i class="fas fa-th me-1 text-warning"></i> Tạo Ma Trận Ô Chữ</h6>
+            <button onclick="toggleSidebar()" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 11px;">Thu gọn</button>
+          </div>
+
+          <div id="sidebarSettings">
+            <div class="mb-2">
+              <label class="small fw-bold text-secondary mb-1">1. Danh sách từ khóa (Mỗi từ 1 dòng):</label>
+              <textarea id="txtKeywords" class="form-control form-control-sm font-monospace fw-bold" rows="7">RAM
+CPU
+ROM
+CHUOT
+BANPHIM
+MONITOR</textarea>
+              <small class="text-muted" style="font-size: 11px;">* Không dấu, viết liền sát nhau.</small>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="small fw-bold text-secondary mb-1">Kích thước bảng:</label>
+                <select id="selSize" class="form-select form-select-sm fw-bold">
+                  <option value="10">10 x 10</option>
+                  <option value="12" selected>12 x 12 (Chuẩn)</option>
+                  <option value="14">14 x 14</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="small fw-bold text-secondary mb-1">Thời gian đếm:</label>
+                <select id="selTimer" class="form-select form-select-sm fw-bold">
+                  <option value="180">3 Phút</option>
+                  <option value="300" selected>5 Phút</option>
+                  <option value="600">10 Phút</option>
+                </select>
+              </div>
+            </div>
+
+            <button onclick="generatePuzzle()" class="btn btn-primary btn-sm w-100 fw-bold rounded-pill py-2 shadow-sm">
+              <i class="fas fa-sync-alt me-1"></i> SINH MA TRẬN & BẮT ĐẦU CHƠI
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-box">
+          <h6 class="fw-bold text-dark mb-2 text-uppercase" style="font-size: 12px;"><i class="fas fa-info-circle me-1 text-primary"></i> Hướng dẫn chơi</h6>
+          <p class="text-secondary small mb-0">
+            Kéo chuột từ ô đầu đến ô cuối theo chiều <b>Ngang, Dọc hoặc Chéo</b> để chọn từ. Hệ thống sẽ tự động nhận diện từ khóa chính xác.
+          </p>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: MÀN HÌNH CHƠI CHÍNH -->
+      <div class="col-lg-8">
+        <div class="panel-box mb-3">
+          
+          <!-- THANH THỜI GIAN & TIẾN ĐỘ -->
+          <div class="d-flex flex-wrap justify-content-between align-items-center bg-light p-3 rounded-4 mb-4 border gap-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-danger fs-6 px-3 py-2" id="timerBadge"><i class="fas fa-clock me-1"></i> 05:00</span>
+              <span class="fw-bold text-secondary small" id="progressText">Đã tìm: 0 / 0 từ</span>
+            </div>
+            <div class="d-flex gap-2">
+              <button onclick="revealAnswers()" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold">
+                <i class="fas fa-key me-1"></i> Hiện đáp án
+              </button>
+              <button onclick="saveRecordToSheet()" class="btn btn-sm btn-success rounded-pill px-3 fw-bold shadow-sm">
+                <i class="fas fa-cloud-upload-alt me-1"></i> Lưu kết quả vào Sheet
+              </button>
+            </div>
+          </div>
+
+          <!-- KHUNG LƯỚI MA TRẬN Ô CHỮ & NHIỆM VỤ TÌM TỪ -->
+          <div class="row g-4 align-items-start">
+            
+            <div class="col-xl-7 text-center overflow-auto">
+              <div id="gridWrapper" class="d-inline-block">
+                <span class="text-muted fst-italic">Bấm "SINH MA TRẬN & BẮT ĐẦU CHƠI" để hiển thị bảng ô chữ.</span>
+              </div>
+            </div>
+
+            <div class="col-xl-5">
+              <h6 class="fw-bold text-dark mb-3 text-uppercase" style="font-size: 13px;"><i class="fas fa-search me-1 text-primary"></i> Nhiệm vụ tìm từ:</h6>
+              <div id="wordTaskList">
+                <!-- Render qua JS -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbzjQPO_AfYLAgZhu78ptIghWfVJtYkqqAP3ys3MNPzc8Owv1x1YoZpQ0ymxLLBgrzo-Tw/exec";
+
+    let puzzleData = {
+      size: 12,
+      words: [],
+      grid: [],
+      foundWords: [],
+      timerSeconds: 300,
+      timeLeft: 300,
+      timerInterval: null,
+      isStarted: false,
+      isMouseDown: false,
+      startCell: null,
+      selectedCells: []
+    };
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = function() {
+      generatePuzzle();
+    };
+
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebarSettings');
+      sb.classList.toggle('d-none');
+    }
+
+    function generatePuzzle() {
+      const rawText = document.getElementById('txtKeywords').value.trim();
+      puzzleData.words = rawText.split('\n').map(w => w.trim().toUpperCase()).filter(Boolean);
+      puzzleData.size = parseInt(document.getElementById('selSize').value) || 12;
+      puzzleData.timerSeconds = parseInt(document.getElementById('selTimer').value) || 300;
+      puzzleData.timeLeft = puzzleData.timerSeconds;
+      puzzleData.foundWords = [];
+      puzzleData.isStarted = true;
+
+      if (puzzleData.words.length === 0) return alert("Vui lòng nhập ít nhất một từ khóa!");
+
+      buildGrid();
+      renderGridUI();
+      renderTaskListUI();
+      startTimer();
+    }
+
+    function buildGrid() {
+      let size = puzzleData.size;
+      let grid = Array(size).fill(null).map(() => Array(size).fill(''));
+
+      // Sắp xếp từ dài đến ngắn để đặt trước
+      let sortedWords = [...puzzleData.words].sort((a,b) => b.length - a.length);
+
+      sortedWords.forEach(word => {
+        let placed = false;
+        let attempts = 0;
+        while (!placed && attempts < 100) {
+          attempts++;
+          let dir = Math.floor(Math.random() * 3); // 0: Ngang, 1: Dọc, 2: Chéo
+          let r = Math.floor(Math.random() * size);
+          let c = Math.floor(Math.random() * size);
+
+          let dr = 0, dc = 0;
+          if (dir === 0) dc = 1;      // Ngang
+          else if (dir === 1) dr = 1; // Dọc
+          else { dr = 1; dc = 1; }    // Chéo
+
+          if (r + dr * (word.length - 1) < size && c + dc * (word.length - 1) < size) {
+            let canPlace = true;
+            for (let i = 0; i < word.length; i++) {
+              let cur = grid[r + dr * i][c + dc * i];
+              if (cur !== '' && cur !== word[i]) {
+                canPlace = false;
+                break;
+              }
+            }
+            if (canPlace) {
+              for (let i = 0; i < word.length; i++) {
+                grid[r + dr * i][c + dc * i] = word[i];
+              }
+              placed = true;
+            }
+          }
+        }
+      });
+
+      // Điền ký tự ngẫu nhiên vào ô trống
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (!grid[r][c]) {
+            grid[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
+          }
+        }
+      }
+
+      puzzleData.grid = grid;
+    }
+
+    function renderGridUI() {
+      const wrapper = document.getElementById('gridWrapper');
+      let size = puzzleData.size;
+      let html = `<div class="puzzle-grid" style="grid-template-columns: repeat(${size}, 38px);">`;
+
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          html += `<div class="grid-cell" data-r="${r}" data-c="${c}" 
+                       onmousedown="onCellDown(${r}, ${c})" 
+                       onmouseover="onCellOver(${r}, ${c})" 
+                       onmouseup="onCellUp()">${puzzleData.grid[r][c]}</div>`;
+        }
+      }
+      html += `</div>`;
+      wrapper.innerHTML = html;
+    }
+
+    function renderTaskListUI() {
+      const container = document.getElementById('wordTaskList');
+      let html = '';
+      puzzleData.words.forEach((w, idx) => {
+        let isFound = puzzleData.foundWords.includes(w);
+        html += `
+          <div class="task-badge ${isFound ? 'done' : ''}" id="task_word_${idx}">
+            <span><b class="me-2">${idx + 1}</b> ${w}</span>
+            <i class="fas ${isFound ? 'fa-check-circle text-success' : 'fa-circle text-muted'}"></i>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+      document.getElementById('progressText').innerText = `Đã tìm: ${puzzleData.foundWords.length} / ${puzzleData.words.length} từ`;
+    }
+
+    function startTimer() {
+      clearInterval(puzzleData.timerInterval);
+      updateTimerUI();
+
+      puzzleData.timerInterval = setInterval(() => {
+        puzzleData.timeLeft--;
+        updateTimerUI();
+        if (puzzleData.timeLeft <= 0) {
+          clearInterval(puzzleData.timerInterval);
+          alert("⏱️ HẾT GIỜ! Thời gian tìm ô chữ đã kết thúc.");
+        }
+      }, 1000);
+    }
+
+    function updateTimerUI() {
+      let m = Math.floor(puzzleData.timeLeft / 60);
+      let s = puzzleData.timeLeft % 60;
+      document.getElementById('timerBadge').innerHTML = `<i class="fas fa-clock me-1"></i> ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+
+    // XỬ LÝ KÉO CHUỘT CHỌN Ô CHỮ
+    function onCellDown(r, c) {
+      puzzleData.isMouseDown = true;
+      puzzleData.startCell = {r, c};
+      puzzleData.selectedCells = [{r, c}];
+      highlightSelection();
+    }
+
+    function onCellOver(r, c) {
+      if (!puzzleData.isMouseDown) return;
+      let start = puzzleData.startCell;
+      
+      // Tính toán đường đi thẳng (Ngang, Dọc, Chéo)
+      let dr = r - start.r;
+      let dc = c - start.c;
+      let steps = Math.max(Math.abs(dr), Math.abs(dc));
+
+      if (steps === 0) {
+        puzzleData.selectedCells = [start];
+      } else {
+        let stepR = dr === 0 ? 0 : dr / Math.abs(dr);
+        let stepC = dc === 0 ? 0 : dc / Math.abs(dc);
+
+        // Chỉ cho phép chọn thẳng hàng ngang, dọc hoặc chéo chuẩn 45 độ
+        if (stepR === 0 || stepC === 0 || Math.abs(dr) === Math.abs(dc)) {
+          let cells = [];
+          for (let i = 0; i <= steps; i++) {
+            cells.push({r: start.r + stepR * i, c: start.c + stepC * i});
+          }
+          puzzleData.selectedCells = cells;
+        }
+      }
+      highlightSelection();
+    }
+
+    function onCellUp() {
+      if (!puzzleData.isMouseDown) return;
+      puzzleData.isMouseDown = false;
+
+      // Ghép các ký tự thành từ được chọn
+      let selectedWord = puzzleData.selectedCells.map(cell => puzzleData.grid[cell.r][cell.c]).join('');
+      let reverseWord = selectedWord.split('').reverse().join('');
+
+      let matchedWord = null;
+      if (puzzleData.words.includes(selectedWord) && !puzzleData.foundWords.includes(selectedWord)) {
+        matchedWord = selectedWord;
+      } else if (puzzleData.words.includes(reverseWord) && !puzzleData.foundWords.includes(reverseWord)) {
+        matchedWord = reverseWord;
+      }
+
+      if (matchedWord) {
+        puzzleData.foundWords.push(matchedWord);
+        markFoundCells();
+        renderTaskListUI();
+
+        if (puzzleData.foundWords.length === puzzleData.words.length) {
+          clearInterval(puzzleData.timerInterval);
+          if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+          alert("🎉 XUẤT SẮC! Đã tìm thấy tất cả các từ trong bảng ô chữ!");
+        }
+      }
+
+      puzzleData.selectedCells = [];
+      highlightSelection();
+    }
+
+    function highlightSelection() {
+      document.querySelectorAll('.grid-cell').forEach(cell => {
+        let r = parseInt(cell.dataset.r);
+        let c = parseInt(cell.dataset.c);
+        let isSel = puzzleData.selectedCells.some(cell => cell.r === r && cell.c === c);
+        if (isSel && !cell.classList.contains('found')) {
+          cell.classList.add('selected');
+        } else if (!cell.classList.contains('found')) {
+          cell.classList.remove('selected');
+        }
+      });
+    }
+
+    function markFoundCells() {
+      // Đánh dấu vĩnh viễn các ô thuộc từ đã tìm thấy
+      // Đơn giản hóa bằng cách giữ class .found trên ô đang được chọn đúng
+      document.querySelectorAll('.grid-cell.selected').forEach(cell => {
+        cell.classList.remove('selected');
+        cell.classList.add('found');
+      });
+    }
+
+    function revealAnswers() {
+      puzzleData.foundWords = [...puzzleData.words];
+      renderTaskListUI();
+      document.querySelectorAll('.grid-cell').forEach(cell => {
+        cell.classList.add('found');
+      });
+      clearInterval(puzzleData.timerInterval);
+    }
+
+    // LƯU KẾT QUẢ VÀO GOOGLE SHEETS
+    async function saveRecordToSheet() {
+      if (!puzzleData.isStarted) return alert("Chưa có ván chơi nào!");
+
+      let resultStatus = puzzleData.foundWords.length === puzzleData.words.length ? "Hoàn thành xuất sắc" : "Đang chơi dở";
+      let timeSpentSec = puzzleData.timerSeconds - puzzleData.timeLeft;
+      let m = Math.floor(timeSpentSec / 60);
+      let s = timeSpentSec % 60;
+      let timeStr = `${m} phút ${s} giây`;
+
+      const item = {
+        keywords: puzzleData.words.join(", "),
+        foundCount: puzzleData.foundWords.length,
+        totalCount: puzzleData.words.length,
+        result: resultStatus,
+        timeSpent: timeStr
+      };
+
+      try {
+        const res = await callApi('saveGameOCuRecord2627', item);
+        alert("✅ Đã lưu kết quả ván chơi [Mã: " + res.id + "] vào Sheet GAME_O_CHU_KY_DIEU_2627 thành công!");
+      } catch (err) {
+        alert("Lỗi lưu sheet: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
