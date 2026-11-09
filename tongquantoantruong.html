@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tổng Quan Toàn Trường 2627 - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      color: white;
+      border-radius: 18px;
+      padding: 20px 24px;
+      box-shadow: 0 4px 15px rgba(15, 23, 42, 0.25);
+    }
+    .kpi-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 18px 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.2s ease;
+    }
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+    }
+    .kpi-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      vertical-align: middle;
+      padding: 10px 6px;
+    }
+    .table tbody td {
+      border: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+    .nav-pills .nav-link {
+      font-weight: 700;
+      font-size: 13px;
+      border-radius: 50px;
+      padding: 6px 18px;
+      color: #64748b;
+    }
+    .nav-pills .nav-link.active {
+      background-color: #0f172a;
+      color: #ffffff;
+    }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-header { display: block !important; }
+      .print-footer { display: flex !important; }
+      .panel-box { border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .table { border: 1px solid #000 !important; }
+      .table th, .table td { border: 1px solid #000 !important; color: #000 !important; font-size: 11px !important; }
+      @page { size: landscape; margin: 10mm; }
+    }
+    .print-header { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1400px;">
+    
+    <!-- THANH TIÊU ĐỀ & LỌC NGÀY (ẨN KHI IN) -->
+    <div class="header-banner mb-4 no-print d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fas fa-school me-1"></i>SCHOOL DASHBOARD 2627</span>
+          <span class="opacity-75 small">Tổng hợp dữ liệu: <b>GVCN</b>, <b>STUDENTS</b>, <b>ATTENDANCE</b>, <b>DISCIPLINE</b></span>
+        </div>
+        <h4 class="fw-bold mb-0">TRUNG TÂM ĐIỀU HÀNH & TỔNG QUAN TOÀN TRƯỜNG</h4>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2">Ngày đối soát:</span>
+        <input type="date" id="selDate" class="form-control form-control-sm border-0 fw-bold" style="width: 135px;" onchange="loadDashboardData()">
+
+        <button onclick="loadDashboardData()" class="btn btn-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-sync-alt me-1"></i> Cập nhật
+        </button>
+
+        <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-print me-1"></i> In báo cáo A4
+        </button>
+      </div>
+    </div>
+
+    <!-- 6 THẺ KPI TỔNG QUAN TOÀN TRƯỜNG (ẨN KHI IN) -->
+    <div class="row g-3 mb-4 no-print">
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="kpi-card">
+          <div class="kpi-icon bg-primary bg-opacity-10 text-primary"><i class="fas fa-door-open"></i></div>
+          <div>
+            <div class="small text-muted fw-bold">TỔNG SỐ LỚP</div>
+            <h3 class="fw-bold text-dark mb-0" id="kpiClasses">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="kpi-card">
+          <div class="kpi-icon bg-info bg-opacity-10 text-info"><i class="fas fa-user-graduate"></i></div>
+          <div>
+            <div class="small text-muted fw-bold">TỔNG HỌC SINH</div>
+            <h3 class="fw-bold text-dark mb-0" id="kpiStudents">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="kpi-card">
+          <div class="kpi-icon bg-danger bg-opacity-10 text-danger"><i class="fas fa-user-clock"></i></div>
+          <div>
+            <div class="small text-muted fw-bold">VẮNG HÔM NAY</div>
+            <h3 class="fw-bold text-danger mb-0" id="kpiAbsent">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="kpi-card">
+          <div class="kpi-icon bg-success bg-opacity-10 text-success"><i class="fas fa-star"></i></div>
+          <div>
+            <div class="small text-muted fw-bold">ĐIỂM CỘNG</div>
+            <h3 class="fw-bold text-success mb-0" id="kpiBonus">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="kpi-card">
+          <div class="kpi-icon bg-warning bg-opacity-10 text-warning"><i class="fas fa-exclamation-triangle"></i></div>
+          <div>
+            <div class="small text-muted fw-bold">VI PHẠM NỀ NẾP</div>
+            <h3 class="fw-bold text-warning mb-0" id="kpiDiscipline">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="kpi-card">
+          <div class="kpi-icon bg-danger bg-opacity-10 text-danger"><i class="fas fa-heartbeat"></i></div>
+          <div>
+            <div class="small text-muted fw-bold">TIẾP NHẬN Y TẾ</div>
+            <h3 class="fw-bold text-danger mb-0" id="kpiMedical">0</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIÊU ĐỀ IN BÁO CÁO A4 (CHỈ HIỆN KHI IN) -->
+    <div class="print-header text-center mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase">TRƯỜNG THCS BÌNH TÂN</div>
+          <div class="small">Bộ phận: <b>Ban Giám Hiệu & Quản lý nề nếp</b></div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-uppercase" style="font-size: 13px;">NĂM HỌC 2026 - 2027</div>
+          <div class="small fst-italic">Báo cáo tình hình hoạt động toàn trường</div>
+        </div>
+      </div>
+      <h3 class="fw-bold text-uppercase text-dark mb-1">BẢNG TỔNG HỢP HOẠT ĐỘNG TOÀN TRƯỜNG</h3>
+      <p class="text-secondary small fst-italic">Ngày đối soát: <b class="text-dark" id="printDateStr">...</b> | Người lập: <b>Thầy Võ Tâm Long</b></p>
+      <hr>
+    </div>
+
+    <!-- BẢNG TỔNG HỢP THEO TỪNG LỚP HỌC -->
+    <div class="panel-box p-0 overflow-hidden mb-4">
+      <div class="p-3 bg-light border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 no-print">
+        <ul class="nav nav-pills gap-1" id="gradePills">
+          <li class="nav-item"><button class="nav-link active" onclick="filterGrade('ALL', this)">Tất cả lớp</button></li>
+          <li class="nav-item"><button class="nav-link" onclick="filterGrade('6', this)">Khối 6</button></li>
+          <li class="nav-item"><button class="nav-link" onclick="filterGrade('7', this)">Khối 7 / GDĐP</button></li>
+          <li class="nav-item"><button class="nav-link" onclick="filterGrade('8', this)">Khối 8</button></li>
+          <li class="nav-item"><button class="nav-link" onclick="filterGrade('9', this)">Khối 9</button></li>
+          <li class="nav-item"><button class="nav-link" onclick="filterGrade('QT', this)">Lớp Quốc Tế (QT)</button></li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-2">
+          <input type="text" id="txtSearchClass" class="form-control form-control-sm" placeholder="Tìm tên lớp hoặc GVCN..." oninput="renderTable()" style="width: 220px;">
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 text-center small" id="overviewTable">
+          <thead>
+            <tr>
+              <th style="width: 50px;">STT</th>
+              <th style="width: 120px;">LỚP HỌC</th>
+              <th class="text-start ps-3" style="width: 230px;">GIÁO VIÊN CHỦ NHIỆM (GVCN)</th>
+              <th style="width: 110px;">SĨ SỐ HS</th>
+              <th style="width: 120px;" class="text-danger">VẮNG HÔM NAY</th>
+              <th style="width: 130px;" class="text-success">ĐIỂM CỘNG (+)</th>
+              <th style="width: 120px;" class="text-warning">VI PHẠM NỀ NẾP</th>
+              <th style="width: 110px;" class="text-danger">CA Y TẾ</th>
+              <th style="width: 140px;">ĐÁNH GIÁ NỀ NẾP</th>
+            </tr>
+          </thead>
+          <tbody id="overviewBody">
+            <tr><td colspan="9" class="p-5 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tổng hợp dữ liệu toàn trường từ Google Sheets...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- KHUNG CHỮ KÝ KHI IN BÁO CÁO A4 (CHỈ HIỆN KHI IN) -->
+    <div class="row mt-5 pt-4 text-center print-footer d-none">
+      <div class="col-4">
+        <p class="fw-bold mb-1">TỔNG PHỤ TRÁCH ĐỘI</p>
+        <small class="text-muted">(Ký và ghi rõ họ tên)</small>
+      </div>
+      <div class="col-4">
+        <p class="fw-bold mb-1">NGƯỜI LẬP BÁO CÁO</p>
+        <small class="text-muted">(Ký và ghi rõ họ tên)</small>
+        <div class="mt-5 fw-bold">Thầy Võ Tâm Long</div>
+      </div>
+      <div class="col-4">
+        <p class="fw-bold mb-1">HIỆU TRƯỞNG DUYỆT</p>
+        <small class="text-muted">(Ký và đóng dấu)</small>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbw93rt6Nr-XPP9H1DvvUtmU78McmUXzaUbllUnWscCts-O2O7Gh3mjn9IIn4uxGLvucBw/exec";
+
+    let rawData = null;
+    let currentGradeFilter = 'ALL';
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = function() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('selDate').value = today;
+      loadDashboardData();
+    };
+
+    async function loadDashboardData() {
+      const dateVal = document.getElementById('selDate').value;
+      const body = document.getElementById('overviewBody');
+      body.innerHTML = '<tr><td colspan="9" class="p-5 text-muted"><i class="fas fa-sync fa-spin me-2"></i>Đang tổng hợp dữ liệu từ các sheet: GVCN, STUDENTS, ATTENDANCE, DISCIPLINE...</td></tr>';
+
+      try {
+        rawData = await callApi('getSchoolOverviewData2627', dateVal);
+        if (!rawData || rawData.error) throw new Error(rawData ? rawData.error : "Không có dữ liệu trả về!");
+
+        document.getElementById('printDateStr').innerText = rawData.filterDate || dateVal;
+
+        // Cập nhật 6 thẻ KPI
+        const ov = rawData.overview || {};
+        document.getElementById('kpiClasses').innerText = ov.totalClasses || 0;
+        document.getElementById('kpiStudents').innerText = ov.totalStudents || 0;
+        document.getElementById('kpiAbsent').innerText = ov.totalAbsentToday || 0;
+        document.getElementById('kpiBonus').innerText = "+" + (ov.totalBonus || 0);
+        document.getElementById('kpiDiscipline').innerText = ov.totalDiscipline || 0;
+        document.getElementById('kpiMedical').innerText = ov.totalMedical || 0;
+
+        renderTable();
+      } catch (err) {
+        body.innerHTML = `<tr><td colspan="9" class="p-4 text-danger">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    function filterGrade(grade, el) {
+      currentGradeFilter = grade;
+      document.querySelectorAll('#gradePills .nav-link').forEach(btn => btn.classList.remove('active'));
+      el.classList.add('active');
+      renderTable();
+    }
+
+    function renderTable() {
+      if (!rawData || !rawData.classes) return;
+
+      const body = document.getElementById('overviewBody');
+      const searchTxt = document.getElementById('txtSearchClass').value.trim().toLowerCase();
+
+      let list = rawData.classes.filter(c => {
+        // Lọc theo Khối
+        let matchGrade = true;
+        let cUpper = c.className.toUpperCase();
+        if (currentGradeFilter === '6') matchGrade = cUpper.startsWith('6') && !cUpper.includes('GDDP') && !cUpper.includes('GDĐP');
+        else if (currentGradeFilter === '7') matchGrade = cUpper.startsWith('7') || cUpper.includes('GDDP') || cUpper.includes('GDĐP') || cUpper.includes('67');
+        else if (currentGradeFilter === '8') matchGrade = cUpper.startsWith('8');
+        else if (currentGradeFilter === '9') matchGrade = cUpper.startsWith('9') && !cUpper.includes('QT');
+        else if (currentGradeFilter === 'QT') matchGrade = cUpper.includes('QT');
+
+        // Lọc theo thanh tìm kiếm
+        let matchSearch = !searchTxt || c.className.toLowerCase().includes(searchTxt) || c.gvcn.toLowerCase().includes(searchTxt);
+
+        return matchGrade && matchSearch;
+      });
+
+      if (list.length === 0) {
+        body.innerHTML = '<tr><td colspan="9" class="p-4 text-muted">Không có lớp nào phù hợp tiêu chí lọc.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      list.forEach((c, idx) => {
+        let badgeRating = 'bg-success bg-opacity-10 text-success';
+        if (c.rating.includes('đôn đốc')) badgeRating = 'bg-danger bg-opacity-10 text-danger';
+        else if (c.rating.includes('Xuất sắc')) badgeRating = 'bg-warning bg-opacity-25 text-dark fw-bold';
+
+        html += `
+          <tr>
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td class="fw-bold text-primary fs-6">${c.className}</td>
+            <td class="text-start ps-3 fw-bold text-dark">${c.gvcn}</td>
+            <td class="fw-bold">${c.studentCount} em</td>
+            <td class="${c.absentToday > 0 ? 'text-danger fw-bold' : 'text-muted'}">${c.absentToday > 0 ? c.absentToday + ' em' : '0'}</td>
+            <td class="text-success fw-bold">+${c.totalBonusPoints}</td>
+            <td class="${c.totalDiscipline > 0 ? 'text-warning fw-bold' : 'text-muted'}">${c.totalDiscipline}</td>
+            <td class="${c.totalMedical > 0 ? 'text-danger fw-bold' : 'text-muted'}">${c.totalMedical}</td>
+            <td><span class="badge ${badgeRating} px-2 py-1 rounded-pill">${c.rating}</span></td>
+          </tr>
+        `;
+      });
+
+      body.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
