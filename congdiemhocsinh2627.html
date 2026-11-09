@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cộng Điểm Học Sinh - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .criteria-btn {
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 700;
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-size: 13.5px;
+      transition: all 0.2s;
+    }
+    .criteria-btn.active {
+      background: #059669 !important;
+      border-color: #059669 !important;
+      color: white !important;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    }
+    .history-item {
+      border-left: 4px solid #059669;
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- THANH BANNER ĐẦU TRANG -->
+    <div class="panel-box mb-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-success text-white fw-bold px-2 py-1"><i class="fas fa-star me-1"></i>ĐIỂM THƯỞNG HỌC TẬP</span>
+          <span class="text-muted small">Đồng bộ từ sheet: <b>LOG_DIEMCONG</b> & học sinh sheet <b>STUDENTS</b></span>
+        </div>
+        <h4 class="fw-bold text-dark m-0">CỘNG ĐIỂM THI ĐUA HỌC TẬP 2627</h4>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-2 bg-light p-2 rounded-pill border">
+          <span class="small fw-bold text-dark ps-2"><i class="fas fa-filter text-success me-1"></i> Lớp:</span>
+          <select id="headerClassSelect" class="form-select form-select-sm border-0 fw-bold text-success bg-white shadow-sm" style="width: 130px;" onchange="filterStudentsByClass(this.value)">
+            <option value="6A3">Lớp 6A3</option>
+          </select>
+        </div>
+        <button onclick="openCriteriaModal()" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-plus me-1"></i> Thêm Tiêu Chí Mới
+        </button>
+      </div>
+    </div>
+
+    <!-- KHUNG CHỌN TIÊU CHÍ ĐIỂM CỘNG -->
+    <div class="panel-box mb-4">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <i class="fas fa-bullseye text-danger fs-5"></i>
+        <h6 class="fw-bold text-dark m-0 text-uppercase">Chọn Tiêu Chí Điểm Cộng:</h6>
+      </div>
+      <small class="text-muted d-block mb-3">* Bấm vào nút để chọn tiêu chí muốn cộng trước khi bấm cộng điểm cho học sinh bên dưới.</small>
+
+      <div class="d-flex flex-wrap gap-2" id="criteriaContainer">
+        <button type="button" class="criteria-btn active" onclick="selectCriteria('C01', 'Dơ tay phát biểu', 2, this)">
+          <span class="badge bg-dark bg-opacity-20 me-1">C01</span> Dơ tay phát biểu (+2)
+        </button>
+        <button type="button" class="criteria-btn" onclick="selectCriteria('C02', 'Tích cực', 2, this)">
+          <span class="badge bg-dark bg-opacity-20 me-1">C02</span> Tích cực (+2)
+        </button>
+      </div>
+    </div>
+
+    <!-- NỘI DUNG CHÍNH: 2 CỘT (TRÁI: DANH SÁCH HỌC SINH, PHẢI: LỊCH SỬ GẦN ĐÂY) -->
+    <div class="row g-4">
+      
+      <!-- CỘT TRÁI: DANH SÁCH HỌC SINH -->
+      <div class="col-lg-7">
+        <div class="panel-box">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <h6 class="fw-bold text-dark m-0 text-uppercase">
+              <i class="fas fa-users text-success me-1"></i> Học Sinh Lớp: <span class="badge bg-success" id="lblCurrentClass">6A3</span>
+            </h6>
+            <div class="input-group input-group-sm" style="width: 250px;">
+              <span class="input-group-text bg-light"><i class="fas fa-search"></i></span>
+              <input type="text" id="searchStudentInput" class="form-control" placeholder="Tìm tên học sinh..." oninput="renderStudentTable()">
+            </div>
+          </div>
+
+          <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
+            <table class="table table-hover align-middle mb-0 small text-center">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 50px;">STT</th>
+                  <th style="width: 100px;">Mã HS</th>
+                  <th class="text-start">Họ và Tên Học Sinh</th>
+                  <th style="width: 80px;">Lớp</th>
+                  <th style="width: 120px;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="studentTableBody">
+                <tr><td colspan="5" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải danh sách học sinh từ Sheet STUDENTS...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: LỊCH SỬ GẦN ĐÂY -->
+      <div class="col-lg-5">
+        <div class="panel-box">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <h6 class="fw-bold text-dark m-0 text-uppercase">
+              <i class="fas fa-history text-warning me-1"></i> Lịch Sử Gần Đây
+            </h6>
+            <button onclick="loadHistoryData()" class="btn btn-outline-secondary btn-sm fw-bold" title="Làm mới">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+
+          <div id="historyListContainer" style="max-height: 520px; overflow-y: auto;">
+            <div class="text-center text-muted p-4"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải lịch sử...</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MODAL THÊM TIÊU CHÍ MỚI -->
+  <div class="modal fade" id="criteriaModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-header bg-success text-white p-4">
+          <h5 class="modal-title fw-bold"><i class="fas fa-plus-circle me-2"></i>Thêm Tiêu Chí Điểm Cộng Mới</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4 bg-light">
+          <div class="mb-3">
+            <label class="small fw-bold">Mã Tiêu Chí (Vd: C03)</label>
+            <input type="text" id="newCode" class="form-control fw-bold" value="C03">
+          </div>
+          <div class="mb-3">
+            <label class="small fw-bold">Nội Dung Điểm Cộng</label>
+            <input type="text" id="newContent" class="form-control" placeholder="Vd: Xây dựng bài tốt, Giải bài tập nhanh...">
+          </div>
+          <div class="mb-3">
+            <label class="small fw-bold">Số Điểm Cộng</label>
+            <input type="number" id="newPoints" class="form-control fw-bold text-success" value="2" min="1" max="10">
+          </div>
+        </div>
+        <div class="modal-footer border-0 p-3 bg-white shadow-sm">
+          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-success rounded-pill px-5 shadow fw-bold" onclick="addNewCriteria()">THÊM TIÊU CHÍ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbzIRDhNmd5T-zure66K_Ax0mRKgr2lPbKldLssBrAecswpaBKEz34FhJ6Kfrwjx4Xk9ZQ/exec";
+
+    let allStudents = [];
+    let historyRecords = [];
+    let selectedCriterion = { code: 'C01', content: 'Dơ tay phát biểu', points: 2 };
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      try {
+        // Nạp danh sách lớp từ sheet GVCN hoặc STUDENTS
+        let classes = await callApi('getClassesFromGVCN');
+        if (!classes || classes.length === 0) classes = await callApi('getAllClasses');
+
+        let classOpts = '';
+        (classes || ["6A3"]).forEach(c => classOpts += `<option value="${c}">Lớp ${c}</option>`);
+        document.getElementById('headerClassSelect').innerHTML = classOpts;
+
+        // Nạp toàn bộ học sinh từ sheet STUDENTS
+        allStudents = await callApi('getAllStudents2627') || [];
+        if (allStudents.length === 0) {
+          // Fallback thử hàm cũ nếu có
+          let stData = await callApi('getAllStudents');
+          allStudents = (stData || []).map(s => ({ id: s.id, name: s.name, className: s.className }));
+        }
+
+        if (classes && classes.length > 0) {
+          document.getElementById('headerClassSelect').value = classes[0];
+        }
+
+        renderStudentTable();
+        await loadHistoryData();
+      } catch (err) {
+        console.error("Lỗi khởi tạo cộng điểm:", err);
+      }
+    };
+
+    function filterStudentsByClass(className) {
+      document.getElementById('lblCurrentClass').innerText = className;
+      renderStudentTable();
+    }
+
+    function renderStudentTable() {
+      const currentClass = document.getElementById('headerClassSelect').value;
+      const keyword = document.getElementById('searchStudentInput').value.trim().toLowerCase();
+      const tbody = document.getElementById('studentTableBody');
+
+      let filtered = allStudents.filter(s => {
+        let matchClass = cleanClassName(s.className) === cleanClassName(currentClass);
+        let matchName = !keyword || s.name.toLowerCase().includes(keyword) || s.id.toLowerCase().includes(keyword);
+        return matchClass && matchName;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-muted">Không tìm thấy học sinh nào trong lớp này.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      filtered.forEach((s, idx) => {
+        html += `
+          <tr>
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td class="fw-bold text-secondary">${s.id}</td>
+            <td class="text-start fw-bold text-dark">${s.name}</td>
+            <td><span class="badge bg-secondary px-2">${s.className}</span></td>
+            <td>
+              <button onclick="givePoint('${s.id}', '${s.name}', '${s.className}')" class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm" style="font-size: 11.5px;">
+                <i class="fas fa-plus me-1"></i> Cộng Điểm
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function cleanClassName(str) {
+      return String(str || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+    }
+
+    function selectCriteria(code, content, points, btn) {
+      document.querySelectorAll('.criteria-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedCriterion = { code, content, points };
+    }
+
+    function openCriteriaModal() {
+      new bootstrap.Modal(document.getElementById('criteriaModal')).show();
+    }
+
+    function addNewCriteria() {
+      const code = document.getElementById('newCode').value.trim();
+      const content = document.getElementById('newContent').value.trim();
+      const points = parseInt(document.getElementById('newPoints').value) || 2;
+
+      if (!code || !content) return alert("Vui lòng nhập đầy đủ mã và nội dung tiêu chí!");
+
+      const container = document.getElementById('criteriaContainer');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'criteria-btn active';
+      btn.onclick = function() { selectCriteria(code, content, points, this); };
+      btn.innerHTML = `<span class="badge bg-dark bg-opacity-20 me-1">${code}</span> ${content} (+${points})`;
+
+      document.querySelectorAll('.criteria-btn').forEach(b => b.classList.remove('active'));
+      container.appendChild(btn);
+      selectedCriterion = { code, content, points };
+
+      bootstrap.Modal.getInstance(document.getElementById('criteriaModal')).hide();
+    }
+
+    async function givePoint(studentId, name, className) {
+      const item = {
+        studentId: studentId,
+        name: name,
+        className: className,
+        content: selectedCriterion.content,
+        points: selectedCriterion.points,
+        code: selectedCriterion.code
+      };
+
+      try {
+        const msg = await callApi('saveDiemCongRecord2627', item);
+        if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+        alert(msg);
+        await loadHistoryData();
+      } catch (err) {
+        alert("Lỗi khi cộng điểm: " + err.message);
+      }
+    }
+
+    async function loadHistoryData() {
+      try {
+        historyRecords = await callApi('getLogDiemCong2627') || [];
+        renderHistoryList();
+      } catch (err) {
+        document.getElementById('historyListContainer').innerHTML = `<div class="text-danger text-center p-3">Lỗi tải lịch sử: ${err.message}</div>`;
+      }
+    }
+
+    function renderHistoryList() {
+      const container = document.getElementById('historyListContainer');
+      if (historyRecords.length === 0) {
+        container.innerHTML = '<div class="text-center text-muted p-4">Chưa có lượt cộng điểm nào được ghi nhận.</div>';
+        return;
+      }
+
+      let html = '';
+      historyRecords.slice(0, 15).forEach(r => {
+        html += `
+          <div class="history-item">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="fw-bold text-dark">${r.name} <small class="text-muted">(${r.className})</small></span>
+              <span class="badge bg-success px-2 py-1">+${r.points} điểm</span>
+            </div>
+            <div class="small text-secondary mb-1"><b>${r.content}</b> <span class="badge bg-light text-dark border">${r.code}</span></div>
+            <div class="d-flex justify-content-between text-muted" style="font-size: 11px;">
+              <span><i class="far fa-clock me-1"></i>${r.time}</span>
+              <span><i class="fas fa-user me-1"></i>${r.creator}</span>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
