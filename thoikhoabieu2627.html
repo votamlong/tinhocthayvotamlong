@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thời Khóa Biểu Giảng Dạy - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 18px 24px;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25);
+    }
+    .table-tkb thead th {
+      background-color: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      padding: 10px 6px;
+    }
+    .table-tkb td {
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 13.5px;
+      padding: 8px 4px;
+    }
+    .class-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: 800;
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .bg-class-red { background: #dc2626; }
+    .bg-class-blue { background: #2563eb; }
+    .bg-class-green { background: #059669; }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- THANH TIÊU ĐỀ & BỘ LỌC TUẦN -->
+    <div class="header-banner mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-white text-primary fw-bold px-2 py-1"><i class="fas fa-calendar-alt me-1"></i>TIMETABLE 2627</span>
+          <span class="opacity-75 small">Đồng bộ tự động từ sheet: <b>TKB</b></span>
+        </div>
+        <h4 class="fw-bold mb-0">THỜI KHÓA BIỂU GIẢNG DẠY 2627</h4>
+      </div>
+
+      <div class="d-flex align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm">
+        <span class="small fw-bold text-dark ps-2"><i class="fas fa-filter text-primary me-1"></i> Chọn Tuần:</span>
+        <select id="selWeek" class="form-select form-select-sm border-0 fw-bold text-primary" style="width: 120px;" onchange="loadTKB()">
+          <option value="1">Tuần 1</option>
+        </select>
+        <button onclick="loadTKB()" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm">
+          <i class="fas fa-sync-alt me-1"></i> Tải lại
+        </button>
+      </div>
+    </div>
+
+    <!-- 1. BẢNG BUỔI SÁNG -->
+    <div class="panel-box mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <h6 class="fw-bold text-warning m-0 text-uppercase"><i class="fas fa-sun me-2"></i> Buổi Sáng</h6>
+        <span class="badge bg-warning bg-opacity-10 text-dark border border-warning px-3 py-1 fw-bold">Tiết 1 - 5</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle mb-0 table-tkb">
+          <thead>
+            <tr>
+              <th style="width: 60px;">Tiết</th>
+              <th style="width: 110px;">Khung Giờ</th>
+              <th>Thứ Hai</th>
+              <th>Thứ Ba</th>
+              <th>Thứ Tư</th>
+              <th>Thứ Năm</th>
+              <th>Thứ Sáu</th>
+              <th>Thứ Bảy</th>
+            </tr>
+          </thead>
+          <tbody id="morningBody">
+            <tr><td colspan="8" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải thời khóa biểu buổi sáng...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2. BẢNG BUỔI CHIỀU -->
+    <div class="panel-box">
+      <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <h6 class="fw-bold text-primary m-0 text-uppercase"><i class="fas fa-moon me-2"></i> Buổi Chiều</h6>
+        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 py-1 fw-bold">Tiết 1 - 5</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle mb-0 table-tkb">
+          <thead>
+            <tr>
+              <th style="width: 60px;">Tiết</th>
+              <th style="width: 110px;">Khung Giờ</th>
+              <th>Thứ Hai</th>
+              <th>Thứ Ba</th>
+              <th>Thứ Tư</th>
+              <th>Thứ Năm</th>
+              <th>Thứ Sáu</th>
+              <th>Thứ Bảy</th>
+            </tr>
+          </thead>
+          <tbody id="afternoonBody">
+            <tr><td colspan="8" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải thời khóa biểu buổi chiều...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbwD5XyXyC7EpxjwcvxYwzCyOwe6_RmMUOBQ7Q8lonvqWfp_3Mau_knjtxU2s57jMjteNg/exec";
+
+    const MORNING_HOURS = ["", "7h15-8h00", "8h05-8h50", "9h25-10h10", "10h15-11h00", "11h05-11h50"];
+    const AFTERNOON_HOURS = ["", "13h30-14h15", "14h20-15h05", "15h25-16h10", "16h15-17h00", "17h05-17h50"];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      try {
+        const weeks = await callApi('getTKBWeeks2627') || ["1"];
+        const sel = document.getElementById('selWeek');
+        let h = '';
+        weeks.forEach(w => h += `<option value="${w}" ${w === "1" ? 'selected' : ''}>Tuần ${w}</option>`);
+        sel.innerHTML = h;
+
+        await loadTKB();
+      } catch (err) {
+        console.error("Lỗi khởi tạo TKB:", err);
+      }
+    };
+
+    async function loadTKB() {
+      const week = document.getElementById('selWeek').value;
+      try {
+        const rows = await callApi('getTKBDataByWeek2627', week) || [];
+        renderTableSection('morning', rows);
+        renderTableSection('afternoon', rows);
+      } catch (err) {
+        alert("Lỗi tải TKB: " + err.message);
+      }
+    }
+
+    function renderTableSection(sessionType, rows) {
+      const isMorning = sessionType === 'morning';
+      const tbodyId = isMorning ? 'morningBody' : 'afternoonBody';
+      const hoursArr = isMorning ? MORNING_HOURS : AFTERNOON_HOURS;
+      const sessionKeyword = isMorning ? 'SÁNG' : 'CHIỀU';
+
+      let html = '';
+      for (let t = 1; t <= 5; t++) {
+        // Tìm dòng khớp với buổi và tiết
+        let rowData = rows.find(r => r.buoi.includes(sessionKeyword) && Number(r.tiet) === t) || {};
+
+        html += `
+          <tr>
+            <td class="fw-bold bg-light">${t}</td>
+            <td class="text-muted small fw-bold">${hoursArr[t]}</td>
+            <td>${formatCell(rowData.t2)}</td>
+            <td>${formatCell(rowData.t3)}</td>
+            <td>${formatCell(rowData.t4)}</td>
+            <td>${formatCell(rowData.t5)}</td>
+            <td>${formatCell(rowData.t6)}</td>
+            <td>${formatCell(rowData.t7)}</td>
+          </tr>
+        `;
+      }
+      document.getElementById(tbodyId).innerHTML = html;
+    }
+
+    function formatCell(val) {
+      if (!val || val === '-' || val.trim() === '') return '<span class="text-muted">-</span>';
+      let cleanVal = val.trim();
+      // Phân loại màu sắc huy hiệu lớp
+      let colorClass = 'bg-class-blue';
+      if (cleanVal.toUpperCase().includes('QT')) colorClass = 'bg-class-red';
+      else if (cleanVal.toUpperCase().includes('GDDP') || cleanVal.toUpperCase().includes('ĐP')) colorClass = 'bg-class-green';
+
+      return `<span class="class-badge ${colorClass}">${cleanVal}</span>`;
+    }
+  </script>
+</body>
+</html>
