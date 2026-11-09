@@ -11,9 +11,10 @@
   <style>
     body {
       background-color: #f1f5f9;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
       color: #1e293b;
       padding: 16px;
+      text-transform: none !important;
     }
     .panel-box {
       background: #ffffff;
@@ -52,6 +53,11 @@
       margin-bottom: 12px;
       margin-top: 16px;
     }
+    /* Đảm bảo font chữ chuẩn, không bị viết hoa toàn bộ */
+    input, select, textarea, button, label, span, h4, h6 {
+      text-transform: none !important;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
   </style>
 </head>
 <body>
@@ -73,7 +79,7 @@
             <h3 class="fw-bold text-primary mb-0" id="statTotal">0</h3>
             <small class="text-muted" style="font-size: 11px;">Tổng số lượt kiểm tra</small>
           </div>
-          <div class="kpi-icon bg-primary bg-opacity-10 text-primary"><i class="fas id-card clipboard-check"></i></div>
+          <div class="kpi-icon bg-primary bg-opacity-10 text-primary"><i class="fas fa-clipboard-check"></i></div>
         </div>
       </div>
       <div class="col-md-3">
@@ -81,7 +87,7 @@
           <div>
             <div class="small text-muted fw-bold">PHÒNG / KHU ĐẠT TỐT</div>
             <h3 class="fw-bold text-success mb-0" id="statDat">0</h3>
-            <small class="text-success fw-semibold" style="font-size: 11px;">Tất điện & sạch sẽ</small>
+            <small class="text-success fw-semibold" style="font-size: 11px;">Tắt điện & sạch sẽ</small>
           </div>
           <div class="kpi-icon bg-success bg-opacity-10 text-success"><i class="fas fa-check-circle"></i></div>
         </div>
@@ -116,11 +122,11 @@
         <div class="panel-box border-top border-4 border-primary">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-              <h6 class="fw-bold text-primary m-0 text-uppercase"><i class="fas fa-clipboard-list me-1"></i> Phiếu Kiểm Tra Cơ Sở Vật Chất</h6>
+              <h6 class="fw-bold text-primary m-0">PHIẾU KIỂM TRA CƠ SỞ VẬT CHẤT</h6>
               <small class="text-muted">Kiểm tra tắt điện, khóa cửa & vệ sinh WC</small>
             </div>
             <button onclick="setAllChecked(true)" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold" style="font-size: 11.5px;">
-              <i class="fas fa-check me-1"></span> Chọn tất cả ĐẠT
+              <i class="fas fa-check me-1"></i> Chọn tất cả ĐẠT
             </button>
           </div>
 
@@ -177,7 +183,7 @@
 
           <div class="mb-3">
             <label class="small fw-bold text-secondary mb-1">4. Ghi chú vi phạm / Hư hỏng thêm (Nếu có)</label>
-            <textarea id="inpNote" class="form-control form-control-sm" rows="2" placeholder="Vd: Quên tắt 2 quạt số 3-4, cửa sau chưa khóa then..."></textarea>
+            <textarea id="inpNote" class="form-control form-control-sm" rows="2" placeholder="Ví dụ: Quên tắt 2 quạt số 3-4, cửa sau chưa khóa then..."></textarea>
           </div>
 
           <div class="mb-4">
@@ -186,7 +192,7 @@
           </div>
 
           <button onclick="submitRoomCheck()" id="btnSubmit" class="btn btn-primary w-100 fw-bold rounded-pill py-2 shadow-sm">
-            <i class="fas fa-save me-1"></i> LƯU KẾT QUẢ VÀO SHEET KIEM_TRA_PHONG
+            <i class="fas fa-save me-1"></i> Lưu kết quả vào sheet KIEM_TRA_PHONG
           </button>
         </div>
       </div>
@@ -195,8 +201,8 @@
       <div class="col-lg-7">
         <div class="panel-box">
           <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-            <h6 class="fw-bold text-dark m-0 text-uppercase">
-              <i class="fas id-card history text-primary me-1"></i> Nhật Ký Kiểm Tra Phòng 2627
+            <h6 class="fw-bold text-dark m-0">
+              <i class="fas fa-history text-primary me-1"></i> Nhật Ký Kiểm Tra Phòng 2627
             </h6>
             <div class="d-flex align-items-center gap-2">
               <select id="filterEval" class="form-select form-select-sm border-secondary fw-bold" style="width: 140px;" onchange="renderLogTable()">
@@ -229,7 +235,7 @@
           </div>
 
           <div class="card-footer bg-light py-2 px-3 mt-3 rounded-3 border d-flex justify-content-between align-items-center small text-muted">
-            <span><i class="fas id-card database text-primary me-1"></i> Tự động đồng bộ với sheet <b>KIEM_TRA_PHONG</b></span>
+            <span><i class="fas fa-database text-primary me-1"></i> Tự động đồng bộ với sheet <b>KIEM_TRA_PHONG</b></span>
             <span id="recordCountLabel">Hiển thị: 0 lượt</span>
           </div>
         </div>
@@ -242,7 +248,7 @@
   <script>
     const API_URL = (window.parent && window.parent.API_URL) 
       ? window.parent.API_URL 
-      : "https://script.google.com/macros/s/AKfycbyb7e0rtB_pUQOBHEjIXY3qd3CDuTdfRuALL8j5IqqKe_EzX58XtcEOr5vRxxT8qeldIw/exec";
+      : "https://script.google.com/macros/s/AKfycbx7CIwSPjv3PM9s7fdi1xLJOb18rkYG9upg9UgWOk8gdie_29e_uZrJZFOwQltYrLUxcw/exec";
 
     let allCheckLogs = [];
 
@@ -341,14 +347,12 @@
       document.getElementById('recordCountLabel').innerText = `Hiển thị: ${list.length} / ${allCheckLogs.length} lượt`;
     }
 
-    // LƯU PHIẾU KIỂM TRA VÀO SHEET KIEM_TRA_PHONG
     async function submitRoomCheck() {
       const areaType = document.getElementById('inpAreaType').value;
       const roomName = document.getElementById('inpRoomName').value;
       const note = document.getElementById('inpNote').value.trim();
       const inspector = document.getElementById('inpInspector').value.trim();
 
-      // Kiểm tra các mục toggle
       let unCheckedList = [];
       if (!document.getElementById('chk1').checked) unCheckedList.push("Quên tắt bóng đèn chiếu sáng");
       if (!document.getElementById('chk2').checked) unCheckedList.push("Quên tắt quạt tường/quạt trần");
