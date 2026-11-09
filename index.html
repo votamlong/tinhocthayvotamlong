@@ -370,12 +370,13 @@
         <div id="tab-school_overview" class="content-tab d-none" style="height: 85vh;">
           <iframe id="iframe-schooloverview" src="tongquantoantruong.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: white;" class="shadow-sm"></iframe>
         </div>
-        <!-- 15. TAB SỔ ĐIỂM VNEDU (NHÚNG sodiemvnedu.html) -->
-        <div id="tab-detailed_scores" class="content-tab d-none" style="height: 85vh;">
+        <!-- TAB SỔ ĐIỂM VNEDU (ĐỒNG BỘ 2 ID ĐỂ KHÔNG BAO GIỜ BỊ TRẮNG TRANG) -->
+        <div id="tab-sodiem_vnedu" class="content-tab d-none" style="height: 85vh;">
           <iframe id="iframe-vnedu" src="sodiemvnedu.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: white;" class="shadow-sm"></iframe>
         </div>
-
-
+        <div id="tab-detailed_scores" class="content-tab d-none" style="height: 85vh;">
+          <iframe id="iframe-vnedu-alt" src="sodiemvnedu.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: white;" class="shadow-sm"></iframe>
+        </div>
         
 
 
@@ -1291,6 +1292,7 @@
        3. ROUTER ĐIỀU PHỐI TAB (44 PHÂN HỆ)
        ============================================================================== */
     function switchTab(id, el) {
+      //
       if (window.innerWidth <= 768) {
         var sidebar = document.getElementById('sidebar-wrapper');
         if (sidebar) sidebar.classList.remove('active');
@@ -1299,17 +1301,33 @@
       var tabs = document.querySelectorAll('.content-tab');
       for (var i = 0; i < tabs.length; i++) tabs[i].classList.add('d-none');
 
-      // 1. Tự động nhận diện tab tương ứng (khắc phục 100% lỗi trắng màn hình)
-      var tabId = 'tab-' + id;
-      if (id.includes('ufo') || id.includes('diabay') || (el && el.innerText.includes('UFO')) || (el && el.innerText.includes('Đĩa Bay'))) {
-        tabId = 'tab-diabay2627';
-      } else if (id.includes('toan_truong') || id.includes('school_overview') || id.includes('tongquan') || (el && el.innerText.includes('Toàn Trường'))) {
-        tabId = 'tab-school_overview';
+      // 1. Tìm tab theo ID gốc
+      var target = document.getElementById('tab-' + id);
+
+      // 2. TỰ ĐỘNG BẮT ĐÚNG TAB CHO SỔ ĐIỂM VNEDU (DÙ MÃ.GS ĐẶT TÊN GÌ)
+      var txt = el ? el.innerText.toLowerCase() : '';
+      var mid = String(id).toLowerCase();
+
+      if (!target || txt.includes('vnedu') || mid.includes('vnedu') || mid.includes('sodiem')) {
+        if (txt.includes('vnedu') || mid.includes('vnedu') || mid.includes('sodiem') || mid === 'detailed_scores') {
+          target = document.getElementById('tab-sodiem_vnedu') 
+                || document.getElementById('tab-detailed_scores') 
+                || document.getElementById('tab-sodiemvnedu');
+        }
       }
 
-      // 2. Kích hoạt hiển thị tab
-      var target = document.getElementById(tabId);
+      // Tự động bắt cho UFO / Đĩa bay và Tổng quan toàn trường
+      if (!target) {
+        if (txt.includes('ufo') || txt.includes('đĩa bay') || mid.includes('diabay') || mid.includes('ufo')) {
+          target = document.getElementById('tab-diabay2627');
+        } else if (txt.includes('toàn trường') || mid.includes('toan_truong') || mid.includes('school_overview') || mid.includes('tongquan')) {
+          target = document.getElementById('tab-school_overview');
+        }
+      }
+
       if (target) target.classList.remove('d-none');
+      //
+      
 
       var items = document.querySelectorAll('#sidebar-menu .list-group-item');
       for (var j = 0; j < items.length; j++) items[j].classList.remove('active');
