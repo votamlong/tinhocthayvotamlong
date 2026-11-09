@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sơ Đồ Trường - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .header-banner {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 14px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .map-stage {
+      background: #f8fafc;
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      min-height: 550px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: auto;
+      padding: 20px;
+    }
+    .map-image {
+      max-width: 100%;
+      height: auto;
+      transition: transform 0.2s ease;
+      transform-origin: center center;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- THANH TIÊU ĐỀ & CÔNG CỤ ĐIỀU KHIỂN (ZOOM, FULLSCREEN, UPLOAD) -->
+    <div class="header-banner mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-success text-white fw-bold px-2 py-1"><i class="fas fa-map-marked-alt me-1"></i>SCHOOL MAP</span>
+          <span class="text-muted small">Lưu trữ trực tiếp vào Sheet: <b>SO_DO_TRUONG_2627</b></span>
+        </div>
+        <h5 class="fw-bold text-dark m-0" id="mapTitle">🗺️ SƠ ĐỒ TỔNG THỂ KHUÔN VIÊN TRƯỜNG</h5>
+        <small class="text-secondary" id="mapSubtitle">Kích thước: Nguyên bản 1:1</small>
+      </div>
+
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <div class="btn-group btn-group-sm bg-light border rounded-pill p-1">
+          <button class="btn btn-light rounded-circle" onclick="zoomMap(0.1)" title="Phóng to (+)"><i class="fas fa-search-plus"></i></button>
+          <button class="btn btn-light rounded-circle" onclick="zoomMap(-0.1)" title="Thu nhỏ (-)"><i class="fas fa-search-minus"></i></button>
+          <button class="btn btn-light rounded-pill px-3 fw-bold small" onclick="resetZoom()">Gốc (100%)</button>
+        </div>
+
+        <button onclick="toggleFullScreen()" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+          <i class="fas fa-expand me-1"></i> Toàn màn hình
+        </button>
+
+        <input type="file" id="fileMapInput" accept="image/*" class="d-none" onchange="uploadMapImage(event)">
+        
+        <button onclick="document.getElementById('fileMapInput').click()" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm">
+          <i class="fas fa-upload me-1"></i> TẢI LÊN ẢNH SƠ ĐỒ
+        </button>
+
+        <button onclick="deleteMapImage()" class="btn btn-outline-danger btn-sm rounded-circle" title="Xóa sơ đồ">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- KHUNG HIỂN THỊ HÌNH ẢNH SƠ ĐỒ -->
+    <div class="panel-box p-0 overflow-hidden">
+      <div class="map-stage" id="mapStage">
+        
+        <!-- TRẠNG THÁI CHƯA CÓ ẢNH -->
+        <div id="emptyState" class="text-center p-5">
+          <div class="mb-3 text-secondary" style="font-size: 3.5rem;">
+            <i class="fas fa-school"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Chưa có hình ảnh Sơ đồ trường</h5>
+          <p class="text-muted small mb-3">Thầy vui lòng bấm nút "Tải lên ảnh sơ đồ" để tải ảnh lên hệ thống.</p>
+          <button onclick="document.getElementById('fileMapInput').click()" class="btn btn-outline-primary rounded-pill px-4 fw-bold">
+            <i class="fas fa-cloud-upload-alt me-2"></i> Chọn ảnh từ máy tính / điện thoại
+          </button>
+        </div>
+
+        <!-- ẢNH SƠ ĐỒ THỰC TẾ -->
+        <img id="mapImageElement" class="map-image d-none" alt="Sơ đồ trường">
+
+      </div>
+
+      <!-- THANH TRẠNG THÁI DƯỚI CÙNG -->
+      <div class="card-footer bg-light py-2 px-4 border-top d-flex justify-content-between align-items-center">
+        <span class="small text-secondary"><i class="fas fa-check-circle text-success me-1"></i> Chế độ hiển thị: <b>Giữ nguyên 100% kích thước gốc của ảnh tải lên</b> (dùng thanh cuộn nếu ảnh lớn).</span>
+        <span class="small text-muted" id="syncStatus">Đã sẵn sàng</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbwMHE7tGqL3NXoazCLMF70cSut-c356meJC6ksk8TTMnrTeaHWqt88syubbDjxGEZL5cQ/exec";
+
+    let currentScale = 1.0;
+    let base64Map = "";
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      try {
+        document.getElementById('syncStatus').innerText = "Đang tải dữ liệu sơ đồ từ Sheet...";
+        const mapData = await callApi('getSchoolMap2627');
+        if (mapData && mapData.imageUrl) {
+          base64Map = mapData.imageUrl;
+          displayImage(base64Map);
+          document.getElementById('syncStatus').innerText = "Đã đồng bộ sơ đồ từ Google Sheets";
+        } else {
+          document.getElementById('syncStatus').innerText = "Chưa có dữ liệu sơ đồ";
+        }
+      } catch (err) {
+        document.getElementById('syncStatus').innerText = "Lỗi tải sơ đồ: " + err.message;
+      }
+    };
+
+    function displayImage(url) {
+      const img = document.getElementById('mapImageElement');
+      const empty = document.getElementById('emptyState');
+      img.src = url;
+      img.classList.remove('d-none');
+      empty.classList.add('d-none');
+      currentScale = 1.0;
+      img.style.transform = `scale(${currentScale})`;
+    }
+
+    // XỬ LÝ UPLOAD & NÉN ẢNH ĐỂ LƯU VÀO GOOGLE SHEETS
+    function uploadMapImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Giới hạn độ phân giải tối đa (ví dụ 1600px) để dung lượng chuỗi base64 gọn gàng
+          const MAX_DIM = 1600;
+          if (width > MAX_DIM || height > MAX_DIM) {
+            if (width > height) {
+              height *= MAX_DIM / width;
+              width = MAX_DIM;
+            } else {
+              width *= MAX_DIM / height;
+              height = MAX_DIM;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Nén chất lượng JPEG 0.85
+          base64Map = canvas.toDataURL('image/jpeg', 0.85);
+          displayImage(base64Map);
+          saveMapToSheet(base64Map);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveMapToSheet(imgUrl) {
+      document.getElementById('syncStatus').innerText = "Đang lưu hình ảnh vào Google Sheets...";
+      try {
+        const item = { title: "SƠ ĐỒ TỔNG THỂ KHUÔN VIÊN TRƯỜNG", imageUrl: imgUrl };
+        const msg = await callApi('saveSchoolMap2627', item);
+        document.getElementById('syncStatus').innerText = "✅ Đã lưu sơ đồ vào Google Sheets thành công!";
+      } catch (err) {
+        alert("Lỗi lưu sơ đồ lên Sheet: " + err.message);
+        document.getElementById('syncStatus').innerText = "❌ Lỗi lưu sơ đồ";
+      }
+    }
+
+    function deleteMapImage() {
+      if (!confirm("Xóa hình ảnh sơ đồ trường hiện tại?")) return;
+      base64Map = "";
+      document.getElementById('mapImageElement').classList.add('d-none');
+      document.getElementById('emptyState').classList.remove('d-none');
+      saveMapToSheet("");
+    }
+
+    function zoomMap(delta) {
+      currentScale = Math.max(0.3, Math.min(3.0, currentScale + delta));
+      const img = document.getElementById('mapImageElement');
+      img.style.transform = `scale(${currentScale})`;
+    }
+
+    function resetZoom() {
+      currentScale = 1.0;
+      const img = document.getElementById('mapImageElement');
+      img.style.transform = `scale(${currentScale})`;
+    }
+
+    function toggleFullScreen() {
+      const stage = document.getElementById('mapStage');
+      if (!document.fullscreenElement) {
+        stage.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+  </script>
+</body>
+</html>
