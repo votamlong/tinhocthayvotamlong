@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thư Viện Trường - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+      color: #1e293b;
+      padding: 16px;
+      text-transform: none !important;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .kpi-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 16px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .kpi-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .target-btn {
+      border: 2px solid #cbd5e1;
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      border-radius: 12px;
+      padding: 10px;
+      transition: all 0.2s;
+    }
+    .target-btn.active-hs {
+      background: #eff6ff !important;
+      border-color: #2563eb !important;
+      color: #1d4ed8 !important;
+    }
+    .target-btn.active-gv {
+      background: #f0fdf4 !important;
+      border-color: #16a34a !important;
+      color: #15803d !important;
+    }
+    .badge-status-muon { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; font-weight: 700; padding: 4px 10px; border-radius: 50px; font-size: 11.5px; cursor: pointer; }
+    .badge-status-quahan { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; font-weight: 700; padding: 4px 10px; border-radius: 50px; font-size: 11.5px; cursor: pointer; }
+    .badge-status-tra { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-weight: 700; padding: 4px 10px; border-radius: 50px; font-size: 11.5px; cursor: pointer; }
+    input, select, textarea, button, label, span, h4, h6 {
+      text-transform: none !important;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- TIÊU ĐỀ & NĂM HỌC -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark m-0">THƯ VIỆN TRƯỜNG</h4>
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Năm học 2026-2027</span>
+    </div>
+
+    <!-- 4 THẺ KPI TỔNG QUAN -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">TỔNG SỐ LƯỢT MƯỢN</div>
+            <h3 class="fw-bold text-primary mb-0" id="statTotal">0</h3>
+            <small class="text-muted" style="font-size: 11px;">Hồ sơ mượn sách 2627</small>
+          </div>
+          <div class="kpi-icon bg-primary bg-opacity-10 text-primary"><i class="fas fa-book-reader"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">SÁCH ĐANG MƯỢN</div>
+            <h3 class="fw-bold text-warning mb-0" id="statMuon">0</h3>
+            <small class="text-warning fw-semibold" style="font-size: 11px;">Bạn đọc đang giữ</small>
+          </div>
+          <div class="kpi-icon bg-warning bg-opacity-10 text-warning"><i class="fas fa-book"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">ĐÃ HOÀN TRẢ KHO</div>
+            <h3 class="fw-bold text-success mb-0" id="statTra">0</h3>
+            <small class="text-success fw-semibold" style="font-size: 11px;">Đã nhập lại kệ</small>
+          </div>
+          <div class="kpi-icon bg-success bg-opacity-10 text-success"><i class="fas fa-check-circle"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">QUÁ HẠN / BÁO MẤT</div>
+            <h3 class="fw-bold text-danger mb-0" id="statQuaHan">0</h3>
+            <small class="text-danger fw-semibold" style="font-size: 11px;">Cần đôn đốc thu hồi</small>
+          </div>
+          <div class="kpi-icon bg-danger bg-opacity-10 text-danger"><i class="fas fa-exclamation-triangle"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NỘI DUNG CHÍNH: 2 CỘT -->
+    <div class="row g-4">
+      
+      <!-- CỘT TRÁI: LẬP PHIẾU MƯỢN SÁCH -->
+      <div class="col-lg-5">
+        <div class="panel-box border-top border-4 border-primary">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="badge bg-primary px-2 py-1 text-white"><i class="fas fa-book-open"></i></span>
+            <h6 class="fw-bold text-primary m-0">LẬP PHIẾU MƯỢN SÁCH</h6>
+            <span class="badge bg-secondary ms-auto">2627</span>
+          </div>
+          <p class="text-muted small mb-3">Cấp mượn cho Học sinh & Giáo viên</p>
+
+          <!-- 1. ĐỐI TƯỢNG BẠN ĐỌC -->
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">1. Đối tượng bạn đọc</label>
+            <div class="row g-2">
+              <div class="col-6">
+                <button type="button" id="btnTargetHS" onclick="setTargetType('Học sinh')" class="target-btn active-hs w-100">
+                  <i class="fas fa-user-graduate me-1"></i> HỌC SINH
+                </button>
+              </div>
+              <div class="col-6">
+                <button type="button" id="btnTargetGV" onclick="setTargetType('Giáo viên')" class="target-btn w-100">
+                  <i class="fas fa-chalkboard-teacher me-1"></i> GIÁO VIÊN
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- KHUNG HỌC SINH HOẶC GIÁO VIÊN -->
+          <div id="studentFormSection">
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="small fw-bold text-secondary mb-1">Lớp học</label>
+                <select id="selClass" class="form-select form-select-sm fw-bold border-primary" onchange="filterStudentsForLibrary()">
+                  <option value="">-- Chọn lớp --</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="small fw-bold text-secondary mb-1">Học sinh</label>
+                <select id="selStudent" class="form-select form-select-sm fw-bold">
+                  <option value="">-- Chọn học sinh --</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="teacherFormSection" class="mb-3 d-none">
+            <label class="small fw-bold text-secondary mb-1">Họ và tên Giáo viên / Cán bộ</label>
+            <input type="text" id="inpTeacherName" class="form-control form-control-sm fw-bold" placeholder="Nhập tên giáo viên...">
+          </div>
+
+          <!-- 2. TÊN SÁCH -->
+          <div class="mb-3">
+            <label class="small fw-bold text-danger mb-1">2. Tên sách / Tài liệu mượn</label>
+            <input type="text" id="inpBookName" class="form-control form-control-sm fw-bold" placeholder="Nhập tên sách, mã ĐKCB (nếu có)...">
+          </div>
+
+          <!-- 3. THỂ LOẠI SÁCH -->
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">3. Thể loại sách</label>
+            <select id="inpBookCategory" class="form-select form-select-sm fw-bold">
+              <option value="Sách Giáo Khoa (SGK)">Sách Giáo Khoa (SGK)</option>
+              <option value="Sách Tham Khảo">Sách Tham Khảo</option>
+              <option value="Truyện / Văn học">Truyện / Văn học</option>
+              <option value="Tài liệu chuyên môn">Tài liệu chuyên môn</option>
+            </select>
+          </div>
+
+          <div class="row g-2 mb-4">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Ngày mượn</label>
+              <input type="date" id="inpBorrowDate" class="form-control form-control-sm fw-bold" onchange="updateDueDate()">
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Hạn trả <span class="text-danger">(Mặc định 7N)</span></label>
+              <input type="date" id="inpDueDate" class="form-control form-control-sm fw-bold text-danger">
+            </div>
+          </div>
+
+          <button onclick="submitLibraryRecord()" id="btnSubmit" class="btn btn-primary w-100 fw-bold rounded-pill py-2 shadow-sm">
+            <i class="fas fa-save me-1"></i> LẬP PHIẾU & CHO MƯỢN SÁCH
+          </button>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: SỔ ĐĂNG KÝ MƯỢN SÁCH -->
+      <div class="col-lg-7">
+        <div class="panel-box">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <h6 class="fw-bold text-dark m-0">
+              <i class="fas fa-book text-primary me-1"></i> Sổ Đăng Ký Mượn Sách
+            </h6>
+            <div class="d-flex align-items-center gap-2">
+              <select id="filterStatus" class="form-select form-select-sm border-secondary fw-bold" style="width: 150px;" onchange="renderLibraryTable()">
+                <option value="ALL">Tất cả trạng thái</option>
+                <option value="Đang mượn">Đang mượn</option>
+                <option value="Quá hạn">Quá hạn</option>
+                <option value="Đã trả">Đã trả</option>
+              </select>
+              <button onclick="loadLibraryData()" class="btn btn-outline-secondary btn-sm fw-bold" title="Làm mới">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+            <table class="table table-hover align-middle mb-0 small text-center">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 45px;">STT</th>
+                  <th style="width: 95px;">Ngày Mượn</th>
+                  <th class="text-start">Bạn Đọc</th>
+                  <th style="width: 100px;">Lớp / Tổ</th>
+                  <th class="text-start">Tên Sách Mượn</th>
+                  <th style="width: 95px;">Hạn Trả</th>
+                  <th style="width: 100px;">Trạng Thái</th>
+                  <th style="width: 70px;">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="libraryTableBody">
+                <tr><td colspan="8" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu thư viện từ Sheet...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-footer bg-light py-2 px-3 mt-3 rounded-3 border d-flex justify-content-between align-items-center small text-muted">
+            <span><i class="fas fa-database text-primary me-1"></i> Đồng bộ trực tiếp sheet <b>THU_VIEN_2627</b></span>
+            <span id="recordCountLabel">Hiển thị: 0 lượt mượn</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbyF51B3m3ta_98npekk7F60hYnLjlwnu8knULbV06SfJWA8KrXQ1SsxZZZ0T7kVZb4Mrw/exec";
+
+    let allStudents = [];
+    let allLibraryRecords = [];
+    let currentTargetType = 'Học sinh';
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      let today = new Date().toISOString().split('T')[0];
+      document.getElementById('inpBorrowDate').value = today;
+      updateDueDate();
+
+      try {
+        allStudents = await callApi('getAllStudents2627') || [];
+        if (allStudents.length === 0) {
+          let stData = await callApi('getAllStudents');
+          allStudents = (stData || []).map(s => ({ id: s.id, name: s.name, className: s.className }));
+        }
+
+        let setC = new Set();
+        allStudents.forEach(s => { if (s.className) setC.add(s.className); });
+        let classes = Array.from(setC).sort();
+        if (classes.length === 0) classes = ["6A3", "6A4", "6A5"];
+
+        let classOpts = '<option value="">-- Chọn lớp --</option>';
+        classes.forEach(c => classOpts += `<option value="${c}">Lớp ${c}</option>`);
+        document.getElementById('selClass').innerHTML = classOpts;
+
+        if (classes.length > 0) {
+          document.getElementById('selClass').value = classes[0];
+          filterStudentsForLibrary();
+        }
+
+        await loadLibraryData();
+      } catch (err) {
+        console.error("Lỗi khởi tạo thư viện:", err);
+      }
+    };
+
+    function setTargetType(type) {
+      currentTargetType = type;
+      const btnHS = document.getElementById('btnTargetHS');
+      const btnGV = document.getElementById('btnTargetGV');
+      const hsSec = document.getElementById('studentFormSection');
+      const gvSec = document.getElementById('teacherFormSection');
+
+      if (type === 'Học sinh') {
+        btnHS.className = 'target-btn active-hs w-100';
+        btnGV.className = 'target-btn w-100';
+        hsSec.classList.remove('d-none');
+        gvSec.classList.add('d-none');
+      } else {
+        btnHS.className = 'target-btn w-100';
+        btnGV.className = 'target-btn active-gv w-100';
+        hsSec.classList.add('d-none');
+        gvSec.classList.remove('d-none');
+      }
+    }
+
+    function updateDueDate() {
+      const borrowDateVal = document.getElementById('inpBorrowDate').value;
+      if (!borrowDateVal) return;
+      let d = new Date(borrowDateVal);
+      d.setDate(d.getDate() + 7); // Mặc định 7 ngày
+      document.getElementById('inpDueDate').value = d.toISOString().split('T')[0];
+    }
+
+    function filterStudentsForLibrary() {
+      const selectedClass = document.getElementById('selClass').value;
+      const selStudent = document.getElementById('selStudent');
+
+      let filtered = allStudents.filter(s => {
+        let cleanS = String(s.className || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        let cleanC = String(selectedClass || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        return cleanS === cleanC || cleanS.includes(cleanC);
+      });
+
+      let html = '<option value="">-- Chọn học sinh --</option>';
+      filtered.forEach(s => {
+        html += `<option value="${s.id}|${s.name}">[${s.id}] ${s.name}</option>`;
+      });
+      selStudent.innerHTML = html;
+    }
+
+    async function loadLibraryData() {
+      try {
+        allLibraryRecords = await callApi('getLibraryBookLogs2627') || [];
+        updateStats();
+        renderLibraryTable();
+      } catch (err) {
+        document.getElementById('libraryTableBody').innerHTML = `<tr><td colspan="8" class="p-4 text-danger text-center">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    function updateStats() {
+      let total = allLibraryRecords.length;
+      let muon = 0, tra = 0, quahan = 0;
+
+      allLibraryRecords.forEach(l => {
+        let st = l.status.toLowerCase();
+        if (st.includes('trả') || st.includes('hoàn')) tra++;
+        else if (st.includes('quá hạn') || st.includes('mất')) quahan++;
+        else muon++;
+      });
+
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statMuon').innerText = muon;
+      document.getElementById('statTra').innerText = tra;
+      document.getElementById('statQuaHan').innerText = quahan;
+    }
+
+    function renderLibraryTable() {
+      const filterStatus = document.getElementById('filterStatus').value;
+      const tbody = document.getElementById('libraryTableBody');
+
+      let list = allLibraryRecords.filter(l => {
+        if (filterStatus === 'ALL') return true;
+        return l.status.toLowerCase().includes(filterStatus.toLowerCase());
+      });
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-muted">Không tìm thấy lượt mượn sách nào.</td></tr>';
+        document.getElementById('recordCountLabel').innerText = `Hiển thị: 0 / ${allLibraryRecords.length} lượt mượn`;
+        return;
+      }
+
+      let html = '';
+      list.forEach((l, idx) => {
+        let badgeClass = 'badge-status-muon';
+        let stLower = l.status.toLowerCase();
+        if (stLower.includes('trả') || stLower.includes('hoàn')) badgeClass = 'badge-status-tra';
+        else if (stLower.includes('quá hạn') || stLower.includes('mất')) badgeClass = 'badge-status-quahan';
+
+        html += `
+          <tr>
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td class="small text-secondary fw-bold">${l.borrowDate}</td>
+            <td class="text-start fw-bold text-dark">${l.readerName}<br><small class="text-muted fw-normal">${l.readerId}</small></td>
+            <td><span class="badge bg-secondary">${l.className || 'GV'}</span></td>
+            <td class="text-start fw-semibold text-dark">${l.bookName}<br><small class="text-primary fw-normal">${l.bookCategory}</small></td>
+            <td class="small text-danger fw-bold">${l.dueDate}</td>
+            <td>
+              <span class="${badgeClass}" onclick="cycleLibraryStatus(${l.rowIdx}, '${l.status}')" title="Bấm để đổi trạng thái">
+                ${l.status}
+              </span>
+            </td>
+            <td>
+              <button onclick="deleteLibraryRecord(${l.rowIdx})" class="btn btn-sm text-danger" title="Xóa phiếu">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+      document.getElementById('recordCountLabel').innerText = `Hiển thị: ${list.length} / ${allLibraryRecords.length} lượt mượn`;
+    }
+
+    async function cycleLibraryStatus(rowIdx, currentStatus) {
+      let nextStatus = "Đang mượn";
+      let st = currentStatus.toLowerCase();
+      if (st.includes('đang mượn')) nextStatus = "Đã trả";
+      else if (st.includes('trả')) nextStatus = "Quá hạn";
+      else nextStatus = "Đang mượn";
+
+      try {
+        await callApi('updateLibraryBookStatus2627', rowIdx, nextStatus);
+        await loadLibraryData();
+      } catch (err) {
+        alert("Lỗi cập nhật: " + err.message);
+      }
+    }
+
+    // LƯU PHIẾU MƯỢN SÁCH VÀO SHEET
+    async function submitLibraryRecord() {
+      let readerId = "";
+      let readerName = "";
+      let className = "";
+
+      if (currentTargetType === 'Học sinh') {
+        className = document.getElementById('selClass').value;
+        let studentVal = document.getElementById('selStudent').value;
+        if (!className || !studentVal) return alert("Vui lòng chọn lớp và học sinh mượn sách!");
+        let parts = studentVal.split('|');
+        readerId = parts[0];
+        readerName = parts[1];
+      } else {
+        readerName = document.getElementById('inpTeacherName').value.trim();
+        if (!readerName) return alert("Vui lòng nhập tên giáo viên mượn sách!");
+        readerId = "GV";
+        className = "Giáo viên";
+      }
+
+      const bookName = document.getElementById('inpBookName').value.trim();
+      const bookCategory = document.getElementById('inpBookCategory').value;
+      const borrowDate = document.getElementById('inpBorrowDate').value;
+      const dueDate = document.getElementById('inpDueDate').value;
+
+      if (!bookName) return alert("Vui lòng nhập tên sách hoặc mã tài liệu mượn!");
+
+      const item = {
+        targetType: currentTargetType,
+        className: className,
+        readerId: readerId,
+        readerName: readerName,
+        bookName: bookName,
+        bookCategory: bookCategory,
+        borrowDate: borrowDate,
+        dueDate: dueDate,
+        status: "Đang mượn",
+        note: ""
+      };
+
+      const btn = document.getElementById('btnSubmit');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lập phiếu...';
+
+      try {
+        const msg = await callApi('saveLibraryBookRecord2627', item);
+        alert(msg);
+        document.getElementById('inpBookName').value = "";
+        await loadLibraryData();
+      } catch (err) {
+        alert("Lỗi khi lập phiếu mượn sách: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    async function deleteLibraryRecord(rowIdx) {
+      if (!confirm("Bạn có chắc chắn muốn xóa phiếu mượn sách này không?")) return;
+      try {
+        const msg = await callApi('deleteLibraryBookRecord2627', rowIdx);
+        alert(msg);
+        await loadLibraryData();
+      } catch (err) {
+        alert("Lỗi khi xóa: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
