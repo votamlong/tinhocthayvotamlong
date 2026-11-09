@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thông Báo Việc Tổ - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .kpi-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 16px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .kpi-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .task-item-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      background: #ffffff;
+      transition: all 0.15s;
+    }
+    .task-item-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-color: #cbd5e1;
+    }
+    .badge-status {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 50px;
+    }
+    .status-todo { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .status-done { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- TIÊU ĐỀ ĐẦU TRANG -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark m-0">THÔNG BÁO VIỆC TỔ</h4>
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Năm học 2026-2027</span>
+    </div>
+
+    <!-- 4 THẺ KPI TỔNG QUAN -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">TỔNG CÔNG VIỆC</div>
+            <h3 class="fw-bold text-dark mb-0" id="statTotal">0</h3>
+            <small class="text-primary fw-semibold" style="font-size: 11px;">Tổ chuyên môn</small>
+          </div>
+          <div class="kpi-icon bg-primary bg-opacity-10 text-primary"><i class="fas fa-list-ul"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">CHƯA HOÀN THÀNH</div>
+            <h3 class="fw-bold text-warning mb-0" id="statTodo">0</h3>
+            <small class="text-warning fw-semibold" style="font-size: 11px;">Cần đôn đốc</small>
+          </div>
+          <div class="kpi-icon bg-warning bg-opacity-10 text-warning"><i class="fas fa-clock"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">QUÁ HẠN DEADLINE</div>
+            <h3 class="fw-bold text-danger mb-0" id="statOverdue">0</h3>
+            <small class="text-danger fw-semibold" style="font-size: 11px;">Cần xử lý gấp</small>
+          </div>
+          <div class="kpi-icon bg-danger bg-opacity-10 text-danger"><i class="fas fa-exclamation-circle"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">ĐÃ HOÀN THÀNH</div>
+            <h3 class="fw-bold text-success mb-0" id="statDone">0</h3>
+            <small class="text-success fw-semibold" style="font-size: 11px;">Tiến độ tốt</small>
+          </div>
+          <div class="kpi-icon bg-success bg-opacity-10 text-success"><i class="fas fa-check-circle"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NỘI DUNG CHÍNH: 2 CỘT (TRÁI: FORM TẠO, PHẢI: DANH SÁCH) -->
+    <div class="row g-4">
+      
+      <!-- CỘT TRÁI: FORM GIAO VIỆC & THÔNG BÁO -->
+      <div class="col-lg-5">
+        <div class="panel-box border-top border-4 border-primary">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="badge bg-primary px-2 py-1"><i class="fas fa-bullhorn text-white"></i></span>
+            <h6 class="fw-bold text-primary m-0 text-uppercase">Giao Việc & Thông Báo</h6>
+          </div>
+          <p class="text-muted small mb-3">Tổ trưởng phân công nhiệm vụ 2026 - 2027</p>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">1. Tiêu đề thông báo / Công việc</label>
+            <input type="text" id="inpTitle" class="form-control form-control-sm fw-bold" placeholder="Vd: Nộp giáo án tuần 25, duyệt đề GK2...">
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">2. Phân công phụ trách</label>
+            <select id="inpReceiver" class="form-select form-select-sm fw-bold">
+              <option value="Toàn thể thành viên Tổ">Toàn thể thành viên Tổ</option>
+              <option value="Tổ trưởng chuyên môn">Tổ trưởng chuyên môn</option>
+              <option value="Giáo viên bộ môn Tin học">Giáo viên bộ môn Tin học</option>
+              <option value="Giáo viên bộ môn Công nghệ">Giáo viên bộ môn Công nghệ</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">3. Hạn chót hoàn thành (Deadline)</label>
+            <input type="date" id="inpDeadline" class="form-control form-control-sm fw-bold">
+          </div>
+
+          <div class="mb-4">
+            <label class="small fw-bold text-secondary mb-1">4. Nội dung chi tiết & Yêu cầu</label>
+            <textarea id="inpContent" class="form-control form-control-sm" rows="4" placeholder="Ghi chú chi tiết yêu cầu, quy cách nộp hoặc dán link thư mục Google Drive nộp bài..."></textarea>
+          </div>
+
+          <button onclick="submitNewTask()" id="btnSubmit" class="btn btn-primary w-100 fw-bold rounded-pill py-2 shadow-sm">
+            <i class="fas fa-paper-plane me-1"></i> BAN HÀNH CÔNG VIỆC / THÔNG BÁO
+          </button>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: DANH SÁCH THÔNG BÁO & VIỆC TỔ GIAO -->
+      <div class="col-lg-7">
+        <div class="panel-box">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <h6 class="fw-bold text-dark m-0 text-uppercase">
+              <i class="fas fa-clipboard-list text-primary me-1"></i> Danh Sách Thông Báo & Việc Tổ Giao
+            </h6>
+            <div class="d-flex align-items-center gap-2">
+              <select id="filterStatus" class="form-select form-select-sm border-secondary fw-bold" onchange="renderTaskList()">
+                <option value="ALL">Tất cả trạng thái</option>
+                <option value="Chưa hoàn thành">Chưa hoàn thành</option>
+                <option value="Đã hoàn thành">Đã hoàn thành</option>
+              </select>
+              <button onclick="loadTasks()" class="btn btn-outline-secondary btn-sm fw-bold" title="Tải lại">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="taskListContainer" style="max-height: 650px; overflow-y: auto;">
+            <div class="text-center text-muted p-4"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu từ Sheet...</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbzu9KViXOw7SOWr2eZ2CCuciiLPSK3Aryswv3w4yFJhuKW80yUJCXtG8T6HiDHop0C5tw/exec";
+
+    let allTasks = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      // Đặt ngày deadline mặc định sau 7 ngày
+      let d = new Date();
+      d.setDate(d.getDate() + 7);
+      document.getElementById('inpDeadline').value = d.toISOString().split('T')[0];
+
+      await loadTasks();
+    };
+
+    async function loadTasks() {
+      const container = document.getElementById('taskListContainer');
+      container.innerHTML = '<div class="text-center text-muted p-4"><i class="fas fa-sync fa-spin me-2"></i>Đang tải dữ liệu từ Sheet THONG_BAO_VIEC_TO_2627...</div>';
+
+      try {
+        allTasks = await callApi('getGroupTasks2627') || [];
+        updateStats();
+        renderTaskList();
+      } catch (err) {
+        container.innerHTML = `<div class="text-danger text-center p-4">Lỗi tải dữ liệu: ${err.message}</div>`;
+      }
+    }
+
+    function updateStats() {
+      let total = allTasks.length;
+      let todo = 0, overdue = 0, done = 0;
+      let todayStr = new Date().toISOString().split('T')[0];
+
+      allTasks.forEach(t => {
+        if (t.status === 'Đã hoàn thành') {
+          done++;
+        } else {
+          todo++;
+          if (t.deadline && t.deadline < todayStr) overdue++;
+        }
+      });
+
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statTodo').innerText = todo;
+      document.getElementById('statOverdue').innerText = overdue;
+      document.getElementById('statDone').innerText = done;
+    }
+
+    function renderTaskList() {
+      const container = document.getElementById('taskListContainer');
+      const filter = document.getElementById('filterStatus').value;
+
+      let list = allTasks.filter(t => {
+        if (filter === 'ALL') return true;
+        return t.status === filter;
+      });
+
+      if (list.length === 0) {
+        container.innerHTML = '<div class="text-center text-muted p-4">Không có công việc hoặc thông báo nào phù hợp.</div>';
+        return;
+      }
+
+      let todayStr = new Date().toISOString().split('T')[0];
+      let html = '';
+
+      list.forEach((t, idx) => {
+        let isDone = (t.status === 'Đã hoàn thành');
+        let isOverdue = (!isDone && t.deadline && t.deadline < todayStr);
+        let statusBadge = isDone ? 'status-done' : 'status-todo';
+        let badgeText = isDone ? '✅ Đã hoàn thành' : (isOverdue ? '⚠️ Quá hạn' : '⏳ Chưa hoàn thành');
+
+        html += `
+          <div class="task-item-card">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <h6 class="fw-bold text-dark mb-0">${idx + 1}. ${t.title}</h6>
+              <select onchange="updateStatus(${t.rowIdx}, this.value)" class="form-select form-select-sm fw-bold badge-status ${statusBadge}" style="width: 155px; cursor: pointer;">
+                <option value="Chưa hoàn thành" ${!isDone ? 'selected' : ''}>⏳ Chưa hoàn thành</option>
+                <option value="Đã hoàn thành" ${isDone ? 'selected' : ''}>✅ Đã hoàn thành</option>
+              </select>
+            </div>
+            <p class="text-secondary small mb-2" style="white-space: pre-wrap;">${t.content || 'Không có ghi chú chi tiết.'}</p>
+            <div class="d-flex flex-wrap justify-content-between align-items-center text-muted" style="font-size: 11.5px;">
+              <div><i class="fas fa-users me-1 text-primary"></i> Nhận: <b>${t.receiver}</b></div>
+              <div><i class="far fa-calendar-alt me-1 text-danger"></i> Hạn chót: <b class="${isOverdue ? 'text-danger' : 'text-dark'}">${t.deadline || 'Không có'}</b></div>
+              <div><i class="far fa-clock me-1 text-secondary"></i> Ngày giao: ${t.dateAssigned}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // BAN HÀNH CÔNG VIỆC MỚI VÀO SHEET
+    async function submitNewTask() {
+      const title = document.getElementById('inpTitle').value.trim();
+      const receiver = document.getElementById('inpReceiver').value;
+      const deadline = document.getElementById('inpDeadline').value;
+      const content = document.getElementById('inpContent').value.trim();
+
+      if (!title) return alert("Vui lòng nhập tiêu đề thông báo / công việc!");
+      if (!deadline) return alert("Vui lòng chọn hạn chót hoàn thành!");
+
+      const item = {
+        title: title,
+        receiver: receiver,
+        deadline: deadline,
+        content: content
+      };
+
+      const btn = document.getElementById('btnSubmit');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang ban hành...';
+
+      try {
+        const msg = await callApi('saveGroupTask2627', item);
+        alert(msg);
+        document.getElementById('inpTitle').value = "";
+        document.getElementById('inpContent').value = "";
+        await loadTasks();
+      } catch (err) {
+        alert("Lỗi ban hành: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    // CẬP NHẬT TRẠNG THÁI TRỰC TIẾP
+    async function updateStatus(rowIdx, newStatus) {
+      try {
+        await callApi('updateGroupTaskStatus2627', rowIdx, newStatus);
+        const task = allTasks.find(x => x.rowIdx === rowIdx);
+        if (task) task.status = newStatus;
+        updateStats();
+        renderTaskList();
+      } catch (err) {
+        alert("Lỗi cập nhật trạng thái: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
