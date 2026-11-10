@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chấm Bài Tự Luận Trên Giấy - EduClass Pro</title>
+  <title>Chấm Bài Tự Luận Bằng AI - EduClass Pro</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <!-- Thư viện hỗ trợ xuất PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
@@ -28,7 +27,7 @@
     .paper-preview {
       border: 2px dashed #cbd5e1;
       border-radius: 12px;
-      min-height: 180px;
+      min-height: 200px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -38,7 +37,7 @@
     }
     .paper-preview img {
       max-width: 100%;
-      max-height: 200px;
+      max-height: 250px;
       object-fit: contain;
     }
     input, select, textarea, button, label, span, h4, h6 {
@@ -53,17 +52,17 @@
     
     <!-- TIÊU ĐỀ -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h4 class="fw-bold text-dark m-0"><i class="fas fa-camera-retro text-primary me-2"></i>CHẤM BÀI TỰ LUẬN TRÊN GIẤY & XUẤT PDF</h4>
+      <h4 class="fw-bold text-dark m-0"><i class="fas fa-robot text-primary me-2"></i>CHẤM BÀI TỰ LUẬN TRÊN GIẤY BẰNG GEMINI AI</h4>
       <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Năm học 2026-2027</span>
     </div>
 
     <!-- 2 CỘT NỘI DUNG -->
     <div class="row g-4">
       
-      <!-- CỘT TRÁI: CHỤP ẢNH & CHẤM ĐIỂM -->
+      <!-- CỘT TRÁI: TẢI ẢNH & AI CHẤM BÀI -->
       <div class="col-lg-5">
         <div class="panel-box border-top border-4 border-primary">
-          <h6 class="fw-bold text-primary mb-3 text-uppercase"><i class="fas fa-pen-fancy me-1"></i> 1. Chấm bài & Ghi nhận điểm</h6>
+          <h6 class="fw-bold text-primary mb-3 text-uppercase"><i class="fas fa-camera me-1"></i> 1. Tải ảnh bài làm & Cấu hình AI</h6>
 
           <div class="row g-2 mb-3">
             <div class="col-6">
@@ -82,41 +81,52 @@
 
           <div class="mb-3">
             <label class="small fw-bold text-secondary mb-1">Tiêu đề bài kiểm tra / Tự luận</label>
-            <input type="text" id="inpExamTitle" class="form-control form-control-sm fw-bold" placeholder="Vd: Kiểm tra 15 phút Tự luận Tin học...">
+            <input type="text" id="inpExamTitle" class="form-control form-control-sm fw-bold" value="Kiểm tra Tự luận Tin học">
           </div>
 
-          <!-- CHỤP / TẢI ẢNH BÀI LÀM -->
           <div class="mb-3">
-            <label class="small fw-bold text-secondary mb-1">2. Chụp ảnh hoặc tải ảnh bài làm giấy</label>
+            <label class="small fw-bold text-danger mb-1">Đáp án gợi ý / Biểu điểm cho AI (Rất quan trọng)</label>
+            <textarea id="inpAnswerKey" class="form-control form-control-sm" rows="3" placeholder="Nhập đáp án đúng hoặc yêu cầu biểu điểm để AI căn cứ chấm chính xác..."></textarea>
+          </div>
+
+          <!-- TẢI ẢNH BÀI LÀM -->
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">2. Chụp ảnh / Tải ảnh bài làm giấy</label>
             <input type="file" id="inpImageFile" class="form-control form-control-sm mb-2" accept="image/*" onchange="previewImage(this)">
             <div class="paper-preview" id="imagePreviewBox">
-              <span class="text-muted small"><i class="fas fa-image fa-2x mb-1 d-block"></i>Chưa có ảnh bài làm. Bấm chọn file hoặc chụp ảnh.</span>
+              <span class="text-muted small text-center"><i class="fas fa-image fa-2x mb-1 d-block"></i>Chưa có ảnh bài làm. Bấm chọn ảnh bài của học sinh.</span>
             </div>
           </div>
+
+          <button onclick="gradeExamWithAI()" id="btnAI" class="btn btn-warning w-100 fw-bold rounded-pill py-2 shadow-sm text-dark mb-2">
+            <i class="fas fa-magic me-1"></i> 🤖 GỌI GEMINI AI CHẤM BÀI TỰ ĐỘNG
+          </button>
+
+          <hr class="my-3">
 
           <div class="row g-2 mb-3">
             <div class="col-6">
-              <label class="small fw-bold text-success mb-1">Điểm số (Thang 10)</label>
-              <input type="number" id="inpScore" class="form-control form-control-sm fw-bold text-success fs-5 text-center" step="0.25" min="0" max="10" placeholder="8.5">
+              <label class="small fw-bold text-success mb-1">Điểm số AI chấm (Thang 10)</label>
+              <input type="number" id="inpScore" class="form-control form-control-sm fw-bold text-success fs-5 text-center" step="0.25" min="0" max="10">
             </div>
             <div class="col-6">
-              <label class="small fw-bold text-secondary mb-1">Nhận xét / Lời phê</label>
-              <input type="text" id="inpFeedback" class="form-control form-control-sm" placeholder="Vd: Trình bày sạch sẽ, đúng ý...">
+              <label class="small fw-bold text-secondary mb-1">Nhận xét chi tiết của AI</label>
+              <textarea id="inpFeedback" class="form-control form-control-sm" rows="2"></textarea>
             </div>
           </div>
 
           <button onclick="submitGradingRecord()" id="btnSubmit" class="btn btn-primary w-100 fw-bold rounded-pill py-2 shadow-sm">
-            <i class="fas fa-save me-1"></i> LƯU KẾT QUẢ & ĐỒNG BỘ SHEET
+            <i class="fas fa-save me-1"></i> LƯU KẾT QUẢ VÀO SHEET
           </button>
         </div>
       </div>
 
-      <!-- CỘT PHẢI: DANH SÁCH ĐÃ CHẤM & XUẤT PDF -->
+      <!-- CỘT PHẢI: KẾT QUẢ & XUẤT PDF -->
       <div class="col-lg-7">
         <div class="panel-box">
           <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
             <h6 class="fw-bold text-dark m-0 text-uppercase">
-              <i class="fas fa-list-alt text-primary me-1"></i> Sổ Chấm Bài Tự Luận
+              <i class="fas fa-list-alt text-primary me-1"></i> Sổ Chấm Bài Tự Luận Bằng AI
             </h6>
             <div class="d-flex align-items-center gap-2">
               <button onclick="exportToPDF()" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold shadow-sm">
@@ -128,10 +138,9 @@
             </div>
           </div>
 
-          <!-- KHUNG NỘI DUNG DÙNG ĐỂ XUẤT PDF -->
           <div id="pdfExportArea" class="bg-white p-3 rounded-3">
             <div class="text-center mb-3 d-none" id="pdfHeaderTitle">
-              <h5 class="fw-bold text-uppercase">BÁO CÁO KẾT QUẢ CHẤM BÀI TỰ LUẬN TRÊN GIẤY</h5>
+              <h5 class="fw-bold text-uppercase">BÁO CÁO KẾT QUẢ CHẤM BÀI TỰ LUẬN BẰNG AI</h5>
               <p class="small text-muted">Trường THCS Bình Tân - Năm học 2026-2027</p>
             </div>
 
@@ -144,19 +153,18 @@
                     <th class="text-start">Học Sinh</th>
                     <th class="text-start">Tiêu Đề Bài</th>
                     <th style="width: 70px;">Điểm</th>
-                    <th class="text-start">Nhận Xét</th>
-                    <th style="width: 80px;" class="no-print">Ảnh Bài</th>
+                    <th class="text-start">Nhận Xét Của AI</th>
                   </tr>
                 </thead>
                 <tbody id="gradingTableBody">
-                  <tr><td colspan="7" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu chấm bài...</td></tr>
+                  <tr><td colspan="6" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu...</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
 
           <div class="card-footer bg-light py-2 px-3 mt-3 rounded-3 border d-flex justify-content-between align-items-center small text-muted">
-            <span><i class="fas id-card database text-primary me-1"></i> Lưu trữ tại sheet <b>CHAM_BAI_TU_LUAN_2627</b></span>
+            <span><i class="fas fa-database text-primary me-1"></i> Đồng bộ với sheet <b>CHAM_BAI_TU_LUAN_2627</b></span>
             <span id="recordCountLabel">Hiển thị: 0 bài</span>
           </div>
         </div>
@@ -174,6 +182,7 @@
     let allStudents = [];
     let allGradingLogs = [];
     let base64ImageString = "";
+    let rawMimeType = "image/jpeg";
 
     async function callApi(fn, ...args) {
       const response = await fetch(API_URL, {
@@ -210,7 +219,7 @@
 
         await loadGradingData();
       } catch (err) {
-        console.error("Lỗi khởi tạo chấm bài tự luận:", err);
+        console.error("Lỗi khởi tạo:", err);
       }
     };
 
@@ -233,12 +242,76 @@
 
     function previewImage(input) {
       if (input.files && input.files[0]) {
+        let file = input.files[0];
+        rawMimeType = file.type || "image/jpeg";
         let reader = new FileReader();
         reader.onload = function(e) {
           base64ImageString = e.target.result;
           document.getElementById('imagePreviewBox').innerHTML = `<img src="${base64ImageString}" alt="Bài làm học sinh">`;
         }
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // GỌI GEMINI AI ĐỂ ĐỌC ẢNH VÀ CHẤM ĐIỂM
+    async function gradeExamWithAI() {
+      let apiKey = localStorage.getItem('gemini_custom_api_key') || "";
+      if (!apiKey) {
+        alert("Vui lòng nhập Gemini API Key ở menu 'Soạn Đề Bằng AI' trước để sử dụng tính năng này!");
+        return;
+      }
+      if (!base64ImageString) {
+        alert("Vui lòng tải lên ảnh chụp bài làm tự luận của học sinh!");
+        return;
+      }
+
+      let answerKey = document.getElementById('inpAnswerKey').value.trim();
+      let promptText = `Bạn là một giáo viên bộ môn đang chấm bài tự luận trên giấy của học sinh. 
+Dựa vào hình ảnh bài làm đính kèm và đáp án/biểu điểm sau: "${answerKey || 'Chấm tự do theo độ chính xác và logic'}".
+Hãy đọc chữ viết tay trong ảnh, đánh giá mức độ hoàn thành và trả về kết quả dưới định dạng JSON chính xác như sau (không kèm markdown rườm rà):
+{
+  "score": 8.5,
+  "feedback": "Nhận xét chi tiết về ưu điểm, lỗi sai và góp ý cải thiện cho học sinh..."
+}`;
+
+      let base64DataOnly = base64ImageString.split(',')[1];
+      let btn = document.getElementById('btnAI');
+      let oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> AI đang đọc chữ và chấm bài...';
+
+      try {
+        let geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        
+        let response = await fetch(geminiEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: promptText },
+                { inline_data: { mime_type: rawMimeType, data: base64DataOnly } }
+              ]
+            }]
+          })
+        });
+
+        let data = await response.json();
+        if (data.error) throw new Error(data.error.message);
+
+        let aiText = data.candidates[0].content.parts[0].text;
+        // Làm sạch định dạng JSON trả về từ AI
+        aiText = aiText.replace(/```json/g, '').replace(/```/g, '').trim();
+        let parsed = JSON.parse(aiText);
+
+        document.getElementById('inpScore').value = parsed.score || 8.0;
+        document.getElementById('inpFeedback').value = parsed.feedback || "Đã hoàn thành bài làm tốt.";
+        alert("🤖 Gemini AI đã chấm bài thành công!");
+      } catch (err) {
+        alert("Lỗi khi gọi AI chấm bài: " + err.message + "\n(Thầy có thể nhập điểm thủ công bên dưới nếu cần).");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
       }
     }
 
@@ -247,14 +320,14 @@
         allGradingLogs = await callApi('getEssayGradingLogs2627') || [];
         renderTable();
       } catch (err) {
-        document.getElementById('gradingTableBody').innerHTML = `<tr><td colspan="7" class="p-4 text-danger text-center">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+        document.getElementById('gradingTableBody').innerHTML = `<tr><td colspan="6" class="p-4 text-danger text-center">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
       }
     }
 
     function renderTable() {
       const tbody = document.getElementById('gradingTableBody');
       if (allGradingLogs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-muted">Chưa có kết quả chấm bài nào.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-muted">Chưa có kết quả chấm bài nào.</td></tr>';
         document.getElementById('recordCountLabel').innerText = `Hiển thị: 0 bài`;
         return;
       }
@@ -268,10 +341,7 @@
             <td class="text-start fw-bold text-dark">${l.studentName}<br><small class="text-muted fw-normal">${l.studentId}</small></td>
             <td class="text-start fw-semibold">${l.examTitle}</td>
             <td class="fw-bold text-success fs-6">${l.score}</td>
-            <td class="text-start small text-muted">${l.feedback || '---'}</td>
-            <td class="no-print">
-              ${l.imageUrl ? `<a href="${l.imageUrl}" target="_blank" class="btn btn-sm btn-outline-primary" title="Xem ảnh"><i class="fas fa-eye"></i></a>` : '<span class="text-muted small">Không có</span>'}
-            </td>
+            <td class="text-start small text-secondary">${l.feedback || '---'}</td>
           </tr>
         `;
       });
@@ -303,7 +373,7 @@
         examTitle: examTitle,
         score: score,
         feedback: feedback,
-        imageUrl: base64ImageString // Lưu chuỗi base64 ảnh bài làm
+        imageUrl: ""
       };
 
       const btn = document.getElementById('btnSubmit');
@@ -316,9 +386,6 @@
         alert(msg);
         document.getElementById('inpScore').value = "";
         document.getElementById('inpFeedback').value = "";
-        document.getElementById('inpImageFile').value = "";
-        document.getElementById('imagePreviewBox').innerHTML = `<span class="text-muted small"><i class="fas fa-image fa-2x mb-1 d-block"></i>Chưa có ảnh bài làm. Bấm chọn file hoặc chụp ảnh.</span>`;
-        base64ImageString = "";
         await loadGradingData();
       } catch (err) {
         alert("Lỗi khi lưu kết quả: " + err.message);
@@ -333,7 +400,7 @@
       let element = document.getElementById('pdfExportArea');
       let opt = {
         margin:       10,
-        filename:     'BaoCaoChamBaiTuLuan.pdf',
+        filename:     'BaoCaoAIChamBaiTuLuan.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2 },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
