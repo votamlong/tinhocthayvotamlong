@@ -1401,34 +1401,100 @@
         var menuText = el ? (el.innerText || el.textContent || '').toLowerCase().replace(/\s+/g, ' ') : '';
         var idLower = String(id || '').toLowerCase();
 
-        if (idLower.includes('tuition') || idLower.includes('hoc_phi') || menuText.includes('học phí lớp chủ nhiệm')) {
+        // 1. Học Phí Lớp Chủ Nhiệm
+        if (idLower.includes('tuition') || idLower.includes('hoc_phi') || menuText.includes('học phí')) {
           target = document.getElementById('tab-homeroom_tuition_manager');
-        } else if (idLower.includes('it') || idLower.includes('giao_vu') || menuText.includes('it & giáo vụ')) {
+        }
+        // 2. IT & Giáo Vụ Học Vụ
+        else if (idLower.includes('it_academic') || idLower.includes('it_giao_vu') || menuText.includes('it & giáo vụ') || menuText.includes('giáo vụ học vụ')) {
           target = document.getElementById('tab-it_academic_support');
-        } else if (idLower.includes('library') || idLower.includes('thu_vien') || menuText.includes('thư viện trường')) {
+        }
+        // 3. Thư Viện Trường
+        else if (idLower.includes('school_library') || idLower.includes('thu_vien') || menuText.includes('thư viện trường')) {
           target = document.getElementById('tab-school_library_manager');
-        } else if (idLower.includes('loan') || idLower.includes('muon_tra') || menuText.includes('mượn trả thiết bị')) {
+        }
+        // 4. Mượn Trả Thiết Bị
+        else if (idLower.includes('equipment_loan') || idLower.includes('muon_tra') || menuText.includes('mượn trả thiết bị')) {
           target = document.getElementById('tab-equipment_loan_manager');
-        } else if (idLower.includes('document') || idLower.includes('van_ban') || menuText.includes('quản lý văn bản')) {
+        }
+        // 5. Quản Lý Văn Bản
+        else if (idLower.includes('document_ management') || idLower.includes('van_ban') || menuText.includes('quản lý văn bản')) {
           target = document.getElementById('tab-document_management');
-        } else if (idLower.includes('medical') || idLower.includes('y_te') || menuText.includes('chuyển xuống y tế')) {
+        }
+        // 6. Chuyển Xuống Y Tế
+        else if (idLower.includes('medical_referral') || idLower.includes('y_te') || menuText.includes('chuyển xuống y tế')) {
           target = document.getElementById('tab-student_medical_referral');
-        } else if (idLower.includes('pass') || idLower.includes('giay_vao_lop') || menuText.includes('giấy hs vào lớp')) {
+        }
+        // 7. Giấy HS Vào Lớp
+        else if (idLower.includes('late_pass') || idLower.includes('giay_vao_lop') || menuText.includes('giấy hs vào lớp')) {
           target = document.getElementById('tab-student_late_pass');
-        } else if (idLower.includes('inspection') || idLower.includes('kiem_tra_phong') || menuText.includes('kiểm tra phòng')) {
+        }
+        // 8. Kiểm Tra Phòng CSVC
+        else if (idLower.includes('facility_inspection') || idLower.includes('kiem_tra_phong') || menuText.includes('kiểm tra phòng')) {
           target = document.getElementById('tab-facility_inspection');
-        } else if (idLower.includes('emulation') || idLower.includes('thi_dua') || menuText.includes('thi đua đa năng')) {
+        }
+        // 9. Thi Đua Đa Năng
+        else if (idLower.includes('emulation') || idLower.includes('thi_dua') || menuText.includes('thi đua đa năng')) {
           target = document.getElementById('tab-multi_emulation_ranking');
-        } else if (idLower.includes('bonus') || idLower.includes('diem_cong') || menuText.includes('cộng điểm học sinh')) {
+        }
+        // 10. Cộng Điểm Học Sinh
+        else if (idLower.includes('bonus_points') || idLower.includes('diem_cong') || menuText.includes('cộng điểm học sinh')) {
           target = document.getElementById('tab-student_bonus_points');
-        } else if (idLower.includes('equipment') || idLower.includes('thiet_bi') || menuText.includes('thiết bị phòng máy')) {
+        }
+        // 11. Thiết Bị Phòng Máy
+        else if (idLower.includes('lab_equipment') || (idLower.includes('thiet_bi') && !idLower.includes('loan')) || menuText.includes('thiết bị phòng máy')) {
           target = document.getElementById('tab-lab_equipment_manager');
-        } else if (idLower.includes('fund') || idLower.includes('thu_chi') || menuText.includes('thu chi quỹ lớp')) {
+        }
+        // 12. Thu Chi Quỹ Lớp
+        else if (idLower.includes('fund') || idLower.includes('thu_chi') || menuText.includes('thu chi quỹ lớp')) {
           target = document.getElementById('tab-class_fund_management');
-        } else if (idLower.includes('map') || idLower.includes('so_do_truong') || menuText.includes('sơ đồ trường')) {
+        }
+        // 13. Sơ Đồ Trường
+        else if (idLower.includes('map') || idLower.includes('so_do_truong') || menuText.includes('sơ đồ trường')) {
           target = document.getElementById('tab-school_map_view');
         }
-    }
+        // 14. Thời Khóa Biểu
+        else if (idLower.includes('tkb') || idLower.includes('timetable') || idLower.includes('thoi_khoa_bieu') || menuText.includes('thời khóa biểu')) {
+          target = document.getElementById('tab-timetable_schedule');
+        }
+        // 15. Game Ô Chữ Kỳ Diệu
+        else if (idLower.includes('word_search') || idLower.includes('o_chu') || menuText.includes('ô chữ')) {
+          target = document.getElementById('tab-word_search_puzzle');
+        }
+        // 16. Thầy Võ Tâm Long
+        else if (idLower.includes('teacher') || idLower.includes('long') || idLower.includes('thay_long') || menuText.includes('võ tâm long')) {
+          target = document.getElementById('tab-teacher_profile_long');
+        }
+        // 17. Thông Báo Việc Tổ
+        else if (idLower.includes('task') || idLower.includes('notice') || idLower.includes('thong_bao') || menuText.includes('thông báo việc tổ')) {
+          target = document.getElementById('tab-group_task_notice');
+        }
+        // 18. Game Đoán Chữ
+        else if (idLower.includes('puzzle') || idLower.includes('doan_chu') || menuText.includes('đoán chữ')) {
+          target = document.getElementById('tab-word_puzzle_game');
+        }
+        // 19. UFO / Đĩa Bay Gọi Tên
+        else if (idLower.includes('ufo') || idLower.includes('diabay') || menuText.includes('ufo') || menuText.includes('đĩa bay')) {
+          target = document.getElementById('tab-diabay2627');
+        }
+        // 20. Tổng Quan Toàn Trường
+        else if (idLower.includes('toan_truong') || idLower.includes('school_overview') || menuText.includes('toàn trường')) {
+          target = document.getElementById('tab-school_overview');
+        }
+        // 21. Sổ Điểm vnEdu
+        else if (idLower.includes('vnedu') || idLower.includes('detailed_scores') || menuText.includes('vnedu') || menuText.includes('sổ điểm')) {
+          target = document.getElementById('tab-detailed_scores');
+        }
+        // 22. Đồng Hồ & Đếm Ngược
+        else if (idLower.includes('clock') || idLower.includes('timer') || idLower.includes('dong_ho') || menuText.includes('đồng hồ') || menuText.includes('đếm ngược')) {
+          target = document.getElementById('tab-clock_timer');
+        }
+        // 23. Quay Số Ngẫu Nhiên
+        else if (idLower.includes('random') || idLower.includes('quay_so') || idLower.includes('dice') || menuText.includes('quay số')) {
+          target = document.getElementById('tab-random_number_picker');
+        }
+      }
+
 
       // 3. HIỂN THỊ NỘI DUNG TAB TƯƠNG ỨNG
       if (target) {
