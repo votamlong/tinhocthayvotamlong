@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sổ Báo Bài & Nộp Bài - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+      color: #1e293b;
+      padding: 16px;
+      text-transform: none !important;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .kpi-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 16px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .kpi-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    input, select, textarea, button, label, span, h4, h6 {
+      text-transform: none !important;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- TIÊU ĐỀ & NĂM HỌC -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark m-0">SỔ BÁO BÀI & NỘP BÀI</h4>
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Năm học 2026-2027</span>
+    </div>
+
+    <!-- 4 THẺ KPI TỔNG QUAN -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">SĨ SỐ LỚP</div>
+            <h3 class="fw-bold text-primary mb-0" id="statTotalStudents">0</h3>
+            <small class="text-muted" style="font-size: 11px;">Học sinh trong danh sách</small>
+          </div>
+          <div class="kpi-icon bg-primary bg-opacity-10 text-primary"><i class="fas fa-user-graduate"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">ĐÃ NỘP LINK BÀI</div>
+            <h3 class="fw-bold text-success mb-0" id="statSubmitted">0</h3>
+            <small class="text-success fw-semibold" style="font-size: 11px;">Có link bài làm</small>
+          </div>
+          <div class="kpi-icon bg-success bg-opacity-10 text-success"><i class="fas fa-link"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">CHƯA NỘP BÀI</div>
+            <h3 class="fw-bold text-danger mb-0" id="statNotSubmitted">0</h3>
+            <small class="text-danger fw-semibold" style="font-size: 11px;">Cần đôn đốc nhắc nhở</small>
+          </div>
+          <div class="kpi-icon bg-danger bg-opacity-10 text-danger"><i class="fas fa-clock"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">ĐÃ CHẤM ĐIỂM</div>
+            <h3 class="fw-bold text-info mb-0" id="statGraded">0</h3>
+            <small class="text-info fw-semibold" style="font-size: 11px;">Đã cho điểm / nhận xét</small>
+          </div>
+          <div class="kpi-icon bg-info bg-opacity-10 text-info"><i class="fas fa-check-double"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THANH ĐIỀU KHIỂN & BỘ LỌC -->
+    <div class="panel-box mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <div>
+          <label class="small fw-bold text-secondary mb-1"><i class="fas fa-filter text-primary me-1"></i> Lớp:</label>
+          <select id="filterClass" class="form-select form-select-sm fw-bold border-primary" style="width: 130px;" onchange="onClassChange()">
+            <option value="6A3">6A3</option>
+          </select>
+        </div>
+        <div>
+          <label class="small fw-bold text-secondary mb-1"><i class="fas fa-book text-primary me-1"></i> Môn học:</label>
+          <select id="filterSubject" class="form-select form-select-sm fw-bold border-primary" style="width: 160px;" onchange="filterAssignments()">
+            <option value="ALL">Tất cả môn học</option>
+            <option value="Tin học">Tin học</option>
+            <option value="Khoa học tự nhiên">Khoa học tự nhiên</option>
+          </select>
+        </div>
+        <div>
+          <label class="small fw-bold text-secondary mb-1"><i class="fas fa-tasks text-danger me-1"></i> Bài tập / Nhiệm vụ:</label>
+          <select id="filterAssignment" class="form-select form-select-sm fw-bold border-danger" style="width: 250px;" onchange="renderStudentSubmissionTable()">
+            <option value="">(Chưa có bài tập nào)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <button onclick="openAssignModal()" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm">
+          <i class="fas fa-plus-circle me-1"></i> Giao Bài Mới
+        </button>
+        <button onclick="loadAssignmentData()" class="btn btn-outline-secondary btn-sm fw-bold" title="Làm mới">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- BẢNG DANH SÁCH NỘP BÀI -->
+    <div class="panel-box">
+      <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <h6 class="fw-bold text-dark m-0 text-uppercase">
+          <i class="fas id-card list-ul text-primary me-1"></i> Danh Sách Nộp Bài Học Sinh: <span class="badge bg-primary" id="lblCurrentAssignment">---</span>
+        </h6>
+        <div class="d-flex align-items-center gap-2">
+          <select id="filterSubmissionStatus" class="form-select form-select-sm border-secondary fw-bold" style="width: 140px;" onchange="renderStudentSubmissionTable()">
+            <option value="ALL">Tất cả học sinh</option>
+            <option value="submitted">Đã nộp bài</option>
+            <option value="not_submitted">Chưa nộp bài</option>
+          </select>
+          <div class="input-group input-group-sm" style="width: 200px;">
+            <span class="input-group-text bg-light"><i class="fas fa-search"></i></span>
+            <input type="text" id="searchStudentInput" class="form-control" placeholder="Tìm tên học sinh..." oninput="renderStudentSubmissionTable()">
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
+        <table class="table table-hover align-middle mb-0 small text-center">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 45px;">STT</th>
+              <th style="width: 100px;">Mã HS</th>
+              <th class="text-start" style="width: 220px;">Họ và Tên Học Sinh</th>
+              <th class="text-start">Link Bài Làm (Mở chấm trực tiếp)</th>
+              <th style="width: 130px;">Thời Gian Nộp</th>
+              <th style="width: 80px;">Điểm</th>
+              <th class="text-start">Nhận Xét Của Giáo Viên</th>
+              <th style="width: 90px;">Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="submissionTableBody">
+            <tr><td colspan="8" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card-footer bg-light py-2 px-3 mt-3 rounded-3 border d-flex justify-content-between align-items-center small text-muted">
+        <span><i class="fas fa-database text-primary me-1"></i> Tự động lưu link bài vào sheet <b>BAO_BAI_2627</b> & <b>NOP_BAI_2627</b>.</span>
+        <span id="recordCountLabel">Hiển thị: 0 học sinh</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL GIAO BÀI MỚI -->
+  <div class="modal fade" id="assignModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-header bg-primary text-white p-4">
+          <h5 class="modal-title fw-bold"><i class="fas fa-plus-circle me-2"></i>Giao Bài Tập / Nhiệm Vụ Mới</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4 bg-light">
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="small fw-bold text-secondary">Lớp nhận bài</label>
+              <select id="modalClass" class="form-select fw-bold border-primary">
+                <option value="6A3">6A3</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="small fw-bold text-secondary">Môn học</label>
+              <select id="modalSubject" class="form-select fw-bold">
+                <option value="Tin học">Tin học</option>
+                <option value="Khoa học tự nhiên">Khoa học tự nhiên</option>
+                <option value="Công nghệ">Công nghệ</option>
+                <option value="Hoạt động trải nghiệm">Hoạt động trải nghiệm</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary">Tiêu Đề Bài Tập</label>
+            <input type="text" id="modalTitle" class="form-control fw-bold" placeholder="Vd: Thực hành Scratch lập trình game...">
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary">Yêu Cầu Chi Tiết</label>
+            <textarea id="modalDescription" class="form-control" rows="3" placeholder="Mô tả nội dung bài tập, hướng dẫn học sinh làm bài..."></textarea>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="small fw-bold text-secondary">Hạn Nộp</label>
+              <input type="text" id="modalDueDate" class="form-control fw-bold" value="23:59 hôm nay">
+            </div>
+            <div class="col-md-6">
+              <label class="small fw-bold text-secondary">Link Đề / Tài Liệu (nếu có)</label>
+              <input type="text" id="modalLinkDoc" class="form-control" placeholder="https://...">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 p-3 bg-white shadow-sm">
+          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-primary rounded-pill px-5 shadow fw-bold" onclick="submitNewAssignment()">PHÁT HÀNH BÀI TẬP</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbxMFGWTD2dF29NIngaDq4cwL9EGPRsLtEDq3-bAG4MRd-ApX3kQ_bB3augNcVyeYILl/exec";
+
+    let allStudents = [];
+    let allAssignments = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      try {
+        allStudents = await callApi('getAllStudents2627') || [];
+        if (allStudents.length === 0) {
+          let stData = await callApi('getAllStudents');
+          allStudents = (stData || []).map(s => ({ id: s.id, name: s.name, className: s.className }));
+        }
+
+        let setC = new Set();
+        allStudents.forEach(s => { if (s.className) setC.add(s.className); });
+        let classes = Array.from(setC).sort();
+        if (classes.length === 0) classes = ["6A3", "6A4", "6A5"];
+
+        let classOpts = '';
+        classes.forEach(c => classOpts += `<option value="${c}">${c}</option>`);
+        document.getElementById('filterClass').innerHTML = classOpts;
+        document.getElementById('modalClass').innerHTML = classOpts;
+
+        if (classes.length > 0) {
+          document.getElementById('filterClass').value = classes[0];
+        }
+
+        await loadAssignmentData();
+      } catch (err) {
+        console.error("Lỗi khởi tạo sổ báo bài:", err);
+      }
+    };
+
+    async function loadAssignmentData() {
+      try {
+        allAssignments = await callApi('getAssignmentLogs2627') || [];
+        onClassChange();
+      } catch (err) {
+        document.getElementById('submissionTableBody').innerHTML = `<tr><td colspan="8" class="p-4 text-danger text-center">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    function onClassChange() {
+      const currentClass = document.getElementById('filterClass').value;
+      let classAssigns = allAssignments.filter(a => String(a.className).replace(/[^a-zA-Z0-9]/g, "").toLowerCase() === String(currentClass).replace(/[^a-zA-Z0-9]/g, "").toLowerCase());
+
+      // Lấy danh sách môn học
+      let setSub = new Set();
+      classAssigns.forEach(a => { if (a.subject) setSub.add(a.subject); });
+      let subs = Array.from(setSub);
+      let subOpts = '<option value="ALL">Tất cả môn học</option>';
+      subs.forEach(s => subOpts += `<option value="${s}">${s}</option>`);
+      document.getElementById('filterSubject').innerHTML = subOpts;
+
+      filterAssignments();
+    }
+
+    function filterAssignments() {
+      const currentClass = document.getElementById('filterClass').value;
+      const currentSub = document.getElementById('filterSubject').value;
+
+      let list = allAssignments.filter(a => {
+        let matchClass = String(a.className).replace(/[^a-zA-Z0-9]/g, "").toLowerCase() === String(currentClass).replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        let matchSub = (currentSub === 'ALL' || a.subject === currentSub);
+        return matchClass && matchSub;
+      });
+
+      let assignSel = document.getElementById('filterAssignment');
+      if (list.length === 0) {
+        assignSel.innerHTML = '<option value="">(Chưa có bài tập nào)</option>';
+        document.getElementById('lblCurrentAssignment').innerText = "---";
+        renderStudentSubmissionTable();
+        return;
+      }
+
+      let opts = '';
+      list.forEach(a => {
+        opts += `<option value="${a.id}">[${a.subject}] ${a.title} (Hạn: ${a.dueDate})</option>`;
+      });
+      assignSel.innerHTML = opts;
+      renderStudentSubmissionTable();
+    }
+
+    function renderStudentSubmissionTable() {
+      const currentClass = document.getElementById('filterClass').value;
+      const assignId = document.getElementById('filterAssignment').value;
+      const keyword = document.getElementById('searchStudentInput').value.trim().toLowerCase();
+      const tbody = document.getElementById('submissionTableBody');
+
+      let currentAssign = allAssignments.find(a => a.id === assignId);
+      document.getElementById('lblCurrentAssignment').innerText = currentAssign ? currentAssign.title : "---";
+
+      let classStudents = allStudents.filter(s => {
+        let cleanS = String(s.className || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        let cleanC = String(currentClass || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        return cleanS === cleanC || cleanS.includes(cleanC);
+      });
+
+      if (keyword) {
+        classStudents = classStudents.filter(s => s.name.toLowerCase().includes(keyword) || s.id.toLowerCase().includes(keyword));
+      }
+
+      let totalStudents = classStudents.length;
+
+      if (classStudents.length === 0 || !currentAssign) {
+        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-muted">Chưa có bài tập nào hoặc không tìm thấy học sinh.</td></tr>';
+        document.getElementById('statTotalStudents').innerText = totalStudents;
+        document.getElementById('statSubmitted').innerText = 0;
+        document.getElementById('statNotSubmitted').innerText = totalStudents;
+        document.getElementById('statGraded').innerText = 0;
+        document.getElementById('recordCountLabel').innerText = `0 học sinh`;
+        return;
+      }
+
+      let submittedCount = 0;
+      let gradedCount = 0;
+
+      let html = '';
+      classStudents.forEach((st, idx) => {
+        // Mô phỏng trạng thái nộp bài (có thể mở rộng đọc từ sheet NOP_BAI_2627)
+        let hasSubmitted = false;
+        let linkVal = "";
+        let timeVal = "";
+        let scoreVal = "";
+        let feedbackVal = "";
+
+        if (hasSubmitted) submittedCount++;
+
+        html += `
+          <tr>
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td class="fw-bold text-secondary">${st.id}</td>
+            <td class="text-start fw-bold text-dark">${st.name}</td>
+            <td class="text-start">${hasSubmitted ? `<a href="${linkVal}" target="_blank" class="text-primary fw-bold text-decoration-none"><i class="fas fa-external-link-alt me-1"></i>${linkVal}</a>` : '<span class="text-danger small">Chưa nộp bài</span>'}</td>
+            <td class="small text-secondary">${timeVal || '---'}</td>
+            <td class="fw-bold text-success">${scoreVal || '-'}</td>
+            <td class="text-start small text-muted">${feedbackVal || 'Chưa nhận xét'}</td>
+            <td>
+              <button onclick="alert('Chức năng chấm điểm trực tuyến cho học sinh ${st.name}')" class="btn btn-sm btn-outline-primary" title="Chấm điểm">
+                <i class="fas fa-marker"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+      document.getElementById('statTotalStudents').innerText = totalStudents;
+      document.getElementById('statSubmitted').innerText = submittedCount;
+      document.getElementById('statNotSubmitted').innerText = totalStudents - submittedCount;
+      document.getElementById('statGraded').innerText = gradedCount;
+      document.getElementById('recordCountLabel').innerText = `Hiển thị: ${classStudents.length} học sinh`;
+    }
+
+    function openAssignModal() {
+      document.getElementById('modalTitle').value = "";
+      document.getElementById('modalDescription').value = "";
+      document.getElementById('modalLinkDoc').value = "";
+      new bootstrap.Modal(document.getElementById('assignModal')).show();
+    }
+
+    async function submitNewAssignment() {
+      const className = document.getElementById('modalClass').value;
+      const subject = document.getElementById('modalSubject').value;
+      const title = document.getElementById('modalTitle').value.trim();
+      const description = document.getElementById('modalDescription').value.trim();
+      const dueDate = document.getElementById('modalDueDate').value.trim();
+      const linkDoc = document.getElementById('modalLinkDoc').value.trim();
+
+      if (!title) return alert("Vui lòng nhập tiêu đề bài tập!");
+
+      const item = {
+        className: className,
+        subject: subject,
+        title: title,
+        description: description,
+        dueDate: dueDate || "23:59 hôm nay",
+        linkDoc: linkDoc
+      };
+
+      try {
+        const msg = await callApi('saveAssignmentRecord2627', item);
+        alert(msg);
+        bootstrap.Modal.getInstance(document.getElementById('assignModal')).hide();
+        await loadAssignmentData();
+      } catch (err) {
+        alert("Lỗi khi giao bài: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
