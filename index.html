@@ -450,6 +450,10 @@
         <div id="tab-school_library_manager" class="content-tab d-none" style="height: 85vh;">
           <iframe id="iframe-schoollibrary" src="thuvientruong2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
         </div>
+        <!-- TAB IT & GIÁO VỤ HỌC VỤ (NHÚNG itgiaovu2627.html) -->
+        <div id="tab-it_academic_support" class="content-tab d-none" style="height: 85vh;">
+          <iframe id="iframe-itgiaovu" src="itgiaovu2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
+        </div>
 
 
 
@@ -1521,6 +1525,13 @@
           var menuText = el ? el.innerText.toLowerCase() : '';
           if (id.includes('library') || id.includes('thu_vien') || menuText.includes('thư viện trường') || menuText.includes('thư viện')) {
             target = document.getElementById('tab-school_library_manager');
+          }
+        }
+        // TỰ ĐỘNG BẬT TAB IT & GIÁO VỤ
+        if (!target) {
+          var menuText = el ? el.innerText.toLowerCase() : '';
+          if (id.includes('it') || id.includes('giao_vu') || menuText.includes('it & giáo vụ') || menuText.includes('giáo vụ')) {
+            target = document.getElementById('tab-it_academic_support');
           }
         }
         
