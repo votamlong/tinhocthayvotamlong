@@ -209,26 +209,24 @@
         </button>
       </div>
       <!--chen menu moi-->
-      <!-- KHUNG CHỨA MENU CHUNG CÓ TÍNH NĂNG CUỘN (overflow-auto) -->
-        <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto">
-          <!-- (Các menu cũ do hệ thống tự sinh ra sẽ nằm ở đây) -->
+<!-- KHUNG CHỨA MENU CHUNG DUY NHẤT CÓ TÍNH NĂNG CUỘN -->
+      <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto">
+        <!-- (Các menu cũ do hệ thống tự sinh ra sẽ tự động nạp vào đây) -->
 
-          <!-- GỘP CHUNG TẤT CÁC MENU MỚI VÀO ĐÂY ĐỂ CHÚNG CÙNG CUỘN ĐỀU -->
-          <div onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2">
-            <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
-          </div>
-          <div onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2">
-            <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
-          </div>
-          <div onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2">
-            <i class="fas fa-laptop-code me-3 text-info" style="width:20px"></i> <span>ÔN CK1 TIN 6</span>
-          </div>
-          <div onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2">
-            <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
-          </div>
+        <!-- CÁC MENU MỚI NẰM CHUNG VÀO ĐÂY ĐỂ CÙNG CUỘN ĐỀU VÀ KHÔNG BỊ MẤT -->
+        <div onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+          <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
         </div>
-      <!---->
-      <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto"></div>
+        <div onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+          <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
+        </div>
+        <div onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+          <i class="fas fa-laptop-code me-3 text-info" style="width:20px"></i> <span>ÔN CK1 TIN 6</span>
+        </div>
+        <div onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+          <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
+        </div>
+      </div>
       <!--chen menu moi cung  o day-->
       
       <!---->
