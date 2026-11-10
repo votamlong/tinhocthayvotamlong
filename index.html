@@ -1342,13 +1342,15 @@
 
     function loginSuccess(res) {
       // TỰ ĐỘNG GHI NHẬT KÝ HOẠT ĐỘNG KHI ĐĂNG NHẬP THÀNH CÔNG
-      google.script.run.logUserActivity2627({
-        email: res.email || 'admin@edu.vn',
-        name: res.name || 'Người dùng',
-        role: res.role || 'ADMIN',
-        action: 'Đăng nhập hệ thống thành công',
-        device: navigator.userAgent.substring(0, 60)
-      });
+      try {
+        google.script.run.logUserActivity2627({
+          email: res.email || 'admin@edu.vn',
+          name: res.name || 'Người dùng',
+          role: res.role || 'ADMIN',
+          action: 'Đăng nhập hệ thống thành công',
+          device: navigator.userAgent.substring(0, 50)
+        });
+      } catch(e) { console.log(e); }
       //
       currentUser = res;
       document.getElementById('u-name').innerText = res.name;
