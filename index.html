@@ -225,6 +225,9 @@
           <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
         </div>
         <!-- Các menu cũ của server sẽ nối tiếp ở dưới -->
+        <div onclick="switchTab('on_ck1_tin9', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+          <i class="fas fa-laptop-code me-3 text-success" style="width:20px"></i> <span>ÔN CK1 TIN 9</span>
+        </div>
       </div>
 
       <!-- PHẦN THÔNG TIN TÀI KHOẢN DƯỚI CÙNG -->
@@ -499,6 +502,10 @@
         <!-- TAB ÔN CK1 TIN 6 (NHÚNG WEB APP) -->
         <div id="tab-on_ck1_tin6" class="content-tab d-none" style="height: 85vh;">
           <iframe src="https://script.google.com/macros/s/AKfycbyFvZTKn9JwlVzbd4yY73Yf_fUH-k2jzTJ9CP3W1ctX6YePvK4_jwX6jf3Gz_dAee_V/exec" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: white;" class="shadow-sm"></iframe>
+        </div>
+        <!-- TAB ÔN CK1 TIN 9 (NHÚNG WEB APP) -->
+        <div id="tab-on_ck1_tin9" class="content-tab d-none" style="height: 85vh;">
+          <iframe src="https://script.google.com/macros/s/AKfycbzKilbFuuaGpv88Yxtl2ybjekG9ZKsGi2fwysNX45RXr05EU8LX7EBIcG5OsXqz2zdVdQ/exec" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: white;" class="shadow-sm"></iframe>
         </div>
 
 
@@ -1576,6 +1583,9 @@
         }
         else if (idLower.includes('ck1') || idLower.includes('tin_6') || menuText.includes('ôn ck1') || menuText.includes('tin học 6')) {
           target = document.getElementById('tab-on_ck1_tin6');
+        }
+        else if (idLower.includes('tin9') || idLower.includes('tin_9') || menuText.includes('tin 9') || menuText.includes('ôn ck1 tin 9')) {
+          target = document.getElementById('tab-on_ck1_tin9');
         }
       }
 
