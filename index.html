@@ -211,22 +211,21 @@
 
      <!-- KHUNG CHỨA MENU DUY NHẤT CÓ TÍNH NĂNG CUỘN -->
       <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto">
-      <!-- BỔ SUNG 4 NÚT BẤM NÀY VÀO TRONG #sidebar-menu -->
-      <div onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
-        <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
+        <!-- 4 MENU CÓ ID ĐỂ DỄ DÀNG ẨN/HIỆN THEO QUYỀN -->
+        <div id="menu-ai-exam" onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2 d-none" style="cursor: pointer;">
+          <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
+        </div>
+        <div id="menu-essay-grade" onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2 d-none" style="cursor: pointer;">
+          <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
+        </div>
+        <div id="menu-tin6-on" onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+          <i class="fas fa-laptop-code me-3 text-info" style="width:20px"></i> <span>ÔN CK1 TIN 6</span>
+        </div>
+        <div id="menu-activity-log" onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2 d-none" style="cursor: pointer;">
+          <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
+        </div>
+        <!-- Các menu cũ của server sẽ nối tiếp ở dưới -->
       </div>
-      <div onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
-        <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
-      </div>
-      <div onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
-        <i class="fas fa-laptop-code me-3 text-info" style="width:20px"></i> <span>ÔN CK1 TIN 6</span>
-      </div>
-      <div onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
-        <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
-      </div>
-      
-      <!-- Các menu cũ tự động render từ server sẽ nằm tiếp ở dưới này -->
-    </div>
 
       <!-- PHẦN THÔNG TIN TÀI KHOẢN DƯỚI CÙNG -->
       <div class="p-3 border-top bg-light">
@@ -1372,6 +1371,17 @@
 
       var menuHtml = '';
       var dataMenu = res.menu || res.menus || [];
+      //
+      // PHÂN QUYỀN HIỂN THỊ CÁC MENU QUẢN TRỊ NĂNG CAO
+      if (res.role === 'ADMIN' || res.role === 'GVCN' || res.role === 'GVBM') {
+        document.getElementById('menu-ai-exam').classList.remove('d-none');
+        document.getElementById('menu-essay-grade').classList.remove('d-none');
+        document.getElementById('menu-tin6-on').classList.remove('d-none');
+        document.getElementById('menu-activity-log').classList.remove('d-none');
+      } else {
+        // Nếu là Học sinh (HS) hoặc Phụ huynh (PH) thì giữ nguyên ẩn (d-none)
+      }
+      //
             
             
 
