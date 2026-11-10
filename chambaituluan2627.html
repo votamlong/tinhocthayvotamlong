@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chấm Bài Tự Luận Trên Giấy - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- Thư viện hỗ trợ xuất PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+      color: #1e293b;
+      padding: 16px;
+      text-transform: none !important;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .paper-preview {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      overflow: hidden;
+      position: relative;
+    }
+    .paper-preview img {
+      max-width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+    }
+    input, select, textarea, button, label, span, h4, h6 {
+      text-transform: none !important;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- TIÊU ĐỀ -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark m-0"><i class="fas fa-camera-retro text-primary me-2"></i>CHẤM BÀI TỰ LUẬN TRÊN GIẤY & XUẤT PDF</h4>
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Năm học 2026-2027</span>
+    </div>
+
+    <!-- 2 CỘT NỘI DUNG -->
+    <div class="row g-4">
+      
+      <!-- CỘT TRÁI: CHỤP ẢNH & CHẤM ĐIỂM -->
+      <div class="col-lg-5">
+        <div class="panel-box border-top border-4 border-primary">
+          <h6 class="fw-bold text-primary mb-3 text-uppercase"><i class="fas fa-pen-fancy me-1"></i> 1. Chấm bài & Ghi nhận điểm</h6>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Chọn lớp</label>
+              <select id="selClass" class="form-select form-select-sm fw-bold border-primary" onchange="filterStudentsForGrading()">
+                <option value="">-- Chọn lớp --</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Học sinh</label>
+              <select id="selStudent" class="form-select form-select-sm fw-bold">
+                <option value="">-- Chọn học sinh --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">Tiêu đề bài kiểm tra / Tự luận</label>
+            <input type="text" id="inpExamTitle" class="form-control form-control-sm fw-bold" placeholder="Vd: Kiểm tra 15 phút Tự luận Tin học...">
+          </div>
+
+          <!-- CHỤP / TẢI ẢNH BÀI LÀM -->
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">2. Chụp ảnh hoặc tải ảnh bài làm giấy</label>
+            <input type="file" id="inpImageFile" class="form-control form-control-sm mb-2" accept="image/*" onchange="previewImage(this)">
+            <div class="paper-preview" id="imagePreviewBox">
+              <span class="text-muted small"><i class="fas fa-image fa-2x mb-1 d-block"></i>Chưa có ảnh bài làm. Bấm chọn file hoặc chụp ảnh.</span>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="small fw-bold text-success mb-1">Điểm số (Thang 10)</label>
+              <input type="number" id="inpScore" class="form-control form-control-sm fw-bold text-success fs-5 text-center" step="0.25" min="0" max="10" placeholder="8.5">
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Nhận xét / Lời phê</label>
+              <input type="text" id="inpFeedback" class="form-control form-control-sm" placeholder="Vd: Trình bày sạch sẽ, đúng ý...">
+            </div>
+          </div>
+
+          <button onclick="submitGradingRecord()" id="btnSubmit" class="btn btn-primary w-100 fw-bold rounded-pill py-2 shadow-sm">
+            <i class="fas fa-save me-1"></i> LƯU KẾT QUẢ & ĐỒNG BỘ SHEET
+          </button>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: DANH SÁCH ĐÃ CHẤM & XUẤT PDF -->
+      <div class="col-lg-7">
+        <div class="panel-box">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <h6 class="fw-bold text-dark m-0 text-uppercase">
+              <i class="fas fa-list-alt text-primary me-1"></i> Sổ Chấm Bài Tự Luận
+            </h6>
+            <div class="d-flex align-items-center gap-2">
+              <button onclick="exportToPDF()" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold shadow-sm">
+                <i class="fas fa-file-pdf me-1"></i> Xuất File PDF Báo Cáo
+              </button>
+              <button onclick="loadGradingData()" class="btn btn-outline-secondary btn-sm fw-bold" title="Làm mới">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- KHUNG NỘI DUNG DÙNG ĐỂ XUẤT PDF -->
+          <div id="pdfExportArea" class="bg-white p-3 rounded-3">
+            <div class="text-center mb-3 d-none" id="pdfHeaderTitle">
+              <h5 class="fw-bold text-uppercase">BÁO CÁO KẾT QUẢ CHẤM BÀI TỰ LUẬN TRÊN GIẤY</h5>
+              <p class="small text-muted">Trường THCS Bình Tân - Năm học 2026-2027</p>
+            </div>
+
+            <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
+              <table class="table table-hover align-middle mb-0 small text-center">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width: 45px;">STT</th>
+                    <th style="width: 80px;">Lớp</th>
+                    <th class="text-start">Học Sinh</th>
+                    <th class="text-start">Tiêu Đề Bài</th>
+                    <th style="width: 70px;">Điểm</th>
+                    <th class="text-start">Nhận Xét</th>
+                    <th style="width: 80px;" class="no-print">Ảnh Bài</th>
+                  </tr>
+                </thead>
+                <tbody id="gradingTableBody">
+                  <tr><td colspan="7" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu chấm bài...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card-footer bg-light py-2 px-3 mt-3 rounded-3 border d-flex justify-content-between align-items-center small text-muted">
+            <span><i class="fas id-card database text-primary me-1"></i> Lưu trữ tại sheet <b>CHAM_BAI_TU_LUAN_2627</b></span>
+            <span id="recordCountLabel">Hiển thị: 0 bài</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbyg3fJvy0_mDsqKVZizmWIxRct2n7m5xxBzeJKlBzj6etY-D84D3MtU0ahHIyivpAdW3Q/exec";
+
+    let allStudents = [];
+    let allGradingLogs = [];
+    let base64ImageString = "";
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      try {
+        allStudents = await callApi('getAllStudents2627') || [];
+        if (allStudents.length === 0) {
+          let stData = await callApi('getAllStudents');
+          allStudents = (stData || []).map(s => ({ id: s.id, name: s.name, className: s.className }));
+        }
+
+        let setC = new Set();
+        allStudents.forEach(s => { if (s.className) setC.add(s.className); });
+        let classes = Array.from(setC).sort();
+        if (classes.length === 0) classes = ["6A3", "6A4", "6A5"];
+
+        let classOpts = '<option value="">-- Chọn lớp --</option>';
+        classes.forEach(c => classOpts += `<option value="${c}">Lớp ${c}</option>`);
+        document.getElementById('selClass').innerHTML = classOpts;
+
+        if (classes.length > 0) {
+          document.getElementById('selClass').value = classes[0];
+          filterStudentsForGrading();
+        }
+
+        await loadGradingData();
+      } catch (err) {
+        console.error("Lỗi khởi tạo chấm bài tự luận:", err);
+      }
+    };
+
+    function filterStudentsForGrading() {
+      const selectedClass = document.getElementById('selClass').value;
+      const selStudent = document.getElementById('selStudent');
+
+      let filtered = allStudents.filter(s => {
+        let cleanS = String(s.className || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        let cleanC = String(selectedClass || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        return cleanS === cleanC || cleanS.includes(cleanC);
+      });
+
+      let html = '<option value="">-- Chọn học sinh --</option>';
+      filtered.forEach(s => {
+        html += `<option value="${s.id}|${s.name}">[${s.id}] ${s.name}</option>`;
+      });
+      selStudent.innerHTML = html;
+    }
+
+    function previewImage(input) {
+      if (input.files && input.files[0]) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+          base64ImageString = e.target.result;
+          document.getElementById('imagePreviewBox').innerHTML = `<img src="${base64ImageString}" alt="Bài làm học sinh">`;
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    async function loadGradingData() {
+      try {
+        allGradingLogs = await callApi('getEssayGradingLogs2627') || [];
+        renderTable();
+      } catch (err) {
+        document.getElementById('gradingTableBody').innerHTML = `<tr><td colspan="7" class="p-4 text-danger text-center">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('gradingTableBody');
+      if (allGradingLogs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-muted">Chưa có kết quả chấm bài nào.</td></tr>';
+        document.getElementById('recordCountLabel').innerText = `Hiển thị: 0 bài`;
+        return;
+      }
+
+      let html = '';
+      allGradingLogs.forEach((l, idx) => {
+        html += `
+          <tr>
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td><span class="badge bg-secondary">${l.className}</span></td>
+            <td class="text-start fw-bold text-dark">${l.studentName}<br><small class="text-muted fw-normal">${l.studentId}</small></td>
+            <td class="text-start fw-semibold">${l.examTitle}</td>
+            <td class="fw-bold text-success fs-6">${l.score}</td>
+            <td class="text-start small text-muted">${l.feedback || '---'}</td>
+            <td class="no-print">
+              ${l.imageUrl ? `<a href="${l.imageUrl}" target="_blank" class="btn btn-sm btn-outline-primary" title="Xem ảnh"><i class="fas fa-eye"></i></a>` : '<span class="text-muted small">Không có</span>'}
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+      document.getElementById('recordCountLabel').innerText = `Hiển thị: ${allGradingLogs.length} bài`;
+    }
+
+    async function submitGradingRecord() {
+      const className = document.getElementById('selClass').value;
+      const studentVal = document.getElementById('selStudent').value;
+      const examTitle = document.getElementById('inpExamTitle').value.trim();
+      const score = document.getElementById('inpScore').value.trim();
+      const feedback = document.getElementById('inpFeedback').value.trim();
+
+      if (!className) return alert("Vui lòng chọn lớp học!");
+      if (!studentVal) return alert("Vui lòng chọn học sinh!");
+      if (!examTitle) return alert("Vui lòng nhập tiêu đề bài kiểm tra!");
+      if (!score) return alert("Vui lòng nhập điểm số!");
+
+      let parts = studentVal.split('|');
+      let studentId = parts[0];
+      let studentName = parts[1];
+
+      const item = {
+        className: className,
+        studentId: studentId,
+        studentName: studentName,
+        examTitle: examTitle,
+        score: score,
+        feedback: feedback,
+        imageUrl: base64ImageString // Lưu chuỗi base64 ảnh bài làm
+      };
+
+      const btn = document.getElementById('btnSubmit');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+
+      try {
+        const msg = await callApi('saveEssayGradingRecord2627', item);
+        alert(msg);
+        document.getElementById('inpScore').value = "";
+        document.getElementById('inpFeedback').value = "";
+        document.getElementById('inpImageFile').value = "";
+        document.getElementById('imagePreviewBox').innerHTML = `<span class="text-muted small"><i class="fas fa-image fa-2x mb-1 d-block"></i>Chưa có ảnh bài làm. Bấm chọn file hoặc chụp ảnh.</span>`;
+        base64ImageString = "";
+        await loadGradingData();
+      } catch (err) {
+        alert("Lỗi khi lưu kết quả: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    function exportToPDF() {
+      document.getElementById('pdfHeaderTitle').classList.remove('d-none');
+      let element = document.getElementById('pdfExportArea');
+      let opt = {
+        margin:       10,
+        filename:     'BaoCaoChamBaiTuLuan.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+
+      html2pdf().from(element).set(opt).save().then(() => {
+        document.getElementById('pdfHeaderTitle').classList.add('d-none');
+      });
+    }
+  </script>
+</body>
+</html>
