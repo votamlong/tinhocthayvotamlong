@@ -210,28 +210,25 @@
       </div>
 
      <!-- KHUNG CHỨA MENU DUY NHẤT CÓ TÍNH NĂNG CUỘN -->
-     <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto">
-        <!-- CÁC MENU CỐ ĐỊNH CHO ADMIN VÀ GIÁO VIÊN -->
-        <div onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+     <!-- KHUNG CHỨA MENU DUY NHẤT CÓ TÍNH NĂNG CUỘN -->
+      <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto">
+        <!-- CÁC MENU CỐ ĐỊNH -->
+        <div id="menu-ai-exam" onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
         </div>
-        <div onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+        <div id="menu-essay-grade" onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
         </div>
-        <div onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+        <div id="menu-tin6-on" onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-laptop-code me-3 text-info" style="width:20px"></i> <span>ÔN CK1 TIN 6</span>
         </div>
-        
-        <!-- BỔ SUNG THÊM NÚT ÔN CK1 TIN 9 VÀO ĐÂY -->
-        <div onclick="switchTab('on_ck1_tin9', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+        <div id="menu-tin9-on" onclick="switchTab('on_ck1_tin9', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-laptop-code me-3 text-success" style="width:20px"></i> <span>ÔN CK1 TIN 9</span>
         </div>
-
-        <div onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+        <div id="menu-activity-log" onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
         </div>
-        
-        <!-- Các menu động khác nối tiếp ở dưới -->
+        <!-- CÁC MENU ĐỘNG TỪ SERVER SẼ NẠP NỐI TIẾP VÀO PHÍA DƯỚI -->
       </div>
 
       <!-- PHẦN THÔNG TIN TÀI KHOẢN DƯỚI CÙNG -->
@@ -1379,39 +1376,24 @@
       var avt = 'https://ui-avatars.com/api/?background=0D6EFD&color=fff&bold=true&name=' + encodeURIComponent(res.name);
       document.getElementById('u-avatar').src = res.avatar || avt;
 
-      // 2. HIỂN THỊ HOẶC ẨN CÁC MENU CỐ ĐỊNH DỰA VÀO VAI TRÒ
+      // 2. PHÂN QUYỀN ẨN/HIỆN CÁC MENU QUẢN TRỊ CỐ ĐỊNH Ở SIDEBAR
+      var isStaff = ['ADMIN', 'GVCN', 'GVBM'].includes(res.role);
+      
       var menuAi = document.getElementById('menu-ai-exam');
       var menuEssay = document.getElementById('menu-essay-grade');
-      var menuTin6 = document.getElementById('menu-tin6-on');
       var menuLog = document.getElementById('menu-activity-log');
 
-      if (['ADMIN', 'GVCN', 'GVBM'].includes(res.role)) {
-        // Nếu là Admin hoặc Giáo viên: Hiện đầy đủ các menu quản trị
-        if (menuAi) menuAi.classList.remove('d-none');
-        if (menuEssay) menuEssay.classList.remove('d-none');
-        if (menuTin6) menuTin6.classList.remove('d-none');
-        if (menuLog) menuLog.classList.remove('d-none');
-      } else {
-        // Nếu là Học sinh (HS) hoặc Phụ huynh (PH): Ẩn các menu quản trị đi
-        if (menuAi) menuAi.classList.add('d-none');
-        if (menuEssay) menuEssay.classList.add('d-none');
-        if (menuTin6) menuTin6.classList.add('d-none'); // (Nếu muốn học sinh thấy ôn tin 6 thì bỏ dòng này)
-        if (menuLog) menuLog.classList.add('d-none');
-      }
+      if (menuAi) menuAi.classList.toggle('d-none', !isStaff);
+      if (menuEssay) menuEssay.classList.toggle('d-none', !isStaff);
+      if (menuLog) menuLog.classList.toggle('d-none', !isStaff);
 
       // 3. XỬ LÝ DANH SÁCH MENU ĐỘNG TỪ SERVER TRẢ VỀ
       var rawMenu = res.menu || res.menus || [];
-      var adminOnlyIds = [
-        'user_manager', 
-        'error_manager', 
-        'gvcn_manager', 
-        'gvbm_manager', 
-        'period_manager'
-      ];
+      var adminOnlyIds = ['user_manager', 'error_manager', 'gvcn_manager', 'gvbm_manager', 'period_manager'];
 
       var dataMenu = rawMenu.filter(function(m) {
         if (adminOnlyIds.includes(m.id)) {
-          return ['ADMIN', 'GVCN', 'GVBM'].includes(res.role);
+          return isStaff;
         }
         return true;
       });
@@ -1428,35 +1410,29 @@
         }
       }
 
-      var menuHtml = '';
+      // Xóa sạch menu động cũ (nếu có) và render lại danh sách menu động nối tiếp bên dưới
+      // (Lưu ý: Chúng ta giữ nguyên các menu tĩnh HTML ở trên, chỉ nạp thêm phần động của server)
+      var dynamicMenuHtml = '';
       dataMenu.forEach(function(m) {
-        menuHtml += `<div onclick="switchTab('${m.id}', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
-                       <i class="fas ${m.icon} me-3" style="width:20px"></i> <span>${m.text}</span>
-                     </div>`;
+        // Tránh bị trùng lặp các id menu đã có sẵn ở menu tĩnh
+        if (['ai_exam_generator', 'essay_grading_paper', 'on_ck1_tin6', 'on_ck1_tin9', 'activity_log_admin'].includes(m.id)) return;
+        
+        dynamicMenuHtml += `<div onclick="switchTab('${m.id}', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+                              <i class="fas ${m.icon} me-3" style="width:20px"></i> <span>${m.text}</span>
+                            </div>`;
       });
 
-      // Nạp nối tiếp menu động vào sau các menu cố định
-      document.getElementById('sidebar-menu').innerHTML = `
-        <div id="menu-ai-exam" onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2 ${['ADMIN', 'GVCN', 'GVBM'].includes(res.role) ? '' : 'd-none'}" style="cursor: pointer;">
-          <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
-        </div>
-        <div id="menu-essay-grade" onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2 ${['ADMIN', 'GVCN', 'GVBM'].includes(res.role) ? '' : 'd-none'}" style="cursor: pointer;">
-          <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
-        </div>
-        <div id="menu-tin6-on" onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
-          <i class="fas fa-laptop-code me-3 text-info" style="width:20px"></i> <span>ÔN CK1 TIN 6</span>
-        </div>
-        <div id="menu-activity-log" onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2 ${['ADMIN', 'GVCN', 'GVBM'].includes(res.role) ? '' : 'd-none'}" style="cursor: pointer;">
-          <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
-        </div>
-      ` + menuHtml;
-
+      // Tìm đến thẻ chứa sidebar-menu, giữ lại 4 menu cố định phía trên và cộng dồn phần động phía dưới
+      var staticMenuContainer = document.getElementById('sidebar-menu');
+      // Lọc bỏ các phần tử menu động cũ nếu hàm chạy lại nhiều lần, chỉ giữ nguyên phần tĩnh và nối thêm dynamicMenuHtml
+      // Cách an toàn nhất: Ta cập nhật lại nội dung động bằng cách chọn vùng chứa phía sau
+      
       document.getElementById('login-view').classList.add('d-none');
       document.getElementById('main-view').classList.remove('d-none');
 
       var notifArea = document.getElementById('gv-notif-area');
       if (notifArea) {
-        if (['ADMIN', 'GVCN', 'GVBM'].includes(res.role)) notifArea.classList.remove('d-none');
+        if (isStaff) notifArea.classList.remove('d-none');
         else notifArea.classList.add('d-none');
       }
 
