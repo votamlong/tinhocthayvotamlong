@@ -210,9 +210,7 @@
       </div>
 
      <!-- KHUNG CHỨA MENU DUY NHẤT CÓ TÍNH NĂNG CUỘN -->
-     <!-- KHUNG CHỨA MENU DUY NHẤT CÓ TÍNH NĂNG CUỘN -->
-      <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto">
-        <!-- CÁC MENU CỐ ĐỊNH -->
+     <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto">
         <div id="menu-ai-exam" onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
         </div>
@@ -228,7 +226,6 @@
         <div id="menu-activity-log" onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
         </div>
-        <!-- CÁC MENU ĐỘNG TỪ SERVER SẼ NẠP NỐI TIẾP VÀO PHÍA DƯỚI -->
       </div>
 
       <!-- PHẦN THÔNG TIN TÀI KHOẢN DƯỚI CÙNG -->
@@ -1376,12 +1373,13 @@
       var avt = 'https://ui-avatars.com/api/?background=0D6EFD&color=fff&bold=true&name=' + encodeURIComponent(res.name);
       document.getElementById('u-avatar').src = res.avatar || avt;
 
-      // 2. PHÂN QUYỀN ẨN/HIỆN CÁC MENU QUẢN TRỊ CỐ ĐỊNH Ở SIDEBAR
       var isStaff = ['ADMIN', 'GVCN', 'GVBM'].includes(res.role);
-      
+
+      // 2. ĐIỀU KHIỂN ẨN / HIỆN CÁC MENU CỐ ĐỊNH DỰA VÀO VAI TRÒ
       var menuAi = document.getElementById('menu-ai-exam');
       var menuEssay = document.getElementById('menu-essay-grade');
       var menuLog = document.getElementById('menu-activity-log');
+      var menuTin9 = document.getElementById('menu-tin9-on'); // Menu Tin 9 (Thầy có thể ẩn/hiện tùy ý, mặc định để hiển thị cho cả học sinh ôn tập)
 
       if (menuAi) menuAi.classList.toggle('d-none', !isStaff);
       if (menuEssay) menuEssay.classList.toggle('d-none', !isStaff);
@@ -1389,7 +1387,13 @@
 
       // 3. XỬ LÝ DANH SÁCH MENU ĐỘNG TỪ SERVER TRẢ VỀ
       var rawMenu = res.menu || res.menus || [];
-      var adminOnlyIds = ['user_manager', 'error_manager', 'gvcn_manager', 'gvbm_manager', 'period_manager'];
+      var adminOnlyIds = [
+        'user_manager', 
+        'error_manager', 
+        'gvcn_manager', 
+        'gvbm_manager', 
+        'period_manager'
+      ];
 
       var dataMenu = rawMenu.filter(function(m) {
         if (adminOnlyIds.includes(m.id)) {
@@ -1410,11 +1414,9 @@
         }
       }
 
-      // Xóa sạch menu động cũ (nếu có) và render lại danh sách menu động nối tiếp bên dưới
-      // (Lưu ý: Chúng ta giữ nguyên các menu tĩnh HTML ở trên, chỉ nạp thêm phần động của server)
       var dynamicMenuHtml = '';
       dataMenu.forEach(function(m) {
-        // Tránh bị trùng lặp các id menu đã có sẵn ở menu tĩnh
+        // Tránh bị trùng lặp với các menu cố định đã khai báo sẵn trong HTML
         if (['ai_exam_generator', 'essay_grading_paper', 'on_ck1_tin6', 'on_ck1_tin9', 'activity_log_admin'].includes(m.id)) return;
         
         dynamicMenuHtml += `<div onclick="switchTab('${m.id}', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
@@ -1422,11 +1424,18 @@
                             </div>`;
       });
 
-      // Tìm đến thẻ chứa sidebar-menu, giữ lại 4 menu cố định phía trên và cộng dồn phần động phía dưới
-      var staticMenuContainer = document.getElementById('sidebar-menu');
-      // Lọc bỏ các phần tử menu động cũ nếu hàm chạy lại nhiều lần, chỉ giữ nguyên phần tĩnh và nối thêm dynamicMenuHtml
-      // Cách an toàn nhất: Ta cập nhật lại nội dung động bằng cách chọn vùng chứa phía sau
+      // 4. NẠP NỐI TIẾP MENU ĐỘNG VÀO SAU CÁC MENU CỐ ĐỊNH (DÙNG += ĐỂ KHÔNG BAO GIỜ BỊ MẤT)
+      var sidebarMenu = document.getElementById('sidebar-menu');
       
+      // Tìm xem đã có phần chứa menu động phía dưới chưa, nếu chưa thì tạo mới nối vào
+      let dynamicContainer = document.getElementById('dynamic-menu-container');
+      if (!dynamicContainer) {
+        dynamicContainer = document.createElement('div');
+        dynamicContainer.id = 'dynamic-menu-container';
+        sidebarMenu.appendChild(dynamicContainer);
+      }
+      dynamicContainer.innerHTML = dynamicMenuHtml;
+
       document.getElementById('login-view').classList.add('d-none');
       document.getElementById('main-view').classList.remove('d-none');
 
