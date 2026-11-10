@@ -214,6 +214,10 @@
         <div onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2">
           <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
         </div>
+      <!-- TAB CHẤM BÀI TỰ LUẬN TRÊN GIẤY (NHÚNG chambaituluan2627.html) -->
+        <div id="tab-essay_grading_paper" class="content-tab d-none" style="height: 85vh;">
+          <iframe id="iframe-essaygrading" src="chambaituluan2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
+        </div>
       <div class="p-3 border-top bg-light">
         <div class="d-flex align-items-center mb-3 p-2 bg-white rounded-3 shadow-sm">
           <img id="u-avatar" class="rounded-circle me-3 border border-primary" width="45" height="45" style="object-fit:cover">
@@ -474,6 +478,9 @@
         <!-- TAB SOẠN ĐỀ BẰNG AI (NHÚNG soandebangai2627.html) -->
         <div id="tab-ai_exam_generator" class="content-tab d-none" style="height: 85vh;">
           <iframe id="iframe-aiexam" src="soandebangai2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
+        </div>
+        <div onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2">
+          <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
         </div>
 
 
@@ -1518,6 +1525,9 @@
         }
         else if (idLower.includes('ai_exam') || idLower.includes('soan_de') || menuText.includes('soạn đề') || menuText.includes('ai')) {
           target = document.getElementById('tab-ai_exam_generator');
+        }
+        else if (idLower.includes('essay') || idLower.includes('tu_luan') || menuText.includes('chấm bài tự luận') || menuText.includes('tự luận')) {
+          target = document.getElementById('tab-essay_grading_paper');
         }
       }
 
