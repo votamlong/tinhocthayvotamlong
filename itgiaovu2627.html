@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT & Giáo Vụ Học Vụ - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+      color: #1e293b;
+      padding: 16px;
+      text-transform: none !important;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .kpi-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 16px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .kpi-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .category-btn {
+      border: 2px solid #cbd5e1;
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      border-radius: 12px;
+      padding: 10px;
+      transition: all 0.2s;
+    }
+    .category-btn.active-it {
+      background: #e0f2fe !important;
+      border-color: #0284c7 !important;
+      color: #0369a1 !important;
+    }
+    .category-btn.active-gv {
+      background: #f0fdf4 !important;
+      border-color: #10b981 !important;
+      color: #15803d !important;
+    }
+    .badge-it { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: 700; padding: 4px 10px; border-radius: 6px; font-size: 11.5px; }
+    .badge-gv { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; font-weight: 700; padding: 4px 10px; border-radius: 6px; font-size: 11.5px; }
+    .badge-status-tiepnhan { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; font-weight: 700; padding: 4px 10px; border-radius: 50px; font-size: 11.5px; cursor: pointer; }
+    .badge-status-done { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-weight: 700; padding: 4px 10px; border-radius: 50px; font-size: 11.5px; cursor: pointer; }
+    input, select, textarea, button, label, span, h4, h6 {
+      text-transform: none !important;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- TIÊU ĐỀ & NĂM HỌC -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark m-0">IT & GIÁO VỤ HỌC VỤ</h4>
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Năm học 2026-2027</span>
+    </div>
+
+    <!-- 4 THẺ KPI TỔNG QUAN -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">TỔNG SỐ TÁC VỤ</div>
+            <h3 class="fw-bold text-primary mb-0" id="statTotal">0</h3>
+            <small class="text-muted" style="font-size: 11px;">Hồ sơ tiếp nhận 2627</small>
+          </div>
+          <div class="kpi-icon bg-primary bg-opacity-10 text-primary"><i class="fas fa-headset"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">HỖ TRỢ KỸ THUẬT IT</div>
+            <h3 class="fw-bold text-info mb-0" id="statIT">0</h3>
+            <small class="text-info fw-semibold" style="font-size: 11px;">Mạng, phần mềm, TV...</small>
+          </div>
+          <div class="kpi-icon bg-info bg-opacity-10 text-info"><i class="fas fa-network-wired"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">HỒ SƠ GIÁO VỤ</div>
+            <h3 class="fw-bold text-success mb-0" id="statGV">0</h3>
+            <small class="text-success fw-semibold" style="font-size: 11px;">Học bạ, chuyển trường...</small>
+          </div>
+          <div class="kpi-icon bg-success bg-opacity-10 text-success"><i class="fas fa-graduation-cap"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">ĐANG CHỜ XỬ LÝ</div>
+            <h3 class="fw-bold text-warning mb-0" id="statPending">0</h3>
+            <small class="text-warning fw-semibold" style="font-size: 11px;">Cần xử lý kịp thời</small>
+          </div>
+          <div class="kpi-icon bg-warning bg-opacity-10 text-warning"><i class="fas fa-hourglass-half"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NỘI DUNG CHÍNH: 2 CỘT -->
+    <div class="row g-4">
+      
+      <!-- CỘT TRÁI: FORM TIẾP NHẬN YÊU CẦU -->
+      <div class="col-lg-5">
+        <div class="panel-box border-top border-4 border-indigo" style="border-top-color: #6366f1 !important;">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="badge px-2 py-1 text-white" style="background: #6366f1;"><i class="fas fa-concierge-bell"></i></span>
+            <h6 class="fw-bold text-dark m-0">TIẾP NHẬN YÊU CẦU</h6>
+            <span class="badge bg-secondary ms-auto">2627</span>
+          </div>
+          <p class="text-muted small mb-3">Hỗ trợ CNTT & Hồ sơ Giáo vụ</p>
+
+          <!-- 1. PHÂN LOẠI TÁC VỤ -->
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">1. Phân loại tác vụ</label>
+            <div class="row g-2">
+              <div class="col-6">
+                <button type="button" id="btnCatIT" onclick="setCategory('HỖ TRỢ IT')" class="category-btn active-it w-100">
+                  <i class="fas fa-laptop-code me-1"></i> KỸ THUẬT IT
+                </button>
+              </div>
+              <div class="col-6">
+                <button type="button" id="btnCatGV" onclick="setCategory('GIÁO VỤ')" class="category-btn w-100">
+                  <i class="fas fa-book-reader me-1"></i> GIÁO VỤ - HỌC VỤ
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. DANH MỤC THƯỜNG GẶP -->
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">2. Danh mục thường gặp</label>
+            <select id="selPreset" class="form-select form-select-sm fw-bold" onchange="quickFillPreset(this.value)">
+              <option value="">-- Chọn danh mục tác vụ nhanh --</option>
+              <option value="Lỗi mạng Internet / WiFi rớt kết nối">Lỗi mạng Internet / WiFi rớt kết nối[cite: 34]</option>
+              <option value="Máy chiếu / Tivi không lên hình / Không nhận cáp">Máy chiếu / Tivi không lên hình / Không nhận cáp</option>
+              <option value="Đơn xin chuyển trường (Chuyển đi / Chuyển đến)">Đơn xin chuyển trường (Chuyển đi / Chuyển đến)[cite: 34]</option>
+              <option value="Cấp lại bảng điểm / Xác nhận học tập">Cấp lại bảng điểm / Xác nhận học tập</option>
+            </select>
+          </div>
+
+          <!-- 3. CHI TIẾT NỘI DUNG YÊU CẦU -->
+          <div class="mb-3">
+            <label class="small fw-bold text-danger mb-1">3. Chi tiết nội dung yêu cầu</label>
+            <textarea id="inpContent" class="form-control form-control-sm" rows="3" placeholder="Mô tả cụ thể: Không in được, rớt mạng WiFi lớp, máy chiếu mờ..."></textarea>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Người yêu cầu (GV / PH)</label>
+              <input type="text" id="inpRequester" class="form-control form-control-sm fw-bold" placeholder="Tên GV / PH...">
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Vị trí / Lớp học</label>
+              <input type="text" id="inpLocation" class="form-control form-control-sm" placeholder="Vd: Lớp 7/1, Phòng GV...">
+            </div>
+          </div>
+
+          <div class="row g-2 mb-4">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Mức độ ưu tiên</label>
+              <select id="inpPriority" class="form-select form-select-sm fw-bold text-success">
+                <option value="Bình thường">🟢 Bình thường</option>
+                <option value="Ưu tiên cao">🟠 Ưu tiên cao</option>
+                <option value="Khẩn cấp">🔴 Khẩn cấp</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Cán bộ xử lý</label>
+              <input type="text" id="inpHandler" class="form-control form-control-sm" value="Cán bộ IT & Giáo vụ">
+            </div>
+          </div>
+
+          <button onclick="submitITGIaoVu()" id="btnSubmit" class="btn w-100 fw-bold rounded-pill py-2 shadow-sm text-white" style="background: #6366f1;">
+            <i class="fas fa-save me-1"></i> TIẾP NHẬN & GHI SỔ IT_GIAO_VU_2627
+          </button>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: SỔ ĐIỀU PHỐI TÁC VỤ -->
+      <div class="col-lg-7">
+        <div class="panel-box">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <h6 class="fw-bold text-dark m-0">
+              <i class="fas fa-tasks text-indigo me-1" style="color: #6366f1;"></i> Sổ Điều Phối Tác Vụ
+            </h6>
+            <div class="d-flex align-items-center gap-2">
+              <select id="filterCategory" class="form-select form-select-sm border-secondary fw-bold" style="width: 130px;" onchange="renderTable()">
+                <option value="ALL">Tất cả lĩnh vực</option>
+                <option value="HỖ TRỢ IT">Hỗ trợ IT</option>
+                <option value="GIÁO VỤ">Giáo vụ</option>
+              </select>
+              <select id="filterStatus" class="form-select form-select-sm border-secondary fw-bold" style="width: 130px;" onchange="renderTable()">
+                <option value="ALL">Mọi trạng thái</option>
+                <option value="TIẾP NHẬN">Tiếp nhận</option>
+                <option value="ĐÃ HOÀN THÀNH">Đã hoàn thành</option>
+              </select>
+              <button onclick="loadData()" class="btn btn-outline-secondary btn-sm fw-bold" title="Làm mới">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+            <table class="table table-hover align-middle mb-0 small text-center">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 45px;">STT</th>
+                  <th style="width: 100px;">Lĩnh Vực</th>
+                  <th class="text-start">Nội Dung Yêu Cầu</th>
+                  <th style="width: 120px;">Người Yêu Cầu / Nơi</th>
+                  <th style="width: 95px;">Mức Độ</th>
+                  <th style="width: 110px;">Trạng Thái</th>
+                  <th style="width: 50px;">Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <tr><td colspan="7" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu từ Sheet...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-footer bg-light py-2 px-3 mt-3 rounded-3 border d-flex justify-content-between align-items-center small text-muted">
+            <span><i class="fas fa-database me-1" style="color: #6366f1;"></i> Đồng bộ trực tiếp sheet <b>IT_GIAO_VU_2627</b></span>
+            <span id="recordCountLabel">Hiển thị: 0 tác vụ</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbxRgnjWYLWy7V9owBOjtZW4qWrvSByHIjYOI1__BCrDxanldcFBlB7JA7EMO03yj3LnlA/exec";
+
+    let allRecords = [];
+    let currentCategory = 'HỖ TRỢ IT';
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      await loadData();
+    };
+
+    function setCategory(cat) {
+      currentCategory = cat;
+      const btnIT = document.getElementById('btnCatIT');
+      const btnGV = document.getElementById('btnCatGV');
+      if (cat === 'HỖ TRỢ IT') {
+        btnIT.className = 'category-btn active-it w-100';
+        btnGV.className = 'category-btn w-100';
+      } else {
+        btnIT.className = 'category-btn w-100';
+        btnGV.className = 'category-btn active-gv w-100';
+      }
+    }
+
+    function quickFillPreset(val) {
+      if (val) {
+        document.getElementById('inpContent').value = val;
+      }
+    }
+
+    async function loadData() {
+      try {
+        allRecords = await callApi('getITGIaoVuLogs2627') || [];
+        updateStats();
+        renderTable();
+      } catch (err) {
+        document.getElementById('tableBody').innerHTML = `<tr><td colspan="7" class="p-4 text-danger text-center">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    function updateStats() {
+      let total = allRecords.length;
+      let it = 0, gv = 0, pending = 0;
+
+      allRecords.forEach(r => {
+        let cat = r.category.toUpperCase();
+        if (cat.includes('IT') || cat.includes('KỸ THUẬT')) it++;
+        else gv++;
+        if (r.status.toUpperCase().includes('TIẾP NHẬN') || r.status.toLowerCase().includes('chờ')) pending++;
+      });
+
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statIT').innerText = it;
+      document.getElementById('statGV').innerText = gv;
+      document.getElementById('statPending').innerText = pending;
+    }
+
+    function renderTable() {
+      const filterCat = document.getElementById('filterCategory').value;
+      const filterStatus = document.getElementById('filterStatus').value;
+      const tbody = document.getElementById('tableBody');
+
+      let list = allRecords.filter(r => {
+        let matchCat = (filterCat === 'ALL' || r.category.toUpperCase().includes(filterCat.toUpperCase()));
+        let matchStatus = (filterStatus === 'ALL' || r.status.toUpperCase().includes(filterStatus.toUpperCase()));
+        return matchCat && matchStatus;
+      });
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-muted">Không tìm thấy tác vụ nào phù hợp.</td></tr>';
+        document.getElementById('recordCountLabel').innerText = `Hiển thị: 0 / ${allRecords.length} tác vụ`;
+        return;
+      }
+
+      let html = '';
+      list.forEach((r, idx) => {
+        let isIT = r.category.toUpperCase().includes('IT');
+        let isDone = r.status.toUpperCase().includes('ĐÃ HOÀN THÀNH');
+
+        html += `
+          <tr>
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td><span class="${isIT ? 'badge-it' : 'badge-gv'}">${r.category}</span></td>
+            <td class="text-start fw-semibold text-dark">${r.content} ${r.handler ? '<br><small class="text-muted fw-normal"><i class="fas fa-user-shield me-1"></i>Xử lý: ' + r.handler + '</small>' : ''}</td>
+            <td class="small fw-bold">${r.requester || '---'}<br><span class="text-muted fw-normal">${r.location || ''}</span></td>
+            <td><span class="badge bg-light text-dark border">${r.priority}</span></td>
+            <td>
+              <span class="${isDone ? 'badge-status-done' : 'badge-status-tiepnhan'}" onclick="toggleStatus(${r.rowIdx}, '${r.status}')" title="Bấm để đổi trạng thái">
+                ${r.status}
+              </span>
+            </td>
+            <td>
+              <button onclick="deleteRecord(${r.rowIdx})" class="btn btn-sm text-danger" title="Xóa tác vụ">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+      document.getElementById('recordCountLabel').innerText = `Hiển thị: ${list.length} / ${allRecords.length} tác vụ`;
+    }
+
+    async function toggleStatus(rowIdx, currentStatus) {
+      let nextStatus = currentStatus.toUpperCase().includes('TIẾP NHẬN') ? "ĐÃ HOÀN THÀNH" : "TIẾP NHẬN";
+      try {
+        await callApi('updateITGIaoVuStatus2627', rowIdx, nextStatus);
+        await loadData();
+      } catch (err) {
+        alert("Lỗi cập nhật: " + err.message);
+      }
+    }
+
+    // LƯU TÁC VỤ VÀO SHEET
+    async function submitITGIaoVu() {
+      const content = document.getElementById('inpContent').value.trim();
+      const requester = document.getElementById('inpRequester').value.trim();
+      const location = document.getElementById('inpLocation').value.trim();
+      const priority = document.getElementById('inpPriority').value;
+      const handler = document.getElementById('inpHandler').value.trim();
+
+      if (!content) return alert("Vui lòng nhập chi tiết nội dung yêu cầu!");
+      if (!requester) return alert("Vui lòng nhập tên người yêu cầu!");
+
+      const item = {
+        category: currentCategory,
+        content: content,
+        requester: requester,
+        location: location,
+        priority: priority,
+        handler: handler || "Cán bộ IT & Giáo vụ",
+        status: "TIẾP NHẬN",
+        note: ""
+      };
+
+      const btn = document.getElementById('btnSubmit');
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang ghi sổ...';
+
+      try {
+        const msg = await callApi('saveITGIaoVuRecord2627', item);
+        alert(msg);
+        document.getElementById('inpContent').value = "";
+        document.getElementById('inpRequester').value = "";
+        document.getElementById('inpLocation').value = "";
+        await loadData();
+      } catch (err) {
+        alert("Lỗi khi ghi sổ: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    }
+
+    async function deleteRecord(rowIdx) {
+      if (!confirm("Bạn có chắc chắn muốn xóa tác vụ này không?")) return;
+      try {
+        const msg = await callApi('deleteITGIaoVuRecord2627', rowIdx);
+        alert(msg);
+        await loadData();
+      } catch (err) {
+        alert("Lỗi khi xóa: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
