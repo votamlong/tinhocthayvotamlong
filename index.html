@@ -211,23 +211,20 @@
 
      <!-- KHUNG CHỨA MENU DUY NHẤT CÓ TÍNH NĂNG CUỘN -->
       <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto">
-        <!-- 4 MENU CÓ ID ĐỂ DỄ DÀNG ẨN/HIỆN THEO QUYỀN -->
-        <div id="menu-ai-exam" onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2 d-none" style="cursor: pointer;">
+        <!-- 4 MENU CỐ ĐỊNH CÓ THÊM ID ĐỂ ĐIỀU KHIỂN ẨN/HIỆN -->
+        <div id="menu-ai-exam" onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
         </div>
-        <div id="menu-essay-grade" onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2 d-none" style="cursor: pointer;">
+        <div id="menu-essay-grade" onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
         </div>
         <div id="menu-tin6-on" onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-laptop-code me-3 text-info" style="width:20px"></i> <span>ÔN CK1 TIN 6</span>
         </div>
-        <div id="menu-activity-log" onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2 d-none" style="cursor: pointer;">
+        <div id="menu-activity-log" onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
         </div>
-        <!-- Các menu cũ của server sẽ nối tiếp ở dưới -->
-        <div onclick="switchTab('on_ck1_tin9', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
-          <i class="fas fa-laptop-code me-3 text-success" style="width:20px"></i> <span>ÔN CK1 TIN 9</span>
-        </div>
+        <!-- Các menu cũ từ server sẽ nối tiếp ở dưới này -->
       </div>
 
       <!-- PHẦN THÔNG TIN TÀI KHOẢN DƯỚI CÙNG -->
@@ -1375,14 +1372,29 @@
       var avt = 'https://ui-avatars.com/api/?background=0D6EFD&color=fff&bold=true&name=' + encodeURIComponent(res.name);
       document.getElementById('u-avatar').src = res.avatar || avt;
 
-      // 2. LẤY DANH SÁCH MENU GỐC TỪ SERVER
+      // 2. HIỂN THỊ HOẶC ẨN CÁC MENU CỐ ĐỊNH DỰA VÀO VAI TRÒ
+      var menuAi = document.getElementById('menu-ai-exam');
+      var menuEssay = document.getElementById('menu-essay-grade');
+      var menuTin6 = document.getElementById('menu-tin6-on');
+      var menuLog = document.getElementById('menu-activity-log');
+
+      if (['ADMIN', 'GVCN', 'GVBM'].includes(res.role)) {
+        // Nếu là Admin hoặc Giáo viên: Hiện đầy đủ các menu quản trị
+        if (menuAi) menuAi.classList.remove('d-none');
+        if (menuEssay) menuEssay.classList.remove('d-none');
+        if (menuTin6) menuTin6.classList.remove('d-none');
+        if (menuLog) menuLog.classList.remove('d-none');
+      } else {
+        // Nếu là Học sinh (HS) hoặc Phụ huynh (PH): Ẩn các menu quản trị đi
+        if (menuAi) menuAi.classList.add('d-none');
+        if (menuEssay) menuEssay.classList.add('d-none');
+        if (menuTin6) menuTin6.classList.add('d-none'); // (Nếu muốn học sinh thấy ôn tin 6 thì bỏ dòng này)
+        if (menuLog) menuLog.classList.add('d-none');
+      }
+
+      // 3. XỬ LÝ DANH SÁCH MENU ĐỘNG TỪ SERVER TRẢ VỀ
       var rawMenu = res.menu || res.menus || [];
-      
-      // 3. DANH SÁCH ID MENU QUẢN TRỊ NĂNG CAO (CHỈ ADMIN / GV MỚI ĐƯỢC THẤY)
       var adminOnlyIds = [
-        'ai_exam_generator', 
-        'essay_grading_paper', 
-        'activity_log_admin', 
         'user_manager', 
         'error_manager', 
         'gvcn_manager', 
@@ -1390,7 +1402,6 @@
         'period_manager'
       ];
 
-      // 4. PHÂN QUYỀN LỌC MENU: HỌC SINH HOẶC PHỤ HUYNH SẼ BỊ LỌC BỎ CÁC TÍNH NĂNG ADMIN
       var dataMenu = rawMenu.filter(function(m) {
         if (adminOnlyIds.includes(m.id)) {
           return ['ADMIN', 'GVCN', 'GVBM'].includes(res.role);
@@ -1398,7 +1409,7 @@
         return true;
       });
 
-      // 5. NẾU LÀ HỌC SINH (HS), TỰ ĐỘNG BỔ SUNG MENU CHUÔNG TRỐNG NẾU CHƯA CÓ
+      // Bổ sung menu Chuông & Trống cho học sinh nếu chưa có
       if (res.role === 'HS') {
         var hasBell = dataMenu.some(function(m) { return m.id === 'school_bell_2627'; });
         if (!hasBell) {
@@ -1410,16 +1421,28 @@
         }
       }
 
-      // 6. RENDER RA GIAO DIỆN
       var menuHtml = '';
-      dataMenu.forEach(function(m, i) {
-        menuHtml += `<div onclick="switchTab('${m.id}', this)" class="list-group-item rounded mb-2">
+      dataMenu.forEach(function(m) {
+        menuHtml += `<div onclick="switchTab('${m.id}', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
                        <i class="fas ${m.icon} me-3" style="width:20px"></i> <span>${m.text}</span>
                      </div>`;
       });
 
-      // Cộng dồn vào khung chứa (giữ nguyên 4 menu tĩnh Thầy đã đặt cố định ở trên)
-      document.getElementById('sidebar-menu').innerHTML += menuHtml;
+      // Nạp nối tiếp menu động vào sau các menu cố định
+      document.getElementById('sidebar-menu').innerHTML = `
+        <div id="menu-ai-exam" onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2 ${['ADMIN', 'GVCN', 'GVBM'].includes(res.role) ? '' : 'd-none'}" style="cursor: pointer;">
+          <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
+        </div>
+        <div id="menu-essay-grade" onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2 ${['ADMIN', 'GVCN', 'GVBM'].includes(res.role) ? '' : 'd-none'}" style="cursor: pointer;">
+          <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
+        </div>
+        <div id="menu-tin6-on" onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+          <i class="fas fa-laptop-code me-3 text-info" style="width:20px"></i> <span>ÔN CK1 TIN 6</span>
+        </div>
+        <div id="menu-activity-log" onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2 ${['ADMIN', 'GVCN', 'GVBM'].includes(res.role) ? '' : 'd-none'}" style="cursor: pointer;">
+          <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
+        </div>
+      ` + menuHtml;
 
       document.getElementById('login-view').classList.add('d-none');
       document.getElementById('main-view').classList.remove('d-none');
@@ -1434,6 +1457,7 @@
       if (['HS', 'PH'].includes(res.role)) switchTab('my_profile', document.querySelector('#sidebar-menu div'));
       else loadDashboard();
     }
+    
     function handleLogout() {
       if (confirm("Thầy/Cô muốn thoát hệ thống?")) {
         localStorage.removeItem('eduUser');
