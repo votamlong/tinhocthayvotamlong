@@ -210,21 +210,28 @@
       </div>
 
      <!-- KHUNG CHỨA MENU DUY NHẤT CÓ TÍNH NĂNG CUỘN -->
-      <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto">
-        <!-- 4 MENU CỐ ĐỊNH CÓ THÊM ID ĐỂ ĐIỀU KHIỂN ẨN/HIỆN -->
-        <div id="menu-ai-exam" onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+     <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto">
+        <!-- CÁC MENU CỐ ĐỊNH CHO ADMIN VÀ GIÁO VIÊN -->
+        <div onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
         </div>
-        <div id="menu-essay-grade" onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+        <div onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
         </div>
-        <div id="menu-tin6-on" onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+        <div onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-laptop-code me-3 text-info" style="width:20px"></i> <span>ÔN CK1 TIN 6</span>
         </div>
-        <div id="menu-activity-log" onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+        
+        <!-- BỔ SUNG THÊM NÚT ÔN CK1 TIN 9 VÀO ĐÂY -->
+        <div onclick="switchTab('on_ck1_tin9', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+          <i class="fas fa-laptop-code me-3 text-success" style="width:20px"></i> <span>ÔN CK1 TIN 9</span>
+        </div>
+
+        <div onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
         </div>
-        <!-- Các menu cũ từ server sẽ nối tiếp ở dưới này -->
+        
+        <!-- Các menu động khác nối tiếp ở dưới -->
       </div>
 
       <!-- PHẦN THÔNG TIN TÀI KHOẢN DƯỚI CÙNG -->
