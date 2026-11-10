@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soạn Đề Bằng AI - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+      color: #1e293b;
+      padding: 16px;
+      text-transform: none !important;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .preview-box {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 20px;
+      min-height: 450px;
+      max-height: 600px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 13.5px;
+    }
+    input, select, textarea, button, label, span, h4, h6 {
+      text-transform: none !important;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- TIÊU ĐỀ & API KEY SETTING -->
+    <div class="panel-box mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="bg-indigo bg-opacity-10 text-indigo rounded-4 p-3 fs-3" style="background: #e0e7ff; color: #4338ca;">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div>
+          <h4 class="fw-bold text-dark m-0">SOẠN ĐỀ THI & CÂU HỎI BẰNG GEMINI AI</h4>
+          <small class="text-muted">Sử dụng Google Gemini API Key cá nhân để tự động tạo đề kiểm tra chuẩn định dạng</small>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2" style="width: 350px;">
+        <div class="input-group input-group-sm shadow-sm">
+          <span class="input-group-text bg-light fw-bold"><i class="fas fa-key text-warning"></i> API Key</span>
+          <input type="password" id="inpApiKey" class="form-control" placeholder="Dán Gemini API Key vào đây..." oninput="saveApiKey()">
+          <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyShow()"><i class="fas fa-eye" id="eyeIcon"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 CỘT NỘI DUNG -->
+    <div class="row g-4">
+      
+      <!-- CỘT TRÁI: CẤU HÌNH SOẠN ĐỀ -->
+      <div class="col-lg-5">
+        <div class="panel-box border-top border-4 border-indigo" style="border-top-color: #4338ca !important;">
+          <h6 class="fw-bold text-dark mb-3 text-uppercase"><i class="fas fa-sliders-h me-1 text-indigo" style="color: #4338ca;"></i> 1. Cấu hình tham số đề thi</h6>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Môn học</label>
+              <select id="selSubject" class="form-select form-select-sm fw-bold">
+                <option value="Tin học">Tin học</option>
+                <option value="Khoa học tự nhiên">Khoa học tự nhiên</option>
+                <option value="Công nghệ">Công nghệ</option>
+                <option value="Toán học">Toán học</option>
+                <option value="Ngữ văn">Ngữ văn</option>
+                <option value="Tiếng Anh">Tiếng Anh</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Khối lớp</label>
+              <select id="selGrade" class="form-select form-select-sm fw-bold">
+                <option value="Lớp 6">Lớp 6</option>
+                <option value="Lớp 7">Lớp 7</option>
+                <option value="Lớp 8">Lớp 8</option>
+                <option value="Lớp 9" selected>Lớp 9</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Loại đề kiểm tra</label>
+              <select id="selExamType" class="form-select form-select-sm fw-bold">
+                <option value="15 phút">Kiểm tra 15 phút</option>
+                <option value="Giữa kỳ">Kiểm tra Giữa kỳ</option>
+                <option value="Cuối kỳ">Kiểm tra Cuối kỳ</option>
+                <option value="Trắc nghiệm ôn tập">Trắc nghiệm ôn tập</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary mb-1">Tỷ lệ Trắc nghiệm / Tự luận</label>
+              <select id="selRatio" class="form-select form-select-sm fw-bold">
+                <option value="100% Trắc nghiệm (10 hoặc 20 câu)">100% Trắc nghiệm</option>
+                <option value="70% Trắc nghiệm + 30% Tự luận">70% Trắc nghiệm + 30% Tự luận</option>
+                <option value="50% Trắc nghiệm + 50% Tự luận">50% Trắc nghiệm + 50% Tự luận</option>
+                <option value="100% Tự luận">100% Tự luận</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary mb-1">Tiêu đề đề thi</label>
+            <input type="text" id="inpExamTitle" class="form-control form-control-sm fw-bold" value="Đề kiểm tra định kỳ môn Tin học - THCS">
+          </div>
+
+          <div class="mb-4">
+            <label class="small fw-bold text-danger mb-1">Nội dung / Chủ đề trọng tâm (Prompt yêu cầu AI)</label>
+            <textarea id="inpPrompt" class="form-control form-control-sm" rows="4" placeholder="Vd: Soạn các câu hỏi về Mạng máy tính, Internet, thuật toán tìm kiếm nhị phân trong C++, kèm đáp án chi tiết..."></textarea>
+          </div>
+
+          <button onclick="generateExamWithAI()" id="btnGenerate" class="btn w-100 fw-bold rounded-pill py-2 shadow-sm text-white mb-2" style="background: #4338ca;">
+            <i class="fas fa-magic me-1"></i> GỌI GEMINI AI SOẠN ĐỀ NGAY
+          </button>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI: XEM TRƯỚC & LƯU TRỮ -->
+      <div class="col-lg-7">
+        <div class="panel-box">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <h6 class="fw-bold text-dark m-0 text-uppercase">
+              <i class="fas fa-file-alt text-success me-1"></i> Kết Quả Đề Thi Do AI Soạn Thảo
+            </h6>
+            <div class="d-flex align-items-center gap-2">
+              <button onclick="copyExamContent()" class="btn btn-outline-primary btn-sm fw-bold">
+                <i class="fas fa-copy me-1"></i> Sao chép
+              </button>
+              <button onclick="saveExamToSheet()" id="btnSave" class="btn btn-success btn-sm fw-bold shadow-sm" disabled>
+                <i class="fas fa-save me-1"></i> Lưu Vào Sheet
+              </button>
+            </div>
+          </div>
+
+          <div id="previewArea" class="preview-box">
+            <div class="text-center text-muted p-5">
+              <i class="fas fa-robot fa-3x mb-3 text-secondary opacity-50"></i>
+              <p>Chưa có nội dung đề thi. Thầy/Cô vui lòng nhập API Key, cấu hình tham số và bấm <b>"Gọi Gemini AI Soạn Đề Ngay"</b> ở cột bên trái.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbxddUsXncyzzPdg7c8r8sOULdB0aNI22Uifism311bWiAiUB7XBjTtiFH0ji4NcmmR-wg/exec";
+
+    window.onload = function() {
+      let savedKey = localStorage.getItem('gemini_custom_api_key') || "";
+      if (savedKey) {
+        document.getElementById('inpApiKey').value = savedKey;
+      }
+    };
+
+    function saveApiKey() {
+      let key = document.getElementById('inpApiKey').value.trim();
+      localStorage.setItem('gemini_custom_api_key', key);
+    }
+
+    function toggleApiKeyShow() {
+      let inp = document.getElementById('inpApiKey');
+      let icon = document.getElementById('eyeIcon');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+      } else {
+        inp.type = 'password';
+        icon.className = 'fas fa-eye';
+      }
+    }
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    async function generateExamWithAI() {
+      let apiKey = document.getElementById('inpApiKey').value.trim();
+      if (!apiKey) {
+        alert("Vui lòng nhập Google Gemini API Key vào ô cấu hình phía trên!");
+        document.getElementById('inpApiKey').focus();
+        return;
+      }
+
+      let subject = document.getElementById('selSubject').value;
+      let grade = document.getElementById('selGrade').value;
+      let examType = document.getElementById('selExamType').value;
+      let ratio = document.getElementById('selRatio').value;
+      let examTitle = document.getElementById('inpExamTitle').value.trim();
+      let promptCustom = document.getElementById('inpPrompt').value.trim();
+
+      let fullPrompt = `Bạn là một giáo viên chuyên gia ra đề thi chuẩn giáo dục tại Việt Nam. Hãy soạn 1 đề kiểm tra (${examType}) môn ${subject} (${grade}). 
+Tiêu đề đề thi: ${examTitle}.
+Yêu cầu cấu trúc: ${ratio}.
+Nội dung/Yêu cầu chi tiết từ giáo viên: ${promptCustom || "Soạn nội dung bám sát chương trình giáo dục phổ thông hiện hành"}.
+Hãy trình bày đề thi rõ ràng, chuyên nghiệp, có kèm theo Bảng đáp án và Hướng dẫn chấm điểm chi tiết ở cuối.`;
+
+      let preview = document.getElementById('previewArea');
+      preview.innerHTML = `<div class="text-center text-primary p-5"><i class="fas fa-spinner fa-spin fa-3x mb-3"></i><p>Gemini AI đang suy nghĩ và soạn đề thi, Thầy/Cô vui lòng đợi trong giây lát...</p></div>`;
+      document.getElementById('btnGenerate').disabled = true;
+
+      try {
+        // Sử dụng Gemini API endpoint chuẩn (gemini-1.5-flash hoặc gemini-2.5-flash)
+        let geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        
+        let response = await fetch(geminiEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: fullPrompt }] }]
+          })
+        });
+
+        let data = await response.json();
+        if (data.error) {
+          throw new Error(data.error.message || "Lỗi API Gemini");
+        }
+
+        let aiText = data.candidates[0].content.parts[0].text;
+        preview.innerText = aiText;
+        document.getElementById('btnSave').disabled = false;
+      } catch (err) {
+        preview.innerHTML = `<div class="text-danger p-4"><b>Lỗi khi gọi Gemini AI:</b> ${err.message}<br><small>Kiểm tra lại tính chính xác của API Key.</small></div>`;
+      } finally {
+        document.getElementById('btnGenerate').disabled = false;
+      }
+    }
+
+    function copyExamContent() {
+      let text = document.getElementById('previewArea').innerText;
+      if (!text || text.includes("Chưa có nội dung")) return alert("Chưa có nội dung đề thi để sao chép!");
+      navigator.clipboard.writeText(text);
+      alert("Đã sao chép toàn bộ nội dung đề thi vào bộ nhớ tạm!");
+    }
+
+    async function saveExamToSheet() {
+      let subject = document.getElementById('selSubject').value;
+      let grade = document.getElementById('selGrade').value;
+      let title = document.getElementById('inpExamTitle').value.trim();
+      let content = document.getElementById('previewArea').innerText;
+
+      if (!content || content.includes("Chưa có nội dung")) return alert("Không có nội dung để lưu!");
+
+      let item = {
+        subject: subject,
+        grade: grade,
+        title: title,
+        content: content,
+        creator: "Thầy Võ Tâm Long"
+      };
+
+      try {
+        let msg = await callApi('saveAIEksamRecord2627', item);
+        alert(msg);
+      } catch (err) {
+        alert("Lỗi khi lưu vào Sheet: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
