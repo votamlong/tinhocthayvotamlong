@@ -218,6 +218,9 @@
         <div onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2">
           <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
         </div>
+      <div onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2">
+          <i class="fas fa-laptop-code me-3 text-info" style="width:20px"></i> <span>ÔN CK1 TIN 6</span>
+        </div>
       <div onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2">
           <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
         </div>
@@ -489,6 +492,10 @@
         <!-- TAB NHẬT KÝ HOẠT ĐỘNG (NHÚNG nhatkyhoatdong2627.html) -->
         <div id="tab-activity_log_admin" class="content-tab d-none" style="height: 85vh;">
           <iframe id="iframe-activitylog" src="nhatkyhoatdong2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
+        </div>
+        <!-- TAB ÔN CK1 TIN 6 (NHÚNG WEB APP) -->
+        <div id="tab-on_ck1_tin6" class="content-tab d-none" style="height: 85vh;">
+          <iframe src="https://script.google.com/macros/s/AKfycbyFvZTKn9JwlVzbd4yY73Yf_fUH-k2jzTJ9CP3W1ctX6YePvK4_jwX6jf3Gz_dAee_V/exec" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: white;" class="shadow-sm"></iframe>
         </div>
 
 
@@ -1552,6 +1559,9 @@
         }
         else if (idLower.includes('activity') || idLower.includes('nhat_ky_hoat_dong') || menuText.includes('nhật ký hoạt động') || menuText.includes('hoạt động')) {
           target = document.getElementById('tab-activity_log_admin');
+        }
+        else if (idLower.includes('ck1') || idLower.includes('tin_6') || menuText.includes('ôn ck1') || menuText.includes('tin học 6')) {
+          target = document.getElementById('tab-on_ck1_tin6');
         }
       }
 
