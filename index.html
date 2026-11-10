@@ -210,20 +210,26 @@
       </div>
       <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto"></div>
       <!--chen menu moi  o day-->
-      <!-- NÚT MENU: SOẠN ĐỀ BẰNG AI -->
-        <div onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2">
-          <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
-        </div>
-      <!-- TAB CHẤM BÀI TỰ LUẬN TRÊN GIẤY (NHÚNG chambaituluan2627.html) -->
-        <div onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2">
-          <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
-        </div>
+      <div id="sidebar-menu" class="list-group list-group-flush p-3 flex-grow-1 overflow-auto">
+      <!-- Các menu cũ tự động render sẽ nằm ở đây -->
+
+      <!-- BỔ SUNG CÁC MENU MỚI NẰM CHUNG VÀO ĐÂY ĐỂ ĐƯỢC CUỘN ĐỀU -->
+      <div onclick="switchTab('ai_exam_generator', this)" class="list-group-item rounded mb-2">
+        <i class="fas fa-robot me-3 text-indigo" style="width:20px"></i> <span>Soạn Đề Bằng AI</span>
+      </div>
+      <div onclick="switchTab('essay_grading_paper', this)" class="list-group-item rounded mb-2">
+        <i class="fas fa-camera-retro me-3 text-primary" style="width:20px"></i> <span>Chấm Bài Tự Luận</span>
+      </div>
       <div onclick="switchTab('on_ck1_tin6', this)" class="list-group-item rounded mb-2">
-          <i class="fas fa-laptop-code me-3 text-info" style="width:20px"></i> <span>ÔN CK1 TIN 6</span>
-        </div>
+        <i class="fas fa-laptop-code me-3 text-info" style="width:20px"></i> <span>ÔN CK1 TIN 6</span>
+      </div>
       <div onclick="switchTab('activity_log_admin', this)" class="list-group-item rounded mb-2">
-          <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
-        </div>
+        <i class="fas fa-history me-3 text-warning" style="width:20px"></i> <span>Nhật Ký Hoạt Động</span>
+      </div>
+      </div>
+      <!---->
+
+      
       <div class="p-3 border-top bg-light">
         <div class="d-flex align-items-center mb-3 p-2 bg-white rounded-3 shadow-sm">
           <img id="u-avatar" class="rounded-circle me-3 border border-primary" width="45" height="45" style="object-fit:cover">
