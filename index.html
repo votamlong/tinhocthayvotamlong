@@ -1380,12 +1380,28 @@
       var dataMenu = res.menu || res.menus || [];
       //
       // PHÂN QUYỀN HIỂN THỊ CÁC MENU QUẢN TRỊ NĂNG CAO
-      if (res.role === 'ADMIN' || res.role === 'GVCN' || res.role === 'GVBM') {
-        document.getElementById('menu-ai-exam').classList.remove('d-none');
-        document.getElementById('menu-essay-grade').classList.remove('d-none');
-        document.getElementById('menu-tin6-on').classList.remove('d-none');
-        document.getElementById('menu-activity-log').classList.remove('d-none');
-      } else {
+      var menuHtml = '';
+      var rawMenu = res.menu || res.menus || [];
+      
+      // DANH SÁCH CÁC ID MENU CHỈ DÀNH RIÊNG CHO ADMIN HOẶC GIÁO VIỆN
+      var adminOnlyIds = [
+        'ai_exam_generator', 
+        'essay_grading_paper', 
+        'activity_log_admin', 
+        'user_manager', 
+        'error_manager', 
+        'gvcn_manager', 
+        'gvbm_manager', 
+        'period_manager'
+      ];
+
+      // LỌC MENU: NẾU TÀI KHOẢN KHÔNG PHẢI ADMIN/GV THÌ ẨN CÁC TÍNH NĂNG QUẢN TRỊ ĐÓ ĐI
+      var dataMenu = rawMenu.filter(function(m) {
+        if (adminOnlyIds.includes(m.id)) {
+          return ['ADMIN', 'GVCN', 'GVBM'].includes(res.role);
+        }
+        return true;
+      });
         // Nếu là Học sinh (HS) hoặc Phụ huynh (PH) thì giữ nguyên ẩn (d-none)
       }
       //
