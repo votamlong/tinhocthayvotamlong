@@ -1341,6 +1341,15 @@
     }
 
     function loginSuccess(res) {
+      // TỰ ĐỘNG GHI NHẬT KÝ HOẠT ĐỘNG KHI ĐĂNG NHẬP THÀNH CÔNG
+      google.script.run.logUserActivity2627({
+        email: res.email || 'admin@edu.vn',
+        name: res.name || 'Người dùng',
+        role: res.role || 'ADMIN',
+        action: 'Đăng nhập hệ thống thành công',
+        device: navigator.userAgent.substring(0, 60)
+      });
+      //
       currentUser = res;
       document.getElementById('u-name').innerText = res.name;
       document.getElementById('u-role').innerText = res.role;
@@ -1392,14 +1401,7 @@
       if (['HS', 'PH'].includes(res.role)) switchTab('my_profile', document.querySelector('#sidebar-menu div'));
       else loadDashboard();
 
-      // TỰ ĐỘNG GHI NHẬT KÝ HOẠT ĐỘNG KHI ĐĂNG NHẬP THÀNH CÔNG
-      google.script.run.logUserActivity2627({
-        email: res.email || 'admin@edu.vn',
-        name: res.name || 'Người dùng',
-        role: res.role || 'ADMIN',
-        action: 'Đăng nhập hệ thống thành công',
-        device: navigator.userAgent.substring(0, 60)
-      });
+      
     }
 
     function handleLogout() {
