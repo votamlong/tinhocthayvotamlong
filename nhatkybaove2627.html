@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhật Ký Bảo Vệ - EduClass Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+      color: #1e293b;
+      padding: 16px;
+      text-transform: none !important;
+    }
+    .panel-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .kpi-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 16px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .kpi-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .badge-trongtruong { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; font-weight: 700; padding: 4px 10px; border-radius: 50px; font-size: 11.5px; cursor: pointer; }
+    .badge-roiruong { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-weight: 700; padding: 4px 10px; border-radius: 50px; font-size: 11.5px; }
+    input, select, textarea, button, label, span, h4, h6 {
+      text-transform: none !important;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid" style="max-width: 1450px;">
+    
+    <!-- TIÊU ĐỀ & NĂM HỌC -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark m-0">NHẬT KÝ BẢO VỆ</h4>
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Năm học 2026-2027</span>
+    </div>
+
+    <!-- 4 THẺ KPI TỔNG QUAN -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">TỔNG LƯỢT VÀO CỔNG</div>
+            <h3 class="fw-bold text-primary mb-0" id="statTotal">0</h3>
+            <small class="text-muted" style="font-size: 11px;">Khách & Học sinh trong ngày</small>
+          </div>
+          <div class="kpi-icon bg-primary bg-opacity-10 text-primary"><img src="https://img.icons8.com/color/48/gate.png" style="width:28px;height:28px;"></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">ĐANG Ở TRONG TRƯỜNG</div>
+            <h3 class="fw-bold text-warning mb-0" id="statInside">0</h3>
+            <small class="text-warning fw-semibold" style="font-size: 11px;">Chưa ký/xác nhận giờ ra</small>
+          </div>
+          <div class="kpi-icon bg-warning bg-opacity-10 text-warning"><i class="fas fa-user-clock"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">ĐÃ RỜI KHỎI TRƯỜNG</div>
+            <h3 class="fw-bold text-success mb-0" id="statOutside">0</h3>
+            <small class="text-success fw-semibold" style="font-size: 11px;">Đã hoàn tất công việc & về</small>
+          </div>
+          <div class="kpi-icon bg-success bg-opacity-10 text-success"><i class="fas fa-check-circle"></i></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <div>
+            <div class="small text-muted fw-bold">HỌC SINH RA/VÀO PHÉP</div>
+            <h3 class="fw-bold text-danger mb-0" id="statLate">0</h3>
+            <small class="text-danger fw-semibold" style="font-size: 11px;">Đi trễ / Đón sớm / Có phép</small>
+          </div>
+          <div class="kpi-icon bg-danger bg-opacity-10 text-danger"><i class="fas fa-user-graduate"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THANH ĐIỀU KHIỂN & BỘ LỌC -->
+    <div class="panel-box mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div>
+          <label class="small fw-bold text-secondary mb-1"><i class="fas fa-calendar-alt text-primary me-1"></i> Ngày Trực Ca:</label>
+          <input type="date" id="filterDate" class="form-control form-control-sm fw-bold border-primary bg-light" style="width: 150px;" onchange="renderTable()">
+        </div>
+        <div>
+          <label class="small fw-bold text-secondary mb-1"><i class="fas fa-filter text-primary me-1"></i> Phân Loại:</label>
+          <select id="filterType" class="form-select form-select-sm fw-bold border-primary bg-light" style="width: 180px;" onchange="renderTable()">
+            <option value="ALL">Tất cả lượt ra/vào</option>
+            <option value="Khách liên hệ">Khách liên hệ công tác</option>
+            <option value="Học sinh đi trễ">Học sinh đi trễ</option>
+            <option value="Học sinh ra phép">Học sinh ra phép / Đón sớm</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <button onclick="openSecurityModal('Khách liên hệ công tác')" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm">
+          <i class="fas fa-user-plus me-1"></i> + Ghi Nhận Khách
+        </button>
+        <button onclick="openSecurityModal('Học sinh đi trễ')" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold shadow-sm">
+          <i class="fas fa-user-graduate me-1"></i> + Học Sinh Đi Trễ/Phép
+        </button>
+        <button onclick="loadSecurityData()" class="btn btn-outline-secondary btn-sm fw-bold" title="Làm mới">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- SỔ TRỰC CỔNG BẢO VỆ -->
+    <div class="panel-box">
+      <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <h6 class="fw-bold text-dark m-0 text-uppercase">
+          <i class="fas fa-shield-alt text-primary me-1"></i> Sổ Trực Cổng Bảo Vệ - Ngày: <span class="badge bg-primary" id="lblCurrentDate">---</span>
+        </h6>
+        <div class="d-flex align-items-center gap-2">
+          <select id="filterStatus" class="form-select form-select-sm border-secondary fw-bold" style="width: 150px;" onchange="renderTable()">
+            <option value="ALL">Tất cả trạng thái</option>
+            <option value="inside">Đang ở trong trường</option>
+            <option value="outside">Đã rời trường</option>
+          </select>
+          <div class="input-group input-group-sm" style="width: 220px;">
+            <span class="input-group-text bg-light"><i class="fas fa-search"></i></span>
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm tên, xe, đối tượng..." oninput="renderTable()">
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
+        <table class="table table-hover align-middle mb-0 small text-center">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 45px;">STT</th>
+              <th style="width: 140px;">Phân Loại</th>
+              <th class="text-start" style="width: 160px;">Họ và Tên</th>
+              <th style="width: 110px;">Đối Tượng / Lớp</th>
+              <th style="width: 120px;">Biển Số / CCCD</th>
+              <th class="text-start">Nội Dung / Mục Đích Làm Việc</th>
+              <th style="width: 80px;">Giờ Vào</th>
+              <th style="width: 80px;">Giờ Ra</th>
+              <th style="width: 110px;">Trạng Thái</th>
+              <th style="width: 70px;">Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="securityTableBody">
+            <tr><td colspan="10" class="p-4 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu từ Sheet BAO_VE_2627...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card-footer bg-light py-2 px-3 mt-3 rounded-3 border d-flex justify-content-between align-items-center small text-muted">
+        <span><i class="fas id-card database text-primary me-1"></i> Tự động đồng bộ với sheet <b>BAO_VE_2627</b>[cite: 35].</span>
+        <span id="recordCountLabel">Hiển thị: 0 lượt</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL GHI NHẬN RA VÀO CỔNG -->
+  <div class="modal fade" id="securityModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-header bg-primary text-white p-4">
+          <h5 class="modal-title fw-bold" id="modalTitle"><i class="fas id-card user-shield me-2"></i>Ghi Nhận Ra Vào Cổng</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4 bg-light">
+          <input type="hidden" id="modalType">
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary">Họ và Tên (Khách / Học sinh)</label>
+            <input type="text" id="modalName" class="form-control fw-bold" placeholder="Vd: Nguyễn Văn A, Cô Như...">
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="small fw-bold text-secondary">Đối tượng / Lớp</label>
+              <input type="text" id="modalTargetClass" class="form-control form-control-sm fw-bold" placeholder="Vd: 6A4, Phụ huynh, Đối tác...">
+            </div>
+            <div class="col-6">
+              <label class="small fw-bold text-secondary">Biển số xe / Số CCCD</label>
+              <input type="text" id="modalVehicle" class="form-control form-control-sm" placeholder="Vd: 59-B1 123.45 hoặc 038...">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="small fw-bold text-secondary">Mục đích / Lý do / Người tiếp</label>
+            <textarea id="modalPurpose" class="form-control form-control-sm" rows="3" placeholder="Vd: Liên hệ công tác / Học sinh đi trễ / Xin phép về sớm gặp Thầy Phi..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer border-0 p-3 bg-white shadow-sm">
+          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-primary rounded-pill px-5 shadow fw-bold" onclick="submitSecurityRecord()">XÁC NHẬN VÀO CỔNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbwgoTALEEMhKwTZN5bM47HtnQcJdYrvDK-yVzmks1eBYl1cYtnPD-GMQ7oIlBubK5ypvQ/exec";
+
+    let allSecurityLogs = [];
+
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    window.onload = async function() {
+      let today = new Date().toISOString().split('T')[0];
+      document.getElementById('filterDate').value = today;
+      await loadSecurityData();
+    };
+
+    async function loadSecurityData() {
+      try {
+        allSecurityLogs = await callApi('getSecurityLogs2627') || [];
+        renderTable();
+      } catch (err) {
+        document.getElementById('securityTableBody').innerHTML = `<tr><td colspan="10" class="p-4 text-danger text-center">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderTable() {
+      const dateVal = document.getElementById('filterDate').value; // YYYY-MM-DD
+      const filterType = document.getElementById('filterType').value;
+      const filterStatus = document.getElementById('filterStatus').value;
+      const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+      const tbody = document.getElementById('securityTableBody');
+
+      // Định dạng ngày hiển thị dd/MM/yyyy
+      let parts = dateVal.split('-');
+      let formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      document.getElementById('lblCurrentDate').innerText = formattedDate;
+
+      let list = allSecurityLogs.filter(l => {
+        // Khớp ngày ghi
+        let matchDate = !l.date || l.date === formattedDate || l.date.includes(parts[2] + '/' + parts[1]);
+        let matchType = (filterType === 'ALL' || l.type.toLowerCase().includes(filterType.toLowerCase()));
+        
+        let isInside = (l.timeOut === '-' || !l.timeOut);
+        let matchStatus = true;
+        if (filterStatus === 'inside') matchStatus = isInside;
+        else if (filterStatus === 'outside') matchStatus = !isInside;
+
+        let matchKeyword = !keyword || l.name.toLowerCase().includes(keyword) || l.targetClass.toLowerCase().includes(keyword) || l.purpose.toLowerCase().includes(keyword) || l.vehicleCCCD.toLowerCase().includes(keyword);
+
+        return matchDate && matchType && matchStatus && matchKeyword;
+      });
+
+      // Cập nhật KPI
+      let totalCount = allSecurityLogs.length;
+      let insideCount = allSecurityLogs.filter(l => l.timeOut === '-' || !l.timeOut).length;
+      let outsideCount = totalCount - insideCount;
+      let lateCount = allSecurityLogs.filter(l => l.type.toLowerCase().includes('trễ') || l.type.toLowerCase().includes('phép')).length;
+
+      document.getElementById('statTotal').innerText = totalCount;
+      document.getElementById('statInside').innerText = insideCount;
+      document.getElementById('statOutside').innerText = outsideCount;
+      document.getElementById('statLate').innerText = lateCount;
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-muted">Không có lượt ra/vào cổng nào phù hợp.</td></tr>';
+        document.getElementById('recordCountLabel').innerText = `Hiển thị: 0 / ${allSecurityLogs.length} lượt`;
+        return;
+      }
+
+      let html = '';
+      list.forEach((l, idx) => {
+        let isInside = (l.timeOut === '-' || !l.timeOut);
+
+        html += `
+          <tr>
+            <td class="text-muted fw-bold">${idx + 1}</td>
+            <td><span class="badge bg-secondary">${l.type}</span></td>
+            <td class="text-start fw-bold text-dark">${l.name}</td>
+            <td><span class="badge bg-light text-dark border">${l.targetClass || '---'}</span></td>
+            <td class="small text-secondary">${l.vehicleCCCD}</td>
+            <td class="text-start small fw-semibold">${l.purpose} ${l.note ? '<br><small class="text-muted fw-normal">Ghi chú: ' + l.note + '</small>' : ''}</td>
+            <td class="fw-bold text-primary">${l.timeIn}</td>
+            <td class="fw-bold text-success">${l.timeOut}</td>
+            <td>
+              ${isInside 
+                ? `<span class="badge-trongtruong" onclick="markTimeOut(${l.rowIdx})" title="Bấm để xác nhận giờ ra">Đang ở trường <i class="fas fa-sign-out-alt ms-1"></i></span>`
+                : `<span class="badge-roiruong">Đã rời trường</span>`
+              }
+            </td>
+            <td>
+              <button onclick="deleteRecord(${l.rowIdx})" class="btn btn-sm text-danger" title="Xóa">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+      document.getElementById('recordCountLabel').innerText = `Hiển thị: ${list.length} / ${allSecurityLogs.length} lượt`;
+    }
+
+    function openSecurityModal(type) {
+      document.getElementById('modalType').value = type;
+      document.getElementById('modalTitle').innerHTML = `<i class="fas id-card user-shield me-2"></i>Ghi Nhận: ${type}`;
+      document.getElementById('modalName').value = "";
+      document.getElementById('modalTargetClass').value = "";
+      document.getElementById('modalVehicle').value = "";
+      document.getElementById('modalPurpose').value = "";
+      new bootstrap.Modal(document.getElementById('securityModal')).show();
+    }
+
+    async function submitSecurityRecord() {
+      const type = document.getElementById('modalType').value;
+      const name = document.getElementById('modalName').value.trim();
+      const targetClass = document.getElementById('modalTargetClass').value.trim();
+      const vehicleCCCD = document.getElementById('modalVehicle').value.trim();
+      const purpose = document.getElementById('modalPurpose').value.trim();
+
+      if (!name) return alert("Vui lòng nhập họ và tên!");
+      if (!purpose) return alert("Vui lòng nhập mục đích hoặc lý do ra vào!");
+
+      const item = {
+        type: type,
+        name: name,
+        targetClass: targetClass,
+        vehicleCCCD: vehicleCCCD || "---",
+        purpose: purpose,
+        note: ""
+      };
+
+      try {
+        const msg = await callApi('saveSecurityRecord2627', item);
+        alert(msg);
+        bootstrap.Modal.getInstance(document.getElementById('securityModal')).hide();
+        await loadSecurityData();
+      } catch (err) {
+        alert("Lỗi khi ghi nhận: " + err.message);
+      }
+    }
+
+    async function markTimeOut(rowIdx) {
+      if (!confirm("Xác nhận ghi nhận học sinh/khách đã rời trường (Giờ ra)?")) return;
+      try {
+        const msg = await callApi('updateSecurityTimeOut2627', rowIdx);
+        alert(msg);
+        await loadSecurityData();
+      } catch (err) {
+        alert("Lỗi cập nhật: " + err.message);
+      }
+    }
+
+    async function deleteRecord(rowIdx) {
+      if (!confirm("Bạn có chắc chắn muốn xóa bản ghi này không?")) return;
+      try {
+        const msg = await callApi('deleteSecurityRecord2627', rowIdx);
+        alert(msg);
+        await loadSecurityData();
+      } catch (err) {
+        alert("Lỗi khi xóa: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
