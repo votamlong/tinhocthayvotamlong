@@ -19,7 +19,7 @@
     <!-- THANH CÔNG CỤ LỌC -->
     <div class="row g-3 align-items-center mb-4 bg-light p-3 rounded-3">
       <div class="col-md-3">
-        <label class="form-label small fw-bold text-secondary">Chọn Lớp:</label>
+        <label class="form-label small fw-bold text-secondary">Chọn Lớp (Sheet GVCN):</label>
         <select id="att-class-select" class="form-select shadow-sm">
           <option value="TOAN_TRUONG">🌐 Toàn Trường</option>
         </select>
@@ -61,7 +61,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxl8geZCvnvWPdE4qb-1kX7eF6O2mExu2EnkQBInT4dVilnS_uktbi3YLGsGJy38xm6hw/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwB1s9Li12v3xLNSGACE0XKN3iqoBjCKoTBX9UmAjUrdL_-hnA_vk4rbPZUK2Cr3qqBFQ/exec";
 
     window.google = window.google || {};
     window.google.script = {
@@ -90,14 +90,12 @@
       })
     };
 
-    // Tự động tải danh sách lớp khi vừa mở trang
+    // Tự động tải danh sách lớp từ sheet GVCN khi mở trang
     window.onload = function() {
-      // Đặt mặc định ngày hôm nay cho nhanh
       var today = new Date().toISOString().split('T')[0];
       document.getElementById('att-start-date').value = today;
       document.getElementById('att-end-date').value = today;
 
-      // Gọi API lấy danh sách lớp đưa vào thẻ select
       google.script.run.withSuccessHandler(function(res) {
         if (res && res.success && res.classes) {
           var select = document.getElementById('att-class-select');
@@ -128,17 +126,6 @@
           if (!res || !res.success) {
             tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Lỗi: ${res ? res.message : "Không nhận được phản hồi"}</td></tr>`;
             return;
-          }
-
-          // Cập nhật lại danh sách lớp nếu có thay đổi
-          if (res.classes) {
-            var select = document.getElementById('att-class-select');
-            var currentVal = select.value;
-            var htmlOpt = '<option value="TOAN_TRUONG">🌐 Toàn Trường</option>';
-            res.classes.forEach(function(cls) {
-              htmlOpt += `<option value="${cls}" ${cls === currentVal ? 'selected' : ''}>${cls}</option>`;
-            });
-            select.innerHTML = htmlOpt;
           }
 
           var list = res.data;
