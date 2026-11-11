@@ -59,7 +59,6 @@
       </table>
     </div>
   </div>
-
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwz6zCj4Lg76sa68KaB1dHJiGDhlzacFyFb4enYcXR1maOxioQhjUFQtnCo4FMl-I_vkg/exec";
 
@@ -90,24 +89,27 @@
       })
     };
 
-    // Tự động nạp danh sách lớp từ sheet GVCN khi mở trang
+    // 1. TỰ ĐỘNG LẤY DANH SÁCH LỚP TỪ HỆ THỐNG CHÍNH ĐƯA VÀO Ô CHỌN
     window.onload = function() {
       var today = new Date().toISOString().split('T')[0];
       document.getElementById('att-start-date').value = today;
       document.getElementById('att-end-date').value = today;
 
-      google.script.run.withSuccessHandler(function(res) {
-        if (res && res.classes) {
-          var select = document.getElementById('att-class-select');
-          var html = '<option value="TOAN_TRUONG">🌐 Toàn Trường</option>';
-          res.classes.forEach(function(cls) {
+      // Gọi hàm lấy toàn bộ lớp chung của hệ thống
+      google.script.run.withSuccessHandler(function(classes) {
+        var select = document.getElementById('att-class-select');
+        var html = '<option value="TOAN_TRUONG">🌐 Toàn Trường</option>';
+        if (classes && classes.length > 0) {
+          classes.forEach(function(cls) {
             html += `<option value="${cls}">${cls}</option>`;
           });
-          select.innerHTML = html;
         }
-      }).getAttendanceStats2627("TOAN_TRUONG", today, today);
+        select.innerHTML = html;
+        document.getElementById('attendance-table-body').innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Đã tải xong danh sách lớp. Vui lòng chọn mốc thời gian và bấm "Tra Cứu Thống Kê".</td></tr>`;
+      }).getAllClasses();
     };
 
+    // 2. HÀM TRA CỨU DỮ LIỆU CHUYÊN CẦN
     function loadAttendanceReport() {
       var classVal = document.getElementById('att-class-select').value;
       var startDate = document.getElementById('att-start-date').value;
@@ -119,7 +121,7 @@
       }
 
       var tbody = document.getElementById('attendance-table-body');
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-primary py-4"><i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý dữ liệu từ 3 sheet...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-primary py-4"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu chuyên cần...</td></tr>`;
 
       google.script.run
         .withSuccessHandler(function(res) {
