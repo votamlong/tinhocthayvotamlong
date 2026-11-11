@@ -14,7 +14,7 @@
 </head>
 <body>
   <div class="card border-0 shadow-sm rounded-4 p-4 bg-white d-flex flex-column" style="height: 90vh;">
-    <h4 class="fw-bold text-primary mb-3"><i class="fas fa-calendar-alt me-2"></i>Thống Kê Chuyên Cần Học Sinh</h4>
+    <h4 class="fw-bold text-primary mb-3"><i class="fas fa-calendar-alt me-2"></i>Thống Kê Chuyên Cần Học Sinh (Tổng Hợp 1 Dòng)</h4>
     
     <!-- THANH CÔNG CỤ LỌC -->
     <div class="row g-3 align-items-center mb-4 bg-light p-3 rounded-3">
@@ -24,11 +24,19 @@
           <option value="TOAN_TRUONG">🌐 Toàn Trường</option>
         </select>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
+        <label class="form-label small fw-bold text-secondary">Trạng Thái:</label>
+        <select id="att-status-filter" class="form-select shadow-sm fw-bold">
+          <option value="ALL">🔍 Tất Cả</option>
+          <option value="VANG">❌ Chỉ Xem Vắng</option>
+          <option value="CO_MAT">✅ Chỉ Xem Có Mặt</option>
+        </select>
+      </div>
+      <div class="col-md-2">
         <label class="form-label small fw-bold text-secondary">Từ Ngày:</label>
         <input type="date" id="att-start-date" class="form-control shadow-sm">
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
         <label class="form-label small fw-bold text-secondary">Đến Ngày:</label>
         <input type="date" id="att-end-date" class="form-control shadow-sm">
       </div>
@@ -44,17 +52,17 @@
       <table class="table table-hover align-middle mb-0 text-center">
         <thead class="sticky-header">
           <tr>
-            <th>STT</th>
-            <th>Ngày Điểm Danh</th>
-            <th>Mã HS</th>
-            <th class="text-start">Họ và Tên Học Sinh</th>
-            <th>Lớp</th>
-            <th>Trạng Thái</th>
-            <th class="text-start">Ghi Chú / Tiết</th>
+            <th style="width: 50px;">STT</th>
+            <th style="width: 100px;">Mã HS</th>
+            <th class="text-start" style="width: 220px;">Họ và Tên Học Sinh</th>
+            <th style="width: 90px;">Lớp</th>
+            <th style="width: 80px;">Có Mặt</th>
+            <th style="width: 80px;">Vắng</th>
+            <th class="text-start">Chi Tiết Ngày Vắng / Ghi Chú</th>
           </tr>
         </thead>
         <tbody id="attendance-table-body">
-          <tr><td colspan="7" class="text-center text-muted py-4">Đang tải danh sách lớp và dữ liệu...</td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-4">Vui lòng chọn mốc thời gian và bấm "Tra Cứu Thống Kê".</td></tr>
         </tbody>
       </table>
     </div>
@@ -63,7 +71,7 @@
   <script>
     const API_URL = (window.parent && window.parent.API_URL) 
       ? window.parent.API_URL 
-      : "https://script.google.com/macros/s/AKfycbx-j7jXpYpRuyMpNYJCBtKdHJzQZPPHQ-QYzGMoFwd1YZ5DabiDqWo7lCSPTvS2Ui_ZLA/exec";
+      : "https://script.google.com/macros/s/AKfycbwN1-AKsm8fV8DQ7ya5QdGGnaFRnXOBNAEHetCEE4r1CWad4AlY5DnXDZZcxndWNtnilw/exec";
 
     async function callApi(fn, ...args) {
       const response = await fetch(API_URL, {
@@ -76,11 +84,12 @@
       return data.result;
     }
 
-    // Tự động quét và nạp danh sách lớp chuẩn y hệt Sổ Báo Bài
+    let globalAttendanceData = [];
+
     window.onload = async function() {
       try {
         var today = new Date().toISOString().split('T')[0];
-        document.getElementById('att-start-date').value = today;
+        document.getElementById('att-start-date').value = "2026-09-01"; // Mặc định từ đầu năm học cho dễ thấy dữ liệu
         document.getElementById('att-end-date').value = today;
 
         let students = await callApi('getAllStudents2627') || [];
@@ -96,11 +105,8 @@
         let classOpts = '<option value="TOAN_TRUONG">🌐 Toàn Trường</option>';
         classes.forEach(c => classOpts += `<option value="${c}">${c}</option>`);
         document.getElementById('att-class-select').innerHTML = classOpts;
-
-        document.getElementById('attendance-table-body').innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Đã tải xong danh sách lớp. Vui lòng chọn mốc thời gian và bấm "Tra Cứu Thống Kê".</td></tr>`;
       } catch (err) {
-        console.error("Lỗi tải danh sách lớp chuyên cần:", err);
-        document.getElementById('attendance-table-body').innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Lỗi tải danh sách lớp: ${err.message}</td></tr>`;
+        console.error("Lỗi tải danh sách lớp:", err);
       }
     };
 
@@ -115,7 +121,7 @@
       }
 
       var tbody = document.getElementById('attendance-table-body');
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-primary py-4"><i class="fas fa-spinner fa-spin me-2"></i>Đang tra cứu dữ liệu chuyên cần...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-primary py-4"><i class="fas fa-spinner fa-spin me-2"></i>Đang tổng hợp dữ liệu chuyên cần...</td></tr>`;
 
       try {
         let res = await callApi('getAttendanceStats2627', classVal, startDate, endDate);
@@ -124,30 +130,48 @@
           return;
         }
 
-        var list = res.data;
-        if (!list || list.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Không có dữ liệu chuyên cần trong khoảng thời gian này.</td></tr>`;
-          return;
-        }
-
-        var html = '';
-        list.forEach(function(item, index) {
-          var badgeColor = String(item.status).toUpperCase().includes('V') ? 'bg-danger' : 'bg-success';
-          html += `<tr>
-                     <td class="text-muted fw-bold">${index + 1}</td>
-                     <td class="fw-bold">${item.date}</td>
-                     <td><span class="badge bg-light text-dark border">${item.studentId}</span></td>
-                     <td class="text-start fw-bold text-dark">${item.studentName}</td>
-                     <td><span class="badge bg-secondary">${item.className}</span></td>
-                     <td><span class="badge ${badgeColor}">${item.status}</span></td>
-                     <td class="text-start">${item.note || ''}</td>
-                   </tr>`;
-        });
-        tbody.innerHTML = html;
+        globalAttendanceData = res.data || [];
+        renderTableFiltered();
       } catch (err) {
         tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Lỗi kết nối: ${err.message}</td></tr>`;
       }
     }
+
+    function renderTableFiltered() {
+      var statusFilter = document.getElementById('att-status-filter').value;
+      var tbody = document.getElementById('attendance-table-body');
+
+      let filteredList = globalAttendanceData.filter(item => {
+        if (statusFilter === 'VANG') return item.countV > 0;
+        if (statusFilter === 'CO_MAT') return item.countV === 0;
+        return true;
+      });
+
+      if (filteredList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Không tìm thấy học sinh nào phù hợp với điều kiện lọc.</td></tr>`;
+        return;
+      }
+
+      var html = '';
+      filteredList.forEach(function(item, index) {
+        var vắngBadge = item.countV > 0 ? `<span class="badge bg-danger px-2">${item.countV} lần</span>` : `<span class="text-muted">0</span>`;
+        var cóMặtBadge = `<span class="badge bg-success px-2">${item.countC} buổi</span>`;
+        
+        html += `<tr>
+                   <td class="text-muted fw-bold">${index + 1}</td>
+                   <td><span class="badge bg-light text-dark border">${item.studentId}</span></td>
+                   <td class="text-start fw-bold text-dark">${item.studentName}</td>
+                   <td><span class="badge bg-secondary">${item.className}</span></td>
+                   <td>${cóMặtBadge}</td>
+                   <td>${vắngBadge}</td>
+                   <td class="text-start small text-secondary">${item.note || '<span class="text-success fst-italic">Đi học đầy đủ, chuyên cần tốt</span>'}</td>
+                 </tr>`;
+      });
+      tbody.innerHTML = html;
+    }
+
+    // Tự động lọc lại ngay khi đổi trạng thái select trên giao diện
+    document.getElementById('att-status-filter').addEventListener('change', renderTableFiltered);
   </script>
 </body>
 </html>
