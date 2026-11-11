@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Thống Kê Chuyên Cần</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
     body { background-color: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
     .grid-table-scroll { max-height: 62vh; overflow-y: auto; overflow-x: auto; border: 1px solid #dee2e6; border-radius: 12px; background: white; }
@@ -20,7 +20,7 @@
     <div class="row g-3 align-items-center mb-4 bg-light p-3 rounded-3">
       <div class="col-md-3">
         <label class="form-label small fw-bold text-secondary">Chọn Lớp:</label>
-        <select id="att-class-select" class="form-select shadow-sm">
+        <select id="att-class-select" class="form-select shadow-sm fw-bold border-primary">
           <option value="TOAN_TRUONG">🌐 Toàn Trường</option>
         </select>
       </div>
@@ -41,74 +41,70 @@
 
     <!-- BẢNG HIỂN THỊ KẾT QUẢ -->
     <div class="grid-table-scroll flex-grow-1">
-      <table class="table table-hover align-middle mb-0">
+      <table class="table table-hover align-middle mb-0 text-center">
         <thead class="sticky-header">
           <tr>
             <th>STT</th>
             <th>Ngày Điểm Danh</th>
             <th>Mã HS</th>
-            <th>Họ và Tên Học Sinh</th>
+            <th class="text-start">Họ và Tên Học Sinh</th>
             <th>Lớp</th>
             <th>Trạng Thái</th>
-            <th>Ghi Chú / Tiết</th>
+            <th class="text-start">Ghi Chú / Tiết</th>
           </tr>
         </thead>
         <tbody id="attendance-table-body">
-          <tr><td colspan="7" class="text-center text-muted py-4">Vui lòng chọn mốc thời gian và bấm "Tra Cứu Thống Kê".</td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-4">Đang tải danh sách lớp và dữ liệu...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzArs8GjIAMja5EwAsBFScqoMBwj3obKzB6X17ExAC_S4VXcDCx8Qj9Si-N_GcJRIqyww/exec";
+    const API_URL = (window.parent && window.parent.API_URL) 
+      ? window.parent.API_URL 
+      : "https://script.google.com/macros/s/AKfycbzArs8GjIAMja5EwAsBFScqoMBwj3obKzB6X17ExAC_S4VXcDCx8Qj9Si-N_GcJRIqyww/exec";
 
-    window.google = window.google || {};
-    window.google.script = {
-      run: new Proxy({}, {
-        get: function(target, prop) {
-          return function(...args) {
-            return {
-              withSuccessHandler: function(successCb) {
-                fetch(API_URL, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                  body: JSON.stringify({ fn: prop, args: args })
-                })
-                .then(res => res.json())
-                .then(json => {
-                  if (json.error) alert('Lỗi: ' + json.error);
-                  else if (successCb) successCb(json.result);
-                })
-                .catch(err => console.error(err));
-                return this;
-              },
-              withFailureHandler: function(failCb) { return this; }
-            };
-          };
+    async function callApi(fn, ...args) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return data.result;
+    }
+
+    // Tự động quét và nạp danh sách lớp chuẩn y hệt Sổ Báo Bài
+    window.onload = async function() {
+      try {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('att-start-date').value = today;
+        document.getElementById('att-end-date').value = today;
+
+        let students = await callApi('getAllStudents2627') || [];
+        if (students.length === 0) {
+          let stData = await callApi('getAllStudents');
+          students = (stData || []).map(s => ({ id: s.id, name: s.name, className: s.className }));
         }
-      })
+
+        let setC = new Set();
+        students.forEach(s => { if (s.className) setC.add(s.className); });
+        let classes = Array.from(setC).sort();
+
+        let classOpts = '<option value="TOAN_TRUONG">🌐 Toàn Trường</option>';
+        classes.forEach(c => classOpts += `<option value="${c}">${c}</option>`);
+        document.getElementById('att-class-select').innerHTML = classOpts;
+
+        document.getElementById('attendance-table-body').innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Đã tải xong danh sách lớp. Vui lòng chọn mốc thời gian và bấm "Tra Cứu Thống Kê".</td></tr>`;
+      } catch (err) {
+        console.error("Lỗi tải danh sách lớp chuyên cần:", err);
+        document.getElementById('attendance-table-body').innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Lỗi tải danh sách lớp: ${err.message}</td></tr>`;
+      }
     };
 
-    // Tự động nạp danh sách lớp chuẩn từ hệ thống ngay khi mở trang
-    window.onload = function() {
-      var today = new Date().toISOString().split('T')[0];
-      document.getElementById('att-start-date').value = today;
-      document.getElementById('att-end-date').value = today;
-
-      google.script.run.withSuccessHandler(function(classes) {
-        var select = document.getElementById('att-class-select');
-        var html = '<option value="TOAN_TRUONG">🌐 Toàn Trường</option>';
-        if (classes && classes.length > 0) {
-          classes.forEach(function(cls) {
-            html += `<option value="${cls}">${cls}</option>`;
-          });
-        }
-        select.innerHTML = html;
-      }).getAllClasses();
-    };
-
-    function loadAttendanceReport() {
+    async function loadAttendanceReport() {
       var classVal = document.getElementById('att-class-select').value;
       var startDate = document.getElementById('att-start-date').value;
       var endDate = document.getElementById('att-end-date').value;
@@ -119,37 +115,38 @@
       }
 
       var tbody = document.getElementById('attendance-table-body');
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-primary py-4"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu chuyên cần...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-primary py-4"><i class="fas fa-spinner fa-spin me-2"></i>Đang tra cứu dữ liệu chuyên cần...</td></tr>`;
 
-      google.script.run
-        .withSuccessHandler(function(res) {
-          if (!res || !res.success) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Lỗi: ${res ? res.message : "Không nhận được phản hồi"}</td></tr>`;
-            return;
-          }
+      try {
+        let res = await callApi('getAttendanceStats2627', classVal, startDate, endDate);
+        if (!res || !res.success) {
+          tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Lỗi: ${res ? res.message : "Không nhận được phản hồi"}</td></tr>`;
+          return;
+        }
 
-          var list = res.data;
-          if (!list || list.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Không có dữ liệu chuyên cần trong khoảng thời gian này.</td></tr>`;
-            return;
-          }
+        var list = res.data;
+        if (!list || list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Không có dữ liệu chuyên cần trong khoảng thời gian này.</td></tr>`;
+          return;
+        }
 
-          var html = '';
-          list.forEach(function(item, index) {
-            var badgeColor = String(item.status).toUpperCase().includes('V') ? 'bg-danger' : 'bg-success';
-            html += `<tr>
-                       <td>${index + 1}</td>
-                       <td class="fw-bold">${item.date}</td>
-                       <td><span class="badge bg-light text-dark border">${item.studentId}</span></td>
-                       <td class="fw-bold text-dark">${item.studentName}</td>
-                       <td><span class="badge bg-secondary">${item.className}</span></td>
-                       <td><span class="badge ${badgeColor}">${item.status}</span></td>
-                       <td>${item.note || ''}</td>
-                     </tr>`;
-          });
-          tbody.innerHTML = html;
-        })
-        .getAttendanceStats2627(classVal, startDate, endDate);
+        var html = '';
+        list.forEach(function(item, index) {
+          var badgeColor = String(item.status).toUpperCase().includes('V') ? 'bg-danger' : 'bg-success';
+          html += `<tr>
+                     <td class="text-muted fw-bold">${index + 1}</td>
+                     <td class="fw-bold">${item.date}</td>
+                     <td><span class="badge bg-light text-dark border">${item.studentId}</span></td>
+                     <td class="text-start fw-bold text-dark">${item.studentName}</td>
+                     <td><span class="badge bg-secondary">${item.className}</span></td>
+                     <td><span class="badge ${badgeColor}">${item.status}</span></td>
+                     <td class="text-start">${item.note || ''}</td>
+                   </tr>`;
+        });
+        tbody.innerHTML = html;
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Lỗi kết nối: ${err.message}</td></tr>`;
+      }
     }
   </script>
 </body>
