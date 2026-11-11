@@ -14,20 +14,14 @@
 </head>
 <body>
   <div class="card border-0 shadow-sm rounded-4 p-4 bg-white d-flex flex-column" style="height: 90vh;">
-    <h4 class="fw-bold text-primary mb-3"><i class="fas fa-calendar-alt me-2"></i>Thống Kê Chuyên Cần Học Sinh</h4>
+    <h4 class="fw-bold text-primary mb-3"><i class="fas fa-calendar-alt me-2"></i>Thống Kê Chuyên Cần Học Sinh (Sheet ATTENDANCE)</h4>
     
     <!-- THANH CÔNG CỤ LỌC -->
     <div class="row g-3 align-items-center mb-4 bg-light p-3 rounded-3">
-      <div class="col-md-3">
-        <label class="form-label small fw-bold text-secondary">Chọn Lớp:</label>
+      <div class="col-md-4">
+        <label class="form-label small fw-bold text-secondary">Chọn Lớp / Toàn Trường:</label>
         <select id="att-class-select" class="form-select shadow-sm">
           <option value="TOAN_TRUONG">🌐 Toàn Trường</option>
-          <option value="6A1">6A1</option>
-          <option value="6A2">6A2</option>
-          <option value="7A1">7A1</option>
-          <option value="7A2">7A2</option>
-          <option value="8A1">8A1</option>
-          <option value="9A1">9A1</option>
         </select>
       </div>
       <div class="col-md-3">
@@ -38,9 +32,9 @@
         <label class="form-label small fw-bold text-secondary">Đến Ngày:</label>
         <input type="date" id="att-end-date" class="form-control shadow-sm">
       </div>
-      <div class="col-md-3 d-flex align-items-end">
+      <div class="col-md-2 d-flex align-items-end">
         <button onclick="loadAttendanceReport()" class="btn btn-primary w-100 fw-bold shadow-sm">
-          <i class="fas fa-search me-2"></i>Tra Cứu Thống Kê
+          <i class="fas fa-search me-2"></i>Tra Cứu
         </button>
       </div>
     </div>
@@ -52,21 +46,21 @@
           <tr>
             <th>STT</th>
             <th>Ngày Điểm Danh</th>
+            <th>Mã HS</th>
             <th>Họ và Tên Học Sinh</th>
-            <th>Lớp</th>
             <th>Trạng Thái</th>
-            <th>Ghi Chú</th>
+            <th>Ghi Chú / Tiết</th>
           </tr>
         </thead>
         <tbody id="attendance-table-body">
-          <tr><td colspan="6" class="text-center text-muted py-4">Vui lòng chọn mốc thời gian và bấm "Tra Cứu Thống Kê".</td></tr>
+          <tr><td colspan="6" class="text-center text-muted py-4">Vui lòng chọn mốc thời gian và bấm "Tra Cứu".</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyQD2dUnyKukXYqe6qD3PsHPhxRUYvSlZDq5BL_SCQgSfzeUBjVntB-eqJOsQqKxdmfGA/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxt6CGtNsaLSAOZsvpUr1gurJf_oUSgC-RzGjtXbPJzoVSmvHA42mFQ8wvLMEC8ym116w/exec";
 
     window.google = window.google || {};
     window.google.script = {
@@ -106,7 +100,7 @@
       }
 
       var tbody = document.getElementById('attendance-table-body');
-      tbody.innerHTML = `<tr><td colspan="6" class="text-center text-primary py-4"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu chuyên cần...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center text-primary py-4"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải dữ liệu từ sheet ATTENDANCE...</td></tr>`;
 
       google.script.run
         .withSuccessHandler(function(res) {
@@ -117,18 +111,18 @@
 
           var list = res.data;
           if (!list || list.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Không có dữ liệu vắng/chuyên cần trong khoảng thời gian này.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Không có dữ liệu chuyên cần trong khoảng thời gian này.</td></tr>`;
             return;
           }
 
           var html = '';
           list.forEach(function(item, index) {
-            var badgeColor = String(item.status).includes('Vắng') ? 'bg-danger' : (String(item.status).includes('Trễ') ? 'bg-warning text-dark' : 'bg-info');
+            var badgeColor = String(item.status).toUpperCase().includes('V') ? 'bg-danger' : 'bg-success';
             html += `<tr>
                        <td>${index + 1}</td>
                        <td class="fw-bold">${item.date}</td>
-                       <td>${item.studentName}</td>
-                       <td><span class="badge bg-secondary">${item.className}</span></td>
+                       <td><span class="badge bg-light text-dark border">${item.studentId}</span></td>
+                       <td class="fw-bold text-dark">${item.studentName}</td>
                        <td><span class="badge ${badgeColor}">${item.status}</span></td>
                        <td>${item.note || ''}</td>
                      </tr>`;
