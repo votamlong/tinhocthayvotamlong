@@ -60,8 +60,8 @@
     </div>
   </div>
 
-  <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbx0PVrBih-57MRc8WFwsHmfl0MU5-FvI76nmkBGZ5eeYdldBl1GPJvK6DORmwRXt1ZgUQ/exec";
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwIX5QOnaFYyac8IFO2kkMbsIJ5Gq6RfgtBrFpC7xLVrFZZBT6wX757BX-9rxF4tkAtAw/exec";
 
     window.google = window.google || {};
     window.google.script = {
@@ -90,14 +90,14 @@
       })
     };
 
-    // Tự động tải danh sách lớp từ sheet GVCN khi mở trang
+    // Tự động tải danh sách lớp từ sheet GVCN ngay khi mở trang
     window.onload = function() {
       var today = new Date().toISOString().split('T')[0];
       document.getElementById('att-start-date').value = today;
       document.getElementById('att-end-date').value = today;
 
       google.script.run.withSuccessHandler(function(res) {
-        if (res && res.success && res.classes) {
+        if (res && res.classes) {
           var select = document.getElementById('att-class-select');
           var html = '<option value="TOAN_TRUONG">🌐 Toàn Trường</option>';
           res.classes.forEach(function(cls) {
