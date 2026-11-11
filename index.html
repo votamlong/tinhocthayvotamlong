@@ -1293,7 +1293,7 @@
     /* ==============================================================================
        1. CẤU HÌNH API & BỘ GIẢ LẬP google.script.run
        ============================================================================== */
-    const API_URL = "https://script.google.com/macros/s/AKfycbwz6zCj4Lg76sa68KaB1dHJiGDhlzacFyFb4enYcXR1maOxioQhjUFQtnCo4FMl-I_vkg/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzArs8GjIAMja5EwAsBFScqoMBwj3obKzB6X17ExAC_S4VXcDCx8Qj9Si-N_GcJRIqyww/exec";
 
     window.google = window.google || {};
     window.google.script = window.google.script || {};
@@ -1614,8 +1614,9 @@
         else if (idLower.includes('tin9') || idLower.includes('tin_9') || menuText.includes('tin 9') || menuText.includes('ôn ck1 tin 9')) {
           target = document.getElementById('tab-on_ck1_tin9');
         }
-         else if (idLower.includes('attendance') || menuText.includes('chuyên cần')) {
-          target = document.getElementById('tab-attendance_stats'); }
+        else if (idLower.includes('attendance') || menuText.includes('chuyên cần')) {
+          target = document.getElementById('tab-attendance_stats');
+        }
       }
 
 
