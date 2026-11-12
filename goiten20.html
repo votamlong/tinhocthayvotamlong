@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>20 Game Gọi Tên Học Sinh - EduClass Pro</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#f7f5ef;--fg:#1f1f1c;--cd:#fff;--ac:#d9480f;--on:#fff;--mu:#6d6b63;--bd:#e0ddd2;--hl:#ffe8cc;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#171719;--fg:#efeee8;--cd:#222226;--ac:#ff8a4c;--on:#1a1a1a;--mu:#a09e96;--bd:#35353a;--hl:#4a3322}}
+:root[data-theme=dark]{--bg:#171719;--fg:#efeee8;--cd:#222226;--ac:#ff8a4c;--on:#1a1a1a;--mu:#a09e96;--bd:#35353a;--hl:#4a3322}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.app{max-width:1100px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:0 0 12px}
+.main{display:grid;grid-template-columns:300px 1fr;gap:16px}
+@media(max-width:760px){.main{grid-template-columns:1fr}}
+aside,section{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:14px;min-width:0}
+label{font-size:13px;color:var(--mu);display:block;margin-bottom:6px}
+textarea{width:100%;height:180px;border:1px solid var(--bd);border-radius:8px;padding:8px;background:var(--bg);color:var(--fg);font:inherit;font-size:14px}
+.ck{display:flex;gap:6px;align-items:center;margin:10px 0;color:var(--fg)}
+#cnt{font-size:13px;color:var(--mu);margin-bottom:8px}
+button{font:inherit;cursor:pointer;color:var(--fg)}
+.pri{background:var(--ac);color:var(--on);border:0;border-radius:10px;padding:12px 28px;font-weight:700;font-size:16px;margin-top:12px}
+.sec{background:none;border:1px solid var(--bd);border-radius:8px;padding:6px 10px;font-size:13px;margin-bottom:10px}
+.source-box{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px;margin-bottom:12px}
+.source-tabs{display:flex;gap:4px;margin-bottom:8px}
+.source-tabs button{flex:1;border:1px solid var(--bd);background:var(--cd);border-radius:6px;padding:6px;font-size:12px;font-weight:600}
+.source-tabs button.active{background:var(--ac);color:var(--on);border-color:var(--ac)}
+#tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+#tabs button{border:1px solid var(--bd);background:var(--bg);border-radius:99px;padding:5px 10px;font-size:12.5px}
+#tabs button.on{background:var(--ac);color:var(--on);border-color:var(--ac)}
+#hint{font-size:13px;color:var(--mu);margin-bottom:8px}
+#st{min-height:390px;border:1px dashed var(--bd);border-radius:12px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px}
+#res{font-size:30px;font-weight:800;text-align:center;margin-top:12px;min-height:44px;word-break:break-word}
+.chip{display:inline-block;padding:7px 13px;border-radius:99px;background:var(--bg);border:1px solid var(--bd);font-size:14px;margin:3px;transition:all .4s}
+.chip.out{opacity:.08;transform:scale(.6)}.chip.hl{background:var(--hl)}.chip.win{background:var(--ac);color:var(--on);transform:scale(1.25)}
+.gr{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.tile{width:92px;height:84px;font-size:34px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);transition:transform .4s}
+.tile:hover{transform:translateY(-4px)}
+.tile.open{background:var(--ac);color:var(--on)}.tile b{font-size:14px;padding:2px;word-break:break-word}
+.flip .tile.open{transform:rotateY(360deg)}
+.bal .tile{border-radius:50%;width:80px;height:92px;background:var(--hl)}
+.stick .tile{width:34px;height:170px;font-size:22px}.stick .tile.open{width:110px}
+.big .tile{width:140px;height:120px;font-size:58px}
+.big2{font-size:42px;font-weight:800;text-align:center;min-height:56px;word-break:break-word}
+.mono{font-family:ui-monospace,Menlo,monospace;letter-spacing:2px}
+.dice,.ball{font-size:80px}.dice{animation:spin 1s linear infinite}.ball{animation:shake .35s infinite}
+.pt{font-size:28px;color:var(--ac);position:absolute;top:2px;left:50%;transform:translateX(-50%);z-index:2}
+canvas{max-width:92%;height:auto;margin-top:18px}
+.lane{width:100%;height:48px;border-bottom:2px dashed var(--bd);position:relative}
+.car{position:absolute;left:0;top:8px;font-size:17px;white-space:nowrap;background:var(--hl);padding:2px 10px;border-radius:99px}
+.clk{position:relative;width:340px;max-width:100%;aspect-ratio:1;border:2px solid var(--bd);border-radius:50%}
+.clk span{position:absolute;transform:translate(-50%,-50%);font-size:11.5px;background:var(--bg);padding:2px 6px;border-radius:99px;border:1px solid var(--bd)}
+.hand{position:absolute;left:calc(50% - 3px);bottom:50%;width:6px;height:38%;background:var(--ac);border-radius:3px;transform-origin:bottom center;transition:transform 4s cubic-bezier(.2,.8,.2,1)}
+.fall{position:absolute;top:-50px;padding:8px 12px;border-radius:99px;border:1px solid var(--bd);background:var(--hl);font-size:14px;animation:fall 6s linear infinite}
+.fall.win{background:var(--ac);color:var(--on)}
+.hint{position:absolute;bottom:6px;font-size:13px;color:var(--mu)}
+.cage{position:relative;width:300px;max-width:100%;height:240px;border:3px solid var(--bd);border-radius:50%}
+.bb{position:absolute;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:700;color:#111;animation:bnc .7s ease-in-out infinite alternate}
+.team{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;min-width:130px;font-size:14px;line-height:1.6}.team b{display:block;color:var(--ac)}
+ol.big3{font-size:30px;font-weight:700;padding-left:34px}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shake{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}
+@keyframes fall{to{transform:translateY(440px)}}
+@keyframes bnc{from{transform:translate(-50px,-60px)}to{transform:translate(60px,60px)}}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>🎓 20 Game Gọi Tên Học Sinh</h1>
+<div class="main">
+<aside>
+<div class="source-box">
+<label style="margin-bottom:4px">Nguồn danh sách học sinh:</label>
+<div class="source-tabs">
+<button id="btnSrcSheet" class="active" onclick="switchSource('sheet')">📊 Từ Google Sheet</button>
+<button id="btnSrcPaste" onclick="switchSource('paste')">✍️ Dán thủ công</button>
+</div>
+<div id="boxSheet">
+<label for="classSelect">Chọn lớp:</label>
+<select id="classSelect" class="sec" style="width:100%;margin-bottom:6px" onchange="loadFromSheet()">
+<option value="">-- Đang tải danh sách lớp... --</option>
+</select>
+<button class="sec" style="width:100%;margin-bottom:0" onclick="fetchSheetStudents()">🔄 Tải lại dữ liệu Sheet</button>
+</div>
+<div id="boxPaste" style="display:none">
+<label for="ta">Danh sách lớp (mỗi dòng một tên)</label>
+<textarea id="ta"></textarea>
+</div>
+</div>
+
+<label class="ck"><input type="checkbox" id="nr" checked> Không gọi lặp lại</label>
+<div id="cnt"></div>
+<button class="sec" id="rs">↺ Làm mới vòng gọi</button>
+<label>Đã gọi gần đây</label><div id="hist"></div>
+</aside>
+<section>
+<div id="tabs"></div><div id="hint"></div>
+<div id="st"></div>
+<div id="res">Chọn game rồi bấm Bắt đầu</div>
+<div style="text-align:center"><button class="pri" id="go">▶ Bắt đầu</button></div>
+</section></div></div>
+
+<script>
+const API_URL = (window.parent && window.parent.API_URL) 
+  ? window.parent.API_URL 
+  : "https://script.google.com/macros/s/AKfycbxdnHbSoeAtyDHo7YPm93hKkTiKqj0K1WawsTBjsrBw1L1iXvSmWrVO9_Tntjursctz/exec";
+
+const $=s=>document.querySelector(s),esc=t=>t.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])),sh=a=>a.sort(()=>Math.random()-.5);
+let names=[],pool=[],H=[],run=0,cur=0,allSheetStudents=[];
+let currentSource = 'sheet';
+
+const sl=ms=>{const m=run;return new Promise((r,j)=>setTimeout(()=>m===run?r():j(),ms))};
+const av=()=>$('#nr').checked?pool:names,rnd=()=>{const a=av();return a[Math.random()*a.length|0]};
+function sample(k,w){const a=sh(av().filter(x=>x!==w)).slice(0,k-1);a.push(w);return sh(a)}
+
+const ta=$('#ta');
+try{ta.value=localStorage.getItem('hs-names')||''}catch(e){}
+if(!ta.value)ta.value=Array.from({length:30},(_,i)=>'Học sinh '+(i+1)).join('\n');
+
+function upd(){$('#cnt').textContent=names.length+' học sinh · còn '+pool.length+' chưa gọi'}
+function loadList(arr){
+  names=arr.map(s=>String(s).trim()).filter(Boolean);
+  pool=names.slice();
+  upd();
+}
+
+async function fetchSheetStudents(){
+  const sel = $('#classSelect');
+  sel.innerHTML = '<option value="">Đang tải...</option>';
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ fn: 'getAllStudents2627', args: [] })
+    });
+    const json = await res.json();
+    if(json.error) throw new Error(json.error);
+    allSheetStudents = json.result || [];
+    
+    const classes = [...new Set(allSheetStudents.map(s => s.className))].filter(Boolean).sort();
+    
+    sel.innerHTML = '<option value="">-- Tất cả các lớp --</option>';
+    classes.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = 'Lớp ' + c;
+      sel.append(opt);
+    });
+    loadFromSheet();
+  } catch(e) {
+    sel.innerHTML = '<option value="">Lỗi tải dữ liệu từ Sheet</option>';
+    console.error(e);
+  }
+}
+
+function loadFromSheet(){
+  const selectedClass = $('#classSelect').value;
+  let filtered = allSheetStudents;
+  if(selectedClass) {
+    filtered = allSheetStudents.filter(s => s.className === selectedClass);
+  }
+  const studentNames = filtered.map(s => s.name);
+  if(studentNames.length === 0 && allSheetStudents.length > 0) {
+    loadList(allSheetStudents.map(s => s.name));
+  } else if(studentNames.length === 0) {
+    loadList(Array.from({length:30},(_,i)=>'Học sinh '+(i+1)));
+  } else {
+    loadList(studentNames);
+  }
+}
+
+function switchSource(type){
+  currentSource = type;
+  $('#btnSrcSheet').classList.toggle('active', type==='sheet');
+  $('#btnSrcPaste').classList.toggle('active', type==='paste');
+  $('#boxSheet').style.display = type==='sheet'?'block':'none';
+  $('#boxPaste').style.display = type==='paste'?'block':'none';
+  if(type==='paste') {
+    loadPaste();
+  } else {
+    loadFromSheet();
+  }
+}
+
+function loadPaste(){
+  names=ta.value.split('\n').map(s=>s.trim()).filter(Boolean);
+  pool=names.slice();
+  try{localStorage.setItem('hs-names',ta.value)}catch(e){}
+  upd();
+}
+
+function fin(n){const r=$('#res');r.textContent='🎉 '+n;r.style.animation='none';r.offsetWidth;r.style.animation='pop .6s';pool=pool.filter(x=>x!==n);H.unshift(n);$('#hist').innerHTML=H.slice(0,12).map(t=>'<span class="chip">'+esc(t)+'</span>').join('');upd()}
+async function flick(el,w,n=25){for(let i=0;i<n;i++){el.textContent=rnd();await sl(40+i*i*.6)}el.textContent=w}
+function tiles(s,w,ic,k,cls){s.innerHTML='<div class="gr '+cls+'">'+('<button class="tile">'+ic+'</button>').repeat(k)+'</div>';let on=1;s.querySelectorAll('.tile').forEach(b=>b.onclick=()=>{if(!on)return;on=0;b.classList.add('open');b.innerHTML='<b>'+esc(w)+'</b>';fin(w)})}
+function big(s,c){const d=document.createElement('div');d.className='big2 '+(c||'');s.append(d);return d}
+
+const G=[
+{n:'Vòng quay',d:'Vòng quay may mắn dừng ở tên được chọn.',f:async(s,w)=>{const L=sample(12,w),n=L.length,k=L.indexOf(w),a=360/n;s.innerHTML='<div class="pt">▼</div><canvas width="320" height="320" style="transition:transform 4s cubic-bezier(.1,.7,.1,1)"></canvas>';const c=s.querySelector('canvas'),x=c.getContext('2d'),R=Math.PI/180;L.forEach((t,i)=>{x.beginPath();x.moveTo(160,160);x.arc(160,160,158,(i*a-90)*R,((i+1)*a-90)*R);x.fillStyle='hsl('+i*360/n+',70%,62%)';x.fill();x.save();x.translate(160,160);x.rotate(((i+.5)*a-90)*R);x.fillStyle='#111';x.font='14px sans-serif';x.textAlign='right';x.fillText(t.slice(0,14),145,5);x.restore()});await sl(60);c.style.transform='rotate('+(2160-(k+.5)*a)+'deg)';await sl(4100);fin(w)}},
+{n:'Phong bì',d:'Chọn một phong bì để mở tên.',f:(s,w)=>tiles(s,w,'✉️',9,'')},
+{n:'Máy xổ số',d:'Tên nhảy liên tục rồi chậm dần.',f:async(s,w)=>{const d=big(s);d.textContent='🎰';await flick(d,w);fin(w)}},
+{n:'Lật thẻ bài',d:'Lật một thẻ bài để biết ai được gọi.',f:(s,w)=>tiles(s,w,'🎴',12,'flip')},
+{n:'Đếm ngược',d:'3 – 2 – 1 rồi lộ tên.',f:async(s,w)=>{const d=big(s);d.style.fontSize='90px';for(const n of [3,2,1]){d.textContent=n;d.style.animation='none';d.offsetWidth;d.style.animation='pop .6s';await sl(1000)}d.style.fontSize='';d.textContent=w;fin(w)}},
+{n:'Đua xe',d:'6 bạn đua xe, ai về đích trước được gọi.',f:async(s,w)=>{const L=sample(6,w);s.innerHTML=L.map(t=>'<div class="lane"><span class="car">🏎️ '+esc(t)+'</span></div>').join('');await sl(100);s.querySelectorAll('.car').forEach((c,i)=>{c.style.transition='left '+(L[i]===w?3:3.6+Math.random()*2)+'s ease-in-out';c.style.left='calc(100% - 170px)'});await sl(3300);fin(w)}},
+{n:'Bóng bay',d:'Bấm một quả bóng bay để bung tên.',f:(s,w)=>tiles(s,w,'🎈',10,'bal')},
+{n:'Rương bí ẩn',d:'Chọn 1 trong 3 rương.',f:(s,w)=>tiles(s,w,'🎁',3,'big')},
+{n:'Rút que',d:'Rút một que tre trong bó.',f:(s,w)=>tiles(s,w,'🥢',8,'stick')},
+{n:'Xúc xắc',d:'Xúc xắc lăn, tên dừng lại.',f:async(s,w)=>{s.innerHTML='<div class="dice">🎲</div>';const d=big(s);await flick(d,w,22);s.firstChild.style.animation='none';fin(w)}},
+{n:'Kim chỉ',d:'Kim đồng hồ quay rồi chỉ vào một bạn.',f:async(s,w)=>{const L=sample(12,w),n=L.length,k=L.indexOf(w),a=360/n,R=Math.PI/180;s.innerHTML='<div class="clk">'+L.map((t,i)=>'<span style="left:'+(50+42*Math.sin(i*a*R))+'%;top:'+(50-42*Math.cos(i*a*R))+'%">'+esc(t.slice(0,10))+'</span>').join('')+'<i class="hand"></i></div>';const h=s.querySelector('.hand');await sl(60);h.style.transform='rotate('+(1800+k*a)+'deg)';await sl(4100);fin(w)}},
+{n:'Loại trừ',d:'Từng tên mờ dần, người cuối cùng còn lại thắng.',f:async(s,w)=>{const L=sample(16,w);s.innerHTML='<div class="gr">'+L.map(t=>'<span class="chip">'+esc(t)+'</span>').join('')+'</div>';const cs=[...s.querySelectorAll('.chip')],o=sh(cs.filter((c,i)=>L[i]!==w));for(const c of o){await sl(450);c.classList.add('out')}cs[L.indexOf(w)].classList.add('win');await sl(700);fin(w)}},
+{n:'Giải mã',d:'Các ký tự lần lượt hiện ra như máy đánh chữ.',f:async(s,w)=>{const d=big(s,'mono'),C='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@%&';let o='';for(const ch of [...w]){for(let j=0;j<6;j++){d.textContent=o+C[Math.random()*C.length|0];await sl(50)}o+=ch;d.textContent=o}fin(w)}},
+{n:'Mưa tên',d:'Bấm vào một tên đang rơi để chọn.',f:async(s,w)=>{const L=sample(12,w);s.innerHTML=L.map((t,i)=>'<button class="fall" style="left:'+(i*7.5+2)+'%;animation-duration:'+(4+Math.random()*4)+'s;animation-delay:-'+Math.random()*4+'s">'+esc(t)+'</button>').join('')+'<div class="hint">Bấm vào một tên đang rơi!</div>';let on=1;s.querySelectorAll('.fall').forEach(b=>b.onclick=()=>{if(!on)return;on=0;s.querySelectorAll('.fall').forEach(x=>x.style.animationPlayState='paused');b.classList.add('win');fin(b.textContent)})}},
+{n:'Tia chớp',d:'Ánh sáng nhảy qua các ô tên rồi dừng lại.',f:async(s,w)=>{const L=sample(20,w);s.innerHTML='<div class="gr">'+L.map(t=>'<span class="chip">'+esc(t)+'</span>').join('')+'</div>';const cs=[...s.querySelectorAll('.chip')];let p=0;for(let i=0;i<22;i++){cs[p].classList.remove('hl');p=i==21?L.indexOf(w):Math.random()*cs.length|0;cs[p].classList.add('hl');await sl(60+i*i*.8)}cs[p].classList.remove('hl');cs[p].classList.add('win');fin(w)}},
+{n:'Quả cầu thần',d:'Lắc quả cầu thần để xem ai được chọn.',f:async(s,w)=>{s.innerHTML='<div class="ball">🎱</div>';const d=big(s);d.textContent='…';await sl(2200);s.firstChild.style.animation='none';d.textContent=w;fin(w)}},
+{n:'Bóng bingo',d:'Bóng nảy trong lồng, một bóng được rút ra.',f:async(s,w)=>{const L=sample(14,w);s.innerHTML='<div class="cage">'+L.map((t,i)=>'<i class="bb" style="left:'+Math.random()*80+'%;top:'+Math.random()*75+'%;animation-delay:-'+Math.random()*2+'s;animation-duration:'+(.5+Math.random()*.5)+'s;background:hsl('+i*26+',70%,62%)">'+(names.indexOf(t)+1)+'</i>').join('')+'</div>';const d=big(s);await sl(3000);s.firstChild.remove();d.textContent='⚪ '+(names.indexOf(w)+1)+' · '+w;fin(w)}},
+{n:'Ô chữ',d:'Các chữ cái lần lượt lộ ra theo thứ tự ngẫu nhiên.',f:async(s,w)=>{const d=big(s,'mono'),ch=[...w],a=ch.map(c=>c==' '?' ':'_'),idx=sh(ch.map((c,i)=>i).filter(i=>ch[i]!=' '));d.textContent=a.join(' ');for(const i of idx){await sl(600);a[i]=ch[i];d.textContent=a.join(' ')}fin(w)}},
+{n:'Gọi 3 bạn',d:'Gọi liền 3 bạn khác nhau, lần lượt từng người.',f:async(s)=>{const P=sh(av().slice()).slice(0,3);s.innerHTML='<ol class="big3"></ol>';const ol=s.firstChild;for(const t of P){await sl(1200);ol.insertAdjacentHTML('beforeend','<li>'+esc(t)+'</li>');fin(t)}}},
+{n:'Chia nhóm',d:'Chia cả lớp thành các nhóm (khoảng 5 bạn mỗi nhóm).',f:s=>{const L=sh(names.slice()),g=Math.max(2,Math.ceil(L.length/5)),T=Array.from({length:g},()=>[]);L.forEach((t,i)=>T[i%g].push(t));s.innerHTML='<div class="gr" style="align-items:flex-start">'+T.map((a,i)=>'<div class="team"><b>Nhóm '+(i+1)+'</b>'+a.map(esc).join('<br>')+'</div>').join('')+'</div>';$('#res').textContent=g+' nhóm'}}
+];
+
+function sel(i){cur=i;run++;const s=$('#st');s.removeAttribute('style');s.innerHTML='';$('#hint').textContent=G[i].d;[...$('#tabs').children].forEach((b,j)=>b.classList.toggle('on',j==i))}
+G.forEach((g,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'. '+g.n;b.onclick=()=>sel(i);$('#tabs').append(b)});
+
+async function go(){if(!names.length){$('#res').textContent='Hãy nhập danh sách tên trước';return}
+if($('#nr').checked&&!pool.length){pool=names.slice();H=[];$('#hist').innerHTML='';upd()}
+const w=rnd(),s=$('#st');run++;s.removeAttribute('style');s.innerHTML='';$('#res').textContent='…';
+try{await G[cur].f(s,w)}catch(e){}}
+
+$('#go').onclick=go;
+$('#rs').onclick=()=>{pool=names.slice();H=[];$('#hist').innerHTML='';upd()};
+ta.oninput=loadPaste;
+
+fetchSheetStudents();
+sel(0);
+</script>
+</body>
+</html>
