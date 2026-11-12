@@ -236,9 +236,7 @@
        <div id="menu-cham-bai-omr" onclick="switchTab('cham_bai_omr', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
         <i class="fas fa-check-double me-3 text-info" style="width:20px"></i> <span>Chấm Trắc Nghiệm OMR</span>
       </div>
-       <div id="menu-goiten20" onclick="switchTab('goiten_20', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
-        <i class="fas fa-dice me-3 text-warning" style="width:20px"></i> <span>20 Game Gọi Tên</span>
-      </div>
+       
       </div>
 
       <!-- PHẦN THÔNG TIN TÀI KHOẢN DƯỚI CÙNG -->
@@ -531,9 +529,7 @@
         <div id="tab-cham_bai_omr" class="content-tab d-none" style="height: 85vh;">
           <iframe src="chambaitracnghiem.html" allow="camera; microphone; encrypted-media" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: var(--bg);" class="shadow-sm"></iframe>
         </div>
-        <div id="tab-goiten_20" class="content-tab d-none" style="height: 85vh;">
-          <iframe src="goiten20.html" style="width: 100%; height: 100%; border: none; border-radius: 14px;" class="shadow-sm"></iframe>
-        </div>
+       
 
 
 
@@ -1313,7 +1309,7 @@
     /* ==============================================================================
        1. CẤU HÌNH API & BỘ GIẢ LẬP google.script.run
        ============================================================================== */
-    const API_URL = "https://script.google.com/macros/s/AKfycbwXKdijel7Tl_nj9fEwWHogcycRNwyRyCE2Fs5h73Q29shsNL1I7tJxfBZAz_GbJ7M/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzqT41cZc_A44t2P58cjZt2R16AoyC8Y1ZH-2AqKzBO4DezyYyebWt4aDB76t6_aTBhDQ/exec";
 
     window.google = window.google || {};
     window.google.script = window.google.script || {};
@@ -1412,7 +1408,7 @@
       var menuAttendance = document.getElementById('menu-attendance-stats');
       var menuTronDe = document.getElementById('menu-tron-de');
       var menuCam = document.getElementById('menu-cham-bai-cam');
-      var menuGoiTen = document.getElementById('menu-goiten20');
+      
 
       if (menuAi) menuAi.classList.toggle('d-none', !isStaff);
       if (menuEssay) menuEssay.classList.toggle('d-none', !isStaff);
@@ -1420,7 +1416,7 @@
       if (menuAttendance) menuAttendance.classList.toggle('d-none', !isStaff);
       if (menuTronDe) menuTronDe.classList.toggle('d-none', !isStaff);
       if (menuCam) menuCam.classList.toggle('d-none', !isStaff);
-      if (menuGoiTen) menuGoiTen.classList.toggle('d-none', !isStaff);
+      
 
       // 3. XỬ LÝ DANH SÁCH MENU ĐỘNG TỪ SERVER TRẢ VỀ
       var rawMenu = res.menu || res.menus || [];
@@ -1649,9 +1645,7 @@
         else if (idLower.includes('omr') || menuText.includes('trắc nghiệm omr')) {
           target = document.getElementById('tab-cham_bai_omr');
         }
-        else if (idLower.includes('goiten') || menuText.includes('gọi tên')) {
-          target = document.getElementById('tab-goiten_20');
-        }
+        
       }
 
 
