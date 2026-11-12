@@ -230,6 +230,9 @@
        <div id="menu-attendance-stats" onclick="switchTab('attendance_stats', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
           <i class="fas fa-calendar-check me-3 text-danger" style="width:20px"></i> <span>Thống Kê Chuyên Cần</span>
         </div>
+       <div id="menu-tron-de" onclick="switchTab('tron_de_thi', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+        <i class="fas fa-random me-3 text-success" style="width:20px"></i> <span>Trộn Đề Trắc Nghiệm</span>
+      </div>
       </div>
 
       <!-- PHẦN THÔNG TIN TÀI KHOẢN DƯỚI CÙNG -->
@@ -513,6 +516,10 @@
         <!-- TAB THỐNG KÊ CHUYÊN CẦN -->
         <div id="tab-attendance_stats" class="content-tab d-none" style="height: 85vh;">
           <iframe src="thongkechuyencan2627.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
+        </div>
+        <!-- TAB TRỘN ĐỀ TRẮC NGHIỆM -->
+        <div id="tab-tron_de_thi" class="content-tab d-none" style="height: 85vh;">
+          <iframe src="tron_de_thi.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
         </div>
 
 
@@ -1390,11 +1397,13 @@
       var menuLog = document.getElementById('menu-activity-log');
       var menuTin9 = document.getElementById('menu-tin9-on'); // Menu Tin 9 (Thầy có thể ẩn/hiện tùy ý, mặc định để hiển thị cho cả học sinh ôn tập)
       var menuAttendance = document.getElementById('menu-attendance-stats');
+      var menuTronDe = document.getElementById('menu-tron-de');
 
       if (menuAi) menuAi.classList.toggle('d-none', !isStaff);
       if (menuEssay) menuEssay.classList.toggle('d-none', !isStaff);
       if (menuLog) menuLog.classList.toggle('d-none', !isStaff);
       if (menuAttendance) menuAttendance.classList.toggle('d-none', !isStaff);
+      if (menuTronDe) menuTronDe.classList.toggle('d-none', !isStaff);
 
       // 3. XỬ LÝ DANH SÁCH MENU ĐỘNG TỪ SERVER TRẢ VỀ
       var rawMenu = res.menu || res.menus || [];
@@ -1616,6 +1625,9 @@
         }
         else if (idLower.includes('attendance') || menuText.includes('chuyên cần')) {
           target = document.getElementById('tab-attendance_stats');
+        }
+        else if (idLower.includes('tron_de') || menuText.includes('trộn đề')) {
+          target = document.getElementById('tab-tron_de_thi');
         }
       }
 
