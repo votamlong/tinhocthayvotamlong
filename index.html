@@ -233,8 +233,8 @@
        <div id="menu-tron-de" onclick="switchTab('tron_de_thi', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
         <i class="fas fa-random me-3 text-success" style="width:20px"></i> <span>Trộn Đề Trắc Nghiệm</span>
       </div>
-       <div id="menu-cham-bai-cam" onclick="switchTab('cham_bai_camera', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
-        <i class="fas fa-camera-retro me-3 text-info" style="width:20px"></i> <span>Chấm Phiếu Qua Camera</span>
+       <div id="menu-cham-bai-omr" onclick="switchTab('cham_bai_omr', this)" class="list-group-item rounded mb-2" style="cursor: pointer;">
+        <i class="fas fa-check-double me-3 text-info" style="width:20px"></i> <span>Chấm Trắc Nghiệm OMR</span>
       </div>
       </div>
 
@@ -525,8 +525,8 @@
           <iframe src="tron_de_thi.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
         </div>
         <!-- TAB CHẤM PHIẾU QUA CAMERA -->
-        <div id="tab-cham_bai_camera" class="content-tab d-none" style="height: 85vh;">
-          <iframe src="chambaitracnghiem.html" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: #f1f5f9;" class="shadow-sm"></iframe>
+        <div id="tab-cham_bai_omr" class="content-tab d-none" style="height: 85vh;">
+          <iframe src="chambaitracnghiem.html" allow="camera; microphone; encrypted-media" style="width: 100%; height: 100%; border: none; border-radius: 14px; background: var(--bg);" class="shadow-sm"></iframe>
         </div>
 
 
@@ -1307,7 +1307,7 @@
     /* ==============================================================================
        1. CẤU HÌNH API & BỘ GIẢ LẬP google.script.run
        ============================================================================== */
-    const API_URL = "https://script.google.com/macros/s/AKfycbweqEcW9sOzge2sdst7CfM5-8WwroUJo25vuaI6zEfT3xmLoVgSGggHKYF3YQVzxEqgEA/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwXxFOzdJ-navDOyj70rsFEZIBKHnmbHtSBteRqtQLoFVlkdqS2AS94wDPkWVJ3poZwkA/exec";
 
     window.google = window.google || {};
     window.google.script = window.google.script || {};
@@ -1638,8 +1638,8 @@
         else if (idLower.includes('tron_de') || menuText.includes('trộn đề')) {
           target = document.getElementById('tab-tron_de_thi');
         }
-        else if (idLower.includes('cham_bai_camera') || menuText.includes('chấm phiếu qua camera')) {
-          target = document.getElementById('tab-cham_bai_camera');
+        else if (idLower.includes('omr') || menuText.includes('trắc nghiệm omr')) {
+          target = document.getElementById('tab-cham_bai_omr');
         }
       }
 
