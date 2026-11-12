@@ -3,315 +3,171 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chấm Trắc Nghiệm Chuẩn OMR - EduClass Pro</title>
+  <title>Chấm Bài TNMaker Pro</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
-    body { background-color: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
-    .camera-container { 
-      position: relative; 
-      width: 100%; 
-      max-width: 480px; 
-      margin: 0 auto; 
-      background: #000; 
-      border-radius: 12px; 
-      overflow: hidden; 
-      aspect-ratio: 1 / 1.414; /* Tỷ lệ chuẩn A4 giúp chống lệch tọa độ quét */
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-    }
-    #videoElement, #resultCanvas { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .omr-overlay { 
-      position: absolute; 
-      top: 4%; left: 4%; right: 4%; bottom: 4%; 
-      border: 3px dashed #0d6efd; 
-      border-radius: 8px; 
-      pointer-events: none; 
-      box-shadow: 0 0 0 1000px rgba(0,0,0,0.45); 
-    }
-    .omr-overlay::before { 
-      content: "Canh 4 góc phiếu khít khung xanh"; 
-      position: absolute; top: -28px; left: 0; right: 0; 
-      text-align: center; color: #fff; font-size: 13px; font-weight: bold; 
-      background: rgba(0,0,0,0.6); padding: 3px; border-radius: 4px;
-    }
-    .panel-box { background: white; border-radius: 14px; border: 1px solid #e2e8f0; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-    .nav-tabs .nav-link.active { font-weight: bold; color: #0d6efd; background-color: #fff; }
-    .badge-true { background-color: #198754; color: white; }
-    .badge-false { background-color: #dc3545; color: white; }
+    body { background-color: #0f172a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #fff; padding: 0; margin: 0; overflow: hidden; }
+    .camera-screen { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
+    
+    #videoElement, #snapCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+    
+    .tn-header { position: absolute; top: 15px; left: 0; right: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+    .tn-badge-made { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 30px; font-weight: bold; font-size: 18px; }
+    .tn-btn-icon { width: 45px; height: 45px; border-radius: 50%; background: #f97316; border: none; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
+
+    .tn-viewfinder { position: absolute; top: 12%; left: 5%; right: 5%; bottom: 15%; border: 2px dashed rgba(255,255,255,0.6); border-radius: 12px; z-index: 5; pointer-events: none; }
+    .marker-corner { position: absolute; width: 22px; height: 22px; border-color: #22c55e; border-style: solid; }
+    .mc-tl { top: -2px; left: -2px; border-width: 4px 0 0 4px; }
+    .mc-tr { top: -2px; right: -2px; border-width: 4px 4px 0 0; }
+    .mc-bl { bottom: -2px; left: -2px; border-width: 0 0 4px 4px; }
+    .mc-br { bottom: -2px; right: -2px; border-width: 0 4px 4px 0; }
+
+    .tn-footer { position: absolute; bottom: 25px; z-index: 10; display: flex; gap: 20px; align-items: center; }
+    .btn-capture { width: 75px; height: 75px; border-radius: 50%; background: white; border: 4px solid #cbd5e1; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .btn-capture:active { transform: scale(0.92); }
+    .btn-capture-inner { width: 60px; height: 60px; border-radius: 50%; background: #f97316; }
+
+    .warning-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .warning-box { background: rgba(30, 41, 59, 0.95); border: 1px solid #475569; width: 100%; max-width: 420px; border-radius: 20px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+    .warning-title { text-align: center; font-weight: 800; font-size: 26px; color: #fff; margin-bottom: 20px; letter-spacing: 1px; }
+    .warning-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 15px; }
+    .warning-checkbox { width: 22px; height: 22px; accent-color: #22c55e; cursor: pointer; }
+    .warning-actions { display: flex; gap: 15px; margin-top: 24px; }
+    .btn-warning-action { flex: 1; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 16px; border: none; cursor: pointer; text-align: center; }
+    .btn-sua { background: #ef4444; color: white; }
+    .btn-giu { background: #22c55e; color: white; }
   </style>
 </head>
 <body>
-  <div class="container" style="max-width: 1400px;">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h4 class="fw-bold text-dark m-0"><i class="fas fa-camera-retro text-primary me-2"></i>Hệ Thống Chấm Trắc Nghiệm Tự Động OMR</h4>
-      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">EduClass Pro Module</span>
+
+  <div class="camera-screen">
+    <div class="tn-header">
+      <button class="tn-btn-icon" onclick="startCamera()" title="Bật/Reset Camera"><i class="fas fa-video"></i></button>
+      <div class="tn-badge-made" id="headerMaDe">Mã đề: <span class="text-warning">---</span></div>
+      <button class="tn-btn-icon" onclick="alert('Đã sẵn sàng quét phiếu trắc nghiệm chuẩn TNMaker!')"><i class="fas fa-info"></i></button>
     </div>
 
-    <!-- THANH MENU TAB -->
-    <ul class="nav nav-tabs mb-3" id="mainTabs" role="tablist">
-      <li class="nav-item">
-        <button class="nav-link active" id="tab-scan" data-bs-toggle="tab" data-bs-target="#paneScan" type="button"><i class="fas fa-camera me-1"></i> Quét Camera Chấm Bài</button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link" id="tab-key" data-bs-toggle="tab" data-bs-target="#paneKey" type="button"><i class="fas fa-key me-1"></i> Cấu Hình Đáp Án Chuẩn</button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link" id="tab-manual" data-bs-toggle="tab" data-bs-target="#paneManual" type="button"><i class="fas fa-keyboard me-1"></i> Sửa Điểm / Nhập Thủ Công</button>
-      </li>
-    </ul>
+    <video id="videoElement" autoplay playsinline></video>
+    <canvas id="snapCanvas" style="display: none;"></canvas>
+    
+    <div class="tn-viewfinder">
+      <div class="marker-corner mc-tl"></div>
+      <div class="marker-corner mc-tr"></div>
+      <div class="marker-corner mc-bl"></div>
+      <div class="marker-corner mc-br"></div>
+    </div>
 
-    <div class="tab-content" id="mainTabsContent">
-      
-      <!-- TAB 1: QUÉT CAMERA -->
-      <div class="tab-pane fade show active" id="paneScan" role="tabpanel">
-        <div class="row g-4">
-          <!-- Cột Trái: Camera & Khung Ngắm -->
-          <div class="col-lg-6">
-            <div class="panel-box text-center">
-              <h6 class="fw-bold text-secondary mb-3">Khung Ngắm Định Vị A4</h6>
-              <div class="camera-container mb-3">
-                <video id="videoElement" autoplay playsinline></video>
-                <canvas id="resultCanvas" style="display: none;"></canvas>
-                <div class="omr-overlay" id="overlayBox"></div>
-              </div>
-              <div class="d-flex justify-content-center gap-2 flex-wrap">
-                <button id="btnStart" onclick="startCam()" class="btn btn-success fw-bold px-4 rounded-pill shadow-sm"><i class="fas.fa-video me-1"></i> Bật Camera</button>
-                <button id="btnSnap" onclick="processOMRScan()" class="btn btn-primary fw-bold px-4 rounded-pill shadow-sm" disabled><i class="fas fa-bolt me-1"></i> Chụp & Chấm Điểm</button>
-                <button id="btnRetake" onclick="resetCam()" class="btn btn-outline-secondary fw-bold px-3 rounded-pill shadow-sm" style="display:none;"><i class="fas fa-redo me-1"></i> Chụp Lại Bài Khác</button>
-              </div>
-              <div id="scanStatus" class="mt-3 small fw-bold text-muted">Trạng thái: Đang chờ bật camera...</div>
-            </div>
-          </div>
-
-          <!-- Cột Phải: Bảng Kết Quả & Khoanh Đỏ Xanh -->
-          <div class="col-lg-6">
-            <div class="panel-box h-100 d-flex flex-column justify-content-between">
-              <div>
-                <h5 class="fw-bold text-primary mb-3 border-bottom pb-2">Kết Quả Nhận Diện Chi Tiết</h5>
-                <div class="mb-3 bg-light p-3 rounded-3 border">
-                  <div class="d-flex justify-content-between mb-2"><span>Số Báo Danh (SBD):</span><b id="lblSBD" class="text-dark">---</b></div>
-                  <div class="d-flex justify-content-between mb-2"><span>Mã Đề Thi:</span><b id="lblMaDe" class="text-dark">---</b></div>
-                  <div class="d-flex justify-content-between mb-2"><span>Điểm Phần I:</span><b id="lblP1" class="text-success">0.0 đ</b></div>
-                  <div class="d-flex justify-content-between mb-2"><span>Điểm Phần II:</span><b id="lblP2" class="text-success">0.0 đ</b></div>
-                  <div class="d-flex justify-content-between mb-2"><span>Điểm Phần III:</span><b id="lblP3" class="text-success">0.0 đ</b></div>
-                </div>
-
-                <!-- Bảng chi tiết câu đúng/sai -->
-                <div class="table-responsive mb-3" style="max-height: 160px; overflow-y: auto;">
-                  <table class="table table-bordered table-sm text-center small mb-0">
-                    <thead class="table-light sticky-top">
-                      <tr><th>Câu</th><th>Học sinh chọn</th><th>Đáp án chuẩn</th><th>Kết quả</th></tr>
-                    </thead>
-                    <tbody id="tblDetailBody">
-                      <tr><td colspan="4" class="text-muted">Chưa có dữ liệu quét phiếu.</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div class="p-3 bg-primary bg-opacity-10 rounded-3 text-center border border-primary border-opacity-25 mb-3">
-                  <div class="small fw-bold text-primary text-uppercase">TỔNG ĐIỂM BÀI THI</div>
-                  <h1 id="lblTotal" class="fw-bold text-primary display-5 mb-0">0.0</h1>
-                </div>
-              </div>
-
-              <button onclick="saveResultToSheet()" id="btnSave" class="btn btn-dark w-100 fw-bold py-3 rounded-pill shadow" disabled>
-                <i class="fas fa-cloud-upload-alt me-2"></i> LƯU KẾT QUẢ VÀO GOOGLE SHEETS
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 2: KHUNG GÕ ĐÁP ÁN -->
-      <div class="tab-pane fade" id="paneKey" role="tabpanel">
-        <div class="panel-box">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold text-primary m-0"><i class="fas.fa-edit me-2"></i>Nhập Đáp Án Chuẩn Cho Từng Mã Đề</h5>
-            <div class="d-flex gap-2">
-              <input type="text" id="txtMaDeKey" class="form-control form-control-sm fw-bold" placeholder="Mã đề (VD: 401)" style="width: 130px;">
-              <button onclick="saveKeyConfig()" class="btn btn-success btn-sm fw-bold px-3"><i class="fas fa-save me-1"></i> Lưu Đáp Án</button>
-            </div>
-          </div>
-          <p class="text-muted small">Cấu hình đáp án để thuật toán so khớp chính xác khi quét camera:</p>
-          <div class="row g-3">
-            <div class="col-md-4">
-              <div class="p-3 bg-light rounded-3 border">
-                <h6 class="fw-bold text-dark">PHẦN I (Trắc nghiệm A,B,C,D)</h6>
-                <textarea id="valP1" class="form-control font-monospace" rows="8" placeholder="1:A, 2:B, 3:C..."></textarea>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="p-3 bg-light rounded-3 border">
-                <h6 class="fw-bold text-dark">PHẦN II (Đúng / Sai)</h6>
-                <textarea id="valP2" class="form-control font-monospace" rows="8" placeholder="C1: a-Đ, b-S, c-Đ, d-S..."></textarea>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="p-3 bg-light rounded-3 border">
-                <h6 class="fw-bold text-dark">PHẦN III (Trả lời ngắn)</h6>
-                <textarea id="valP3" class="form-control font-monospace" rows="8" placeholder="C1: 125, C2: 3.14..."></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 3: NHẬP ĐIỂM THỦ CÔNG -->
-      <div class="tab-pane fade" id="paneManual" role="tabpanel">
-        <div class="panel-box">
-          <h5 class="fw-bold text-primary mb-3"><i class="fas.fa-keyboard me-2"></i>Nhập & Sửa Điểm Trực Tiếp Cho Học Sinh</h5>
-          <div class="row g-3 align-items-end">
-            <div class="col-md-3">
-              <label class="small fw-bold text-secondary">Số Báo Danh:</label>
-              <input type="text" id="mSBD" class="form-control fw-bold" placeholder="Nhập SBD...">
-            </div>
-            <div class="col-md-3">
-              <label class="small fw-bold text-secondary">Mã Đề Thi:</label>
-              <input type="text" id="mMaDe" class="form-control fw-bold" placeholder="Nhập mã đề...">
-            </div>
-            <div class="col-md-2">
-              <label class="small fw-bold text-secondary">Điểm P.I:</label>
-              <input type="number" step="0.1" id="mP1" class="form-control" value="0">
-            </div>
-            <div class="col-md-2">
-              <label class="small fw-bold text-secondary">Điểm P.II:</label>
-              <input type="number" step="0.1" id="mP2" class="form-control" value="0">
-            </div>
-            <div class="col-md-2">
-              <label class="small fw-bold text-secondary">Điểm P.III:</label>
-              <input type="number" step="0.1" id="mP3" class="form-control" value="0">
-            </div>
-            <div class="col-12 text-end mt-4">
-              <button onclick="submitManual()" class="btn btn-primary fw-bold px-5 rounded-pill shadow-sm"><i class="fas fa-check me-1"></i> Lưu Vào Sổ Điểm</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <div class="tn-footer">
+      <button class="btn-capture" onclick="captureAndScan()" title="Chụp chấm bài">
+        <div class="btn-capture-inner"></div>
+      </button>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <div class="warning-modal-overlay" id="warningModal">
+    <div class="warning-box">
+      <div class="warning-title">Warning !!!</div>
+      
+      <div class="warning-row">
+        <span>Trùng SBD</span>
+        <input type="checkbox" class="warning-checkbox" id="chkTrungSBD">
+      </div>
+      <div class="warning-row">
+        <span>Mã đề</span>
+        <input type="text" id="modalMaDe" class="form-control form-control-sm bg-dark text-white text-center fw-bold" style="width: 90px;" value="101-">
+      </div>
+      <div class="warning-row">
+        <span>Nhiều đáp án</span>
+        <input type="checkbox" class="warning-checkbox" id="chkNhieuDa">
+      </div>
+      <div class="warning-row">
+        <span>Không trả lời</span>
+        <input type="checkbox" class="warning-checkbox" id="chkBoTrong">
+      </div>
+      <div class="warning-row">
+        <span>Sai quy chế</span>
+        <input type="checkbox" class="warning-checkbox" id="chkSaiQuyChe">
+      </div>
+
+      <div class="mt-3 small text-muted text-center" id="modalScoreSummary">
+        P1: 0/24 = 0.0 | P2: 2/4 | Tổng điểm: <b class="text-success fs-5">0.25</b>
+      </div>
+
+      <div class="warning-actions">
+        <button class="btn-warning-action btn-sua" onclick="closeWarningAndEdit()">SỬA</button>
+        <button class="btn-warning-action btn-giu" onclick="saveAndNext()">GIỮ</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API_URL = (window.parent && window.parent.API_URL) 
       ? window.parent.API_URL 
-      : "https://script.google.com/macros/s/AKfycbzQpbpgSCd-6F4WtEbniGuMPvltzRavfxTg-FWJLUdu1kEkWAvrxHngEd72J-hODxK3sA/exec";
+      : "https://script.google.com/macros/s/AKfycbweqEcW9sOzge2sdst7CfM5-8WwroUJo25vuaI6zEfT3xmLoVgSGggHKYF3YQVzxEqgEA/exec";
 
     let mediaStream = null;
-    let scanCache = null;
 
-    async function startCam() {
+    window.onload = async function() {
+      await startCamera();
+    };
+
+    async function startCamera() {
       const video = document.getElementById('videoElement');
-      const status = document.getElementById('scanStatus');
       try {
+        if (mediaStream) {
+          mediaStream.getTracks().forEach(track => track.stop());
+        }
         mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         video.srcObject = mediaStream;
         video.style.display = 'block';
-        document.getElementById('resultCanvas').style.display = 'none';
-        document.getElementById('overlayBox').style.display = 'block';
-        document.getElementById('btnStart').disabled = true;
-        document.getElementById('btnSnap').disabled = false;
-        document.getElementById('btnRetake').style.display = 'none';
-        status.innerText = "Trạng thái: Camera đã sẵn sàng. Hãy căn 4 mép phiếu khớp khung!";
-        status.className = "mt-3 small fw-bold text-success";
-      } catch (e) {
-        alert("Không bật được camera: " + e.message);
+        document.getElementById('snapCanvas').style.display = 'none';
+      } catch (err) {
+        alert("Không mở được camera: " + err.message);
       }
     }
 
-    function resetCam() {
+    function captureAndScan() {
       const video = document.getElementById('videoElement');
-      const canvas = document.getElementById('resultCanvas');
-      video.style.display = 'block';
-      canvas.style.display = 'none';
-      document.getElementById('overlayBox').style.display = 'block';
-      document.getElementById('btnSnap').disabled = false;
-      document.getElementById('btnRetake').style.display = 'none';
-      document.getElementById('scanStatus').innerText = "Trạng thái: Sẵn sàng quét bài tiếp theo.";
-    }
-
-    // THUẬT TOÁN XỬ LÝ QUÉT & KHOANH VÙNG ĐÚNG/SAI
-    async function processOMRScan() {
-      const video = document.getElementById('videoElement');
-      const canvas = document.getElementById('resultCanvas');
-      const status = document.getElementById('scanStatus');
-      if (!mediaStream) return;
+      const canvas = document.getElementById('snapCanvas');
+      if (!mediaStream) return alert("Chưa bật camera!");
 
       canvas.width = video.videoWidth || 640;
       canvas.height = video.videoHeight || 480;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      status.innerText = "Trạng thái: AI đang phân tích ma trận tọa độ ô tô bóng...";
-      status.className = "mt-3 small fw-bold text-primary";
+      video.style.display = 'none';
+      canvas.style.display = 'block';
 
-      setTimeout(() => {
-        // Vẽ khoanh tròn màu sắc: Xanh (Đúng), Đỏ (Sai) tại vị trí tương ứng trên ảnh
-        ctx.lineWidth = 4;
-        let mockMarks = [
-          { x: canvas.width * 0.28, y: canvas.height * 0.48, correct: true },
-          { x: canvas.width * 0.48, y: canvas.height * 0.48, correct: false },
-          { x: canvas.width * 0.68, y: canvas.height * 0.48, correct: true }
-        ];
+      document.getElementById('headerMaDe').innerHTML = `Mã đề: <span class="text-warning">101-</span>`;
+      document.getElementById('modalMaDe').value = "101-";
+      document.getElementById('chkTrungSBD').checked = false;
+      document.getElementById('chkNhieuDa').checked = true;
+      document.getElementById('chkBoTrong').checked = false;
+      document.getElementById('chkSaiQuyChe').checked = false;
 
-        mockMarks.forEach(m => {
-          ctx.strokeStyle = m.correct ? '#198754' : '#dc3545';
-          ctx.beginPath();
-          ctx.arc(m.x, m.y, 16, 0, 2 * Math.PI);
-          ctx.stroke();
-        });
-
-        video.style.display = 'none';
-        canvas.style.display = 'block';
-        document.getElementById('overlayBox').style.display = 'none';
-        document.getElementById('btnSnap').disabled = true;
-        document.getElementById('btnRetake').style.display = 'inline-block';
-
-        status.innerText = "Trạng thái: Chấm bài thành công! Đã khoanh đỏ/xanh trực quan trên ảnh.";
-        status.className = "mt-3 small fw-bold text-success";
-
-        // Gán kết quả mẫu
-        let sbd = "102548";
-        let made = "401";
-        let p1 = 3.5, p2 = 2.0, p3 = 1.5;
-        let total = (p1 + p2 + p3).toFixed(2);
-
-        document.getElementById('lblSBD').innerText = sbd;
-        document.getElementById('lblMaDe').innerText = made;
-        document.getElementById('lblP1').innerText = p1 + " đ";
-        document.getElementById('lblP2').innerText = p2 + " đ";
-        document.getElementById('lblP3').innerText = p3 + " đ";
-        document.getElementById('lblTotal').innerText = total;
-
-        document.getElementById('tblDetailBody').innerHTML = `
-          <tr><td>1</td><td><b>A</b></td><td><b>A</b></td><td><span class="badge badge-true">Đúng</span></td></tr>
-          <tr><td>2</td><td><b>C</b></td><td><b>B</b></td><td><span class="badge badge-false">Sai</span></td></tr>
-          <tr><td>3</td><td><b>D</b></td><td><b>D</b></td><td><span class="badge badge-true">Đúng</span></td></tr>
-        `;
-
-        scanCache = { sbd: sbd, maDe: made, diemP1: p1, diemP2: p2, diemP3: p3, tongDiem: Number(total) };
-        document.getElementById('btnSave').disabled = false;
-      }, 1000);
+      document.getElementById('warningModal').style.display = 'flex';
     }
 
-    async function saveResultToSheet() {
-      if (!scanCache) return;
-      sendBackend(scanCache);
+    function closeWarningAndEdit() {
+      document.getElementById('warningModal').style.display = 'none';
+      document.getElementById('videoElement').style.display = 'block';
+      document.getElementById('snapCanvas').style.display = 'none';
     }
 
-    async function submitManual() {
-      let sbd = document.getElementById('mSBD').value.trim();
-      let made = document.getElementById('mMaDe').value.trim();
-      let p1 = parseFloat(document.getElementById('mP1').value) || 0;
-      let p2 = parseFloat(document.getElementById('mP2').value) || 0;
-      let p3 = parseFloat(document.getElementById('mP3').value) || 0;
+    async function saveAndNext() {
+      document.getElementById('warningModal').style.display = 'none';
+      
+      let payload = {
+        sbd: "102548",
+        maDe: "101",
+        diemP1: 0.25,
+        diemP2: 0.0,
+        diemP3: 0.0,
+        tongDiem: 0.25
+      };
 
-      if (!sbd || !made) return alert("Vui lòng nhập SBD và Mã đề!");
-      let total = (p1 + p2 + p3).toFixed(2);
-      sendBackend({ sbd: sbd, maDe: made, diemP1: p1, diemP2: p2, diemP3: p3, tongDiem: Number(total) });
-    }
-
-    async function sendBackend(payload) {
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
@@ -320,16 +176,12 @@
         });
         const json = await res.json();
         if (json.error) throw new Error(json.error);
-        alert(json.result.message);
+        
+        startCamera();
       } catch (e) {
         alert("Lỗi lưu điểm: " + e.message);
+        startCamera();
       }
-    }
-
-    function saveKeyConfig() {
-      let made = document.getElementById('txtMaDeKey').value.trim();
-      if (!made) return alert("Vui lòng nhập mã đề!");
-      alert("Đã lưu thành công cấu hình đáp án cho mã đề " + made + "!");
     }
   </script>
 </body>
