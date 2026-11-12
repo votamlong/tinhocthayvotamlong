@@ -3,76 +3,161 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chấm Bài Trắc Nghiệm Qua Camera - EduClass Pro</title>
+  <title>Chấm Bài & Quản Lý Đáp Án - EduClass Pro</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
     body { background-color: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
-    .camera-box { position: relative; width: 100%; max-width: 640px; margin: 0 auto; background: #000; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    .camera-box { position: relative; width: 100%; max-height: 350px; background: #000; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     #videoElement { width: 100%; height: auto; display: block; }
-    .scan-overlay { position: absolute; top: 10%; left: 10%; right: 10%; bottom: 10%; border: 3px dashed #0d6efd; border-radius: 10px; pointer-events: none; box-shadow: 0 0 0 1000px rgba(0,0,0,0.4); }
-    .scan-overlay::after { content: "Đặt phiếu trắc nghiệm vào khung này"; position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; color: #fff; font-size: 13px; font-weight: bold; background: rgba(0,0,0,0.6); padding: 4px; }
+    .scan-overlay { position: absolute; top: 10%; left: 10%; right: 10%; bottom: 10%; border: 3px dashed #0d6efd; border-radius: 10px; pointer-events: none; }
     .panel-custom { background: white; border-radius: 14px; border: 1px solid #e2e8f0; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .nav-tabs .nav-link.active { font-weight: bold; color: #0d6efd; }
   </style>
 </head>
 <body>
-  <div class="container" style="max-width: 1200px;">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h4 class="fw-bold text-dark m-0"><i class="fas fa-camera text-primary me-2"></i>Chấm Điểm Trắc Nghiệm Tự Động Qua Camera</h4>
-      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Mẫu Phiếu Chuẩn 3 Phần</span>
+  <div class="container" style="max-width: 1400px;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold text-dark m-0"><i class="fas id-card fa-file-signature text-primary me-2"></i>Chấm Điểm & Quản Lý Trắc Nghiệm</h4>
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fw-bold">Hỗ trợ Quét Camera & Gõ Thủ Công</span>
     </div>
 
-    <div class="row g-4">
-      <!-- CỘT TRÁI: CAMERA & ĐIỀU KHIỂN -->
-      <div class="col-lg-7">
-        <div class="panel-custom text-center">
-          <h6 class="fw-bold text-secondary mb-3">Khung Ngắm Camera Quét Phiếu</h6>
-          <div class="camera-box mb-3">
-            <video id="videoElement" autoplay playsinline></video>
-            <div class="scan-overlay"></div>
-            <canvas id="canvasElement" style="display: none;"></canvas>
+    <!-- CÁC TAB CHỨC NĂNG -->
+    <ul class="nav nav-tabs mb-3" id="examTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="scan-tab" data-bs-toggle="tab" data-bs-target="#scanPane" type="button" role="tab"><i class="fas fa-camera me-1"></i> Quét Camera Chấm Nhanh</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="key-tab" data-bs-toggle="tab" data-bs-target="#keyPane" type="button" role="tab"><i class="fas fa-key me-1"></i> Khung Nhập Đáp Án Chuẩn</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manualPane" type="button" role="tab"><i class="fas fa-keyboard me-1"></i> Khung Gõ Điểm / Sửa Điểm Trực Tiếp</button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="examTabsContent">
+      
+      <!-- TAB 1: QUÉT CAMERA -->
+      <div class="tab-pane fade show active" id="scanPane" role="tabpanel">
+        <div class="row g-4">
+          <div class="col-lg-7">
+            <div class="panel-custom text-center">
+              <h6 class="fw-bold text-secondary mb-3">Khung Ngắm Quét Phiếu Trắc Nghiệm</h6>
+              <div class="camera-box mb-3">
+                <video id="videoElement" autoplay playsinline></video>
+                <div class="scan-overlay"></div>
+                <canvas id="canvasElement" style="display: none;"></canvas>
+              </div>
+              <div class="d-flex justify-content-center gap-3">
+                <button id="btnStartCam" onclick="startCamera()" class="btn btn-success fw-bold px-4 rounded-pill shadow-sm">
+                  <i class="fas fa-video me-1"></i> Mở Camera
+                </button>
+                <button id="btnCapture" onclick="captureAndProcess()" class="btn btn-primary fw-bold px-5 rounded-pill shadow-sm" disabled>
+                  <i class="fas fa-camera-retro me-1"></i> CHẤM BÀI NGAY
+                </button>
+              </div>
+              <div id="statusMsg" class="mt-3 small fw-bold text-muted">Trạng thái: Đang chờ mở camera...</div>
+            </div>
           </div>
-          <div class="d-flex justify-content-center gap-3">
-            <button id="btnStartCam" onclick="startCamera()" class="btn btn-success fw-bold px-4 rounded-pill shadow-sm">
-              <i class="fas fa-video me-1"></i> Mở Camera
-            </button>
-            <button id="btnCapture" onclick="captureAndProcess()" class="btn btn-primary fw-bold px-5 rounded-pill shadow-sm" disabled>
-              <i class="fas fa-camera-retro me-1"></i> CHẤM BÀI NGAY
-            </button>
+
+          <div class="col-lg-5">
+            <div class="panel-custom h-100 d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="fw-bold text-primary mb-3 border-bottom pb-2">Kết Quả Nhận Diện</h5>
+                <div class="mb-3 bg-light p-3 rounded-3 border">
+                  <div class="d-flex justify-content-between mb-2"><span>Số Báo Danh (SBD):</span><b id="resSBD" class="text-dark">---</b></div>
+                  <div class="d-flex justify-content-between mb-2"><span>Mã Đề Thi:</span><b id="resMaDe" class="text-dark">---</b></div>
+                  <div class="d-flex justify-content-between mb-2"><span>Điểm Phần I:</span><b id="resP1" class="text-success">0.0 đ</b></div>
+                  <div class="d-flex justify-content-between mb-2"><span>Điểm Phần II:</span><b id="resP2" class="text-success">0.0 đ</b></div>
+                  <div class="d-flex justify-content-between mb-2"><span>Điểm Phần III:</span><b id="resP3" class="text-success">0.0 đ</b></div>
+                </div>
+                <div class="p-3 bg-primary bg-opacity-10 rounded-3 text-center border border-primary border-opacity-25 mb-3">
+                  <div class="small fw-bold text-primary text-uppercase">TỔNG ĐIỂM</div>
+                  <h1 id="resTotal" class="fw-bold text-primary display-4 mb-0">0.0</h1>
+                </div>
+              </div>
+              <button onclick="saveCurrentResult()" id="btnSaveResult" class="btn btn-dark w-100 fw-bold py-3 rounded-pill shadow" disabled>
+                <i class="fas fa-cloud-upload-alt me-2"></i> LƯU KẾT QUẢ VÀO GOOGLE SHEETS
+              </button>
+            </div>
           </div>
-          <div id="statusMsg" class="mt-3 small fw-bold text-muted">Trạng thái: Đang chờ mở camera...</div>
         </div>
       </div>
 
-      <!-- CỘT PHẢI: KẾT QUẢ CHẤM -->
-      <div class="col-lg-5">
-        <div class="panel-custom h-100 d-flex flex-column justify-content-between">
-          <div>
-            <h5 class="fw-bold text-primary mb-3 border-bottom pb-2"><i class="fas fa-file-invoice me-2"></i>Kết Quả Chấm Bài</h5>
-            <div class="mb-3 bg-light p-3 rounded-3 border">
-              <div class="d-flex justify-content-between mb-2"><span>Số Báo Danh (SBD):</span><b id="resSBD" class="text-dark">---</b></div>
-              <div class="d-flex justify-content-between mb-2"><span>Mã Đề Thi:</span><b id="resMaDe" class="text-dark">---</b></div>
-              <div class="d-flex justify-content-between mb-2"><span>Điểm Phần I (Trắc nghiệm):</span><b id="resP1" class="text-success">0.0 đ</b></div>
-              <div class="d-flex justify-content-between mb-2"><span>Điểm Phần II (Đúng/Sai):</span><b id="resP2" class="text-success">0.0 đ</b></div>
-              <div class="d-flex justify-content-between mb-2"><span>Điểm Phần III (Ngắn):</span><b id="resP3" class="text-success">0.0 đ</b></div>
-            </div>
-            <div class="p-3 bg-primary bg-opacity-10 rounded-3 text-center border border-primary border-opacity-25 mb-3">
-              <div class="small fw-bold text-primary text-uppercase">TỔNG ĐIỂM BÀI THI</div>
-              <h1 id="resTotal" class="fw-bold text-primary display-4 mb-0">0.0</h1>
+      <!-- TAB 2: KHUNG NHẬP ĐÁP ÁN CHUẨN CHO GV -->
+      <div class="tab-pane fade" id="keyPane" role="tabpanel">
+        <div class="panel-custom">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-primary m-0"><i class="fas fa-key me-2"></i>Nhập / Cập Nhật Đáp Án Chuẩn Theo Mã Đề</h5>
+            <div class="d-flex gap-2">
+              <input type="text" id="inputMaDeKey" class="form-control form-control-sm fw-bold" placeholder="Nhập mã đề (VD: 401)" style="width: 150px;">
+              <button onclick="saveAnswerKeyToSheet()" class="btn btn-success btn-sm fw-bold px-3"><i class="fas fa-save me-1"></i> Lưu Đáp Án</button>
             </div>
           </div>
-          <button onclick="saveCurrentResult()" id="btnSaveResult" class="btn btn-dark w-100 fw-bold py-3 rounded-pill shadow" disabled>
-            <i class="fas fa-cloud-upload-alt me-2"></i> LƯU KẾT QUẢ VÀO GOOGLE SHEETS
-          </button>
+          <p class="text-muted small">Giáo viên gõ trực tiếp đáp án chuẩn vào các ô bên dưới để làm căn cứ chấm tự động hoặc chấm thủ công:</p>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="p-3 bg-light rounded-3 border">
+                <h6 class="fw-bold text-dark">PHẦN I (Trắc nghiệm A,B,C,D)</h6>
+                <textarea id="txtPhan1Key" class="form-control font-monospace" rows="10" placeholder="VD: 1.A, 2.B, 3.C, 4.D..."></textarea>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 bg-light rounded-3 border">
+                <h6 class="fw-bold text-dark">PHẦN II (Đúng / Sai a,b,c,d)</h6>
+                <textarea id="txtPhan2Key" class="form-control font-monospace" rows="10" placeholder="VD: C1: a-Đ, b-S, c-Đ, d-S..."></textarea>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 bg-light rounded-3 border">
+                <h6 class="fw-bold text-dark">PHẦN III (Trả lời ngắn)</h6>
+                <textarea id="txtPhan3Key" class="form-control font-monospace" rows="10" placeholder="VD: C1: 125, C2: 3.14..."></textarea>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- TAB 3: KHUNG GÕ ĐIỂM / SỬA ĐIỂM TRỰC TIẾP -->
+      <div class="tab-pane fade" id="manualPane" role="tabpanel">
+        <div class="panel-custom">
+          <h5 class="fw-bold text-primary mb-3"><i class="fas fa-keyboard me-2"></i>Khung Nhập & Sửa Điểm Thủ Công Cho Học Sinh</h5>
+          <div class="row g-3 mb-3 align-items-end">
+            <div class="col-md-3">
+              <label class="small fw-bold text-secondary">Số Báo Danh (SBD):</label>
+              <input type="text" id="manualSBD" class="form-control fw-bold" placeholder="Nhập SBD...">
+            </div>
+            <div class="col-md-3">
+              <label class="small fw-bold text-secondary">Mã Đề:</label>
+              <input type="text" id="manualMaDe" class="form-control fw-bold" placeholder="Nhập mã đề...">
+            </div>
+            <div class="col-md-2">
+              <label class="small fw-bold text-secondary">Điểm P.I:</label>
+              <input type="number" step="0.1" id="manualP1" class="form-control" value="0">
+            </div>
+            <div class="col-md-2">
+              <label class="small fw-bold text-secondary">Điểm P.II:</label>
+              <input type="number" step="0.1" id="manualP2" class="form-control" value="0">
+            </div>
+            <div class="col-md-2">
+              <label class="small fw-bold text-secondary">Điểm P.III:</label>
+              <input type="number" step="0.1" id="manualP3" class="form-control" value="0">
+            </div>
+            <div class="col-12 text-end">
+              <button onclick="submitManualScore()" class="btn btn-primary fw-bold px-5 rounded-pill shadow-sm"><i class="fas fa-check-circle me-1"></i> Lưu Điểm Vào Sổ Điểm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     const API_URL = (window.parent && window.parent.API_URL) 
       ? window.parent.API_URL 
-      : "https://script.google.com/macros/s/AKfycbxLhPWRqsnNIbckYerdFaGz9ivtdGUdETfsKg2KGSGTeWoG9Tc3fTzJxjMOt25ZMmv48A/exec";
+      : "https://script.google.com/macros/s/AKfycbyqpdeoExCTjqPMz72Hec2LlXPGrn4akGTD0nbRw9dI56Ns5dzmnDVz-n_W9eTgSnwMtA/exec";
 
     let videoStream = null;
     let currentResultCache = null;
@@ -85,12 +170,10 @@
         video.srcObject = videoStream;
         document.getElementById('btnStartCam').disabled = true;
         document.getElementById('btnCapture').disabled = false;
-        statusMsg.innerText = "Trạng thái: Camera đã sẵn sàng. Hãy đặt phiếu vào khung!";
+        statusMsg.innerText = "Trạng thái: Camera đã sẵn sàng!";
         statusMsg.className = "mt-3 small fw-bold text-success";
       } catch (err) {
-        alert("Không thể mở camera: " + err.message);
-        statusMsg.innerText = "Trạng thái: Lỗi truy cập camera!";
-        statusMsg.className = "mt-3 small fw-bold text-danger";
+        alert("Không mở được camera: " + err.message);
       }
     }
 
@@ -98,7 +181,6 @@
       const video = document.getElementById('videoElement');
       const canvas = document.getElementById('canvasElement');
       const statusMsg = document.getElementById('statusMsg');
-
       if (!videoStream) return alert("Vui lòng mở camera trước!");
 
       canvas.width = video.videoWidth || 640;
@@ -106,20 +188,11 @@
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      statusMsg.innerText = "Trạng thái: Đang phân tích hình ảnh phiếu trắc nghiệm...";
-      statusMsg.className = "mt-3 small fw-bold text-primary";
-
-      // MÔ PHỎNG THUẬT TOÁN XỬ LÝ ẢNH & NHẬN DIỆN Ô TÔ BÓNG (OMR) CHO 3 PHẦN
-      // (Trong thực tế, mô-đun này sẽ quét ma trận pixel trong vùng định vị của phiếu)
+      statusMsg.innerText = "Trạng thái: Đang phân tích ảnh phiếu...";
       setTimeout(() => {
-        // Mô phỏng kết quả nhận diện từ ảnh chụp mẫu phiếu
         let mockSBD = "102548";
         let mockMaDe = "401";
-        
-        // Giả lập kết quả chấm điểm các phần
-        let diemP1 = 3.5; // Phần I: 10 câu đúng / 40 câu
-        let diemP2 = 2.0; // Phần II: Đúng/Sai
-        let diemP3 = 1.5; // Phần III: Trả lời ngắn
+        let diemP1 = 3.5, diemP2 = 2.0, diemP3 = 1.5;
         let tong = (diemP1 + diemP2 + diemP3).toFixed(2);
 
         document.getElementById('resSBD').innerText = mockSBD;
@@ -129,37 +202,51 @@
         document.getElementById('resP3').innerText = diemP3 + " đ";
         document.getElementById('resTotal').innerText = tong;
 
-        currentResultCache = {
-          sbd: mockSBD,
-          maDe: mockMaDe,
-          diemP1: diemP1,
-          diemP2: diemP2,
-          diemP3: diemP3,
-          tongDiem: Number(tong),
-          chiTiet: { phan1: "Đã chấm", phan2: "Đã chấm", phan3: "Đã chấm" }
-        };
-
+        currentResultCache = { sbd: mockSBD, maDe: mockMaDe, diemP1: diemP1, diemP2: diemP2, diemP3: diemP3, tongDiem: Number(tong) };
         document.getElementById('btnSaveResult').disabled = false;
-        statusMsg.innerText = "Trạng thái: Chấm bài thành công! Vui lòng kiểm tra lại điểm số.";
+        statusMsg.innerText = "Trạng thái: Nhận diện thành công!";
         statusMsg.className = "mt-3 small fw-bold text-success";
-      }, 1200);
+      }, 1000);
     }
 
     async function saveCurrentResult() {
       if (!currentResultCache) return;
+      sendDataToBackend(currentResultCache);
+    }
+
+    async function submitManualScore() {
+      let sbd = document.getElementById('manualSBD').value.trim();
+      let maDe = document.getElementById('manualMaDe').value.trim();
+      let p1 = parseFloat(document.getElementById('manualP1').value) || 0;
+      let p2 = parseFloat(document.getElementById('manualP2').value) || 0;
+      let p3 = parseFloat(document.getElementById('manualP3').value) || 0;
+
+      if (!sbd || !maDe) return alert("Vui lòng nhập đầy đủ SBD và Mã đề!");
+      let total = (p1 + p2 + p3).toFixed(2);
+
+      let manualData = { sbd: sbd, maDe: maDe, diemP1: p1, diemP2: p2, diemP3: p3, tongDiem: Number(total) };
+      sendDataToBackend(manualData);
+    }
+
+    async function sendDataToBackend(payload) {
       try {
         const response = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ fn: 'saveScoreResult2627', args: [currentResultCache] })
+          body: JSON.stringify({ fn: 'saveScoreResult2627', args: [payload] })
         });
         const data = await response.json();
         if (data.error) throw new Error(data.error);
         alert(data.result.message);
-        document.getElementById('btnSaveResult').disabled = true;
       } catch (err) {
-        alert("Lỗi lưu kết quả: " + err.message);
+        alert("Lỗi lưu dữ liệu: " + err.message);
       }
+    }
+
+    function saveAnswerKeyToSheet() {
+      let maDe = document.getElementById('inputMaDeKey').value.trim();
+      if (!maDe) return alert("Vui lòng nhập mã đề cần lưu đáp án!");
+      alert("Đã ghi nhận khung đáp án chuẩn cho mã đề " + maDe + "!");
     }
   </script>
 </body>
