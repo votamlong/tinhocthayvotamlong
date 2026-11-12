@@ -1,229 +1,298 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chấm Bài TNMaker Pro - Khoanh Đỏ Xanh Trực Quan</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <style>
-    body { background-color: #0f172a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #fff; padding: 0; margin: 0; overflow: hidden; }
-    .camera-screen { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
-    
-    #videoElement, #snapCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
-    
-    .tn-header { position: absolute; top: 15px; left: 0; right: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-    .tn-badge-made { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 30px; font-weight: bold; font-size: 18px; }
-    .tn-btn-icon { width: 45px; height: 45px; border-radius: 50%; background: #f97316; border: none; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
-
-    .tn-viewfinder { position: absolute; top: 12%; left: 5%; right: 5%; bottom: 15%; border: 2px dashed rgba(255,255,255,0.6); border-radius: 12px; z-index: 5; pointer-events: none; }
-    .marker-corner { position: absolute; width: 22px; height: 22px; border-color: #22c55e; border-style: solid; }
-    .mc-tl { top: -2px; left: -2px; border-width: 4px 0 0 4px; }
-    .mc-tr { top: -2px; right: -2px; border-width: 4px 4px 0 0; }
-    .mc-bl { bottom: -2px; left: -2px; border-width: 0 0 4px 4px; }
-    .mc-br { bottom: -2px; right: -2px; border-width: 0 4px 4px 0; }
-
-    .tn-footer { position: absolute; bottom: 25px; z-index: 10; display: flex; gap: 20px; align-items: center; }
-    .btn-capture { width: 75px; height: 75px; border-radius: 50%; background: white; border: 4px solid #cbd5e1; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-    .btn-capture:active { transform: scale(0.92); }
-    .btn-capture-inner { width: 60px; height: 60px; border-radius: 50%; background: #f97316; }
-
-    /* Modal */
-    .custom-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
-    .custom-box { background: rgba(30, 41, 59, 0.98); border: 1px solid #475569; width: 100%; max-width: 450px; border-radius: 20px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); color: #fff; }
-    .custom-title { text-align: center; font-weight: 800; font-size: 24px; margin-bottom: 20px; }
-    .warning-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 15px; }
-    .warning-checkbox { width: 22px; height: 22px; accent-color: #22c55e; cursor: pointer; }
-    .custom-actions { display: flex; gap: 15px; margin-top: 20px; }
-    .btn-action { flex: 1; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 16px; border: none; cursor: pointer; text-align: center; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chấm phiếu trả lời trắc nghiệm</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f6;--card:#fff;--ink:#12263a;--mute:#5b6b7b;--line:#d5dde6;--acc:#0b5fa5;--acc2:#e8f1fa;--ok:#1b7f4b;--bad:#c0392b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1620;--card:#16222f;--ink:#e6edf4;--mute:#93a4b5;--line:#2a3a4a;--acc:#5aa9ec;--acc2:#1a2b3d;--ok:#4cc58a;--bad:#ef7b6d}}
+:root[data-theme="dark"]{--bg:#0e1620;--card:#16222f;--ink:#e6edf4;--mute:#93a4b5;--line:#2a3a4a;--acc:#5aa9ec;--acc2:#1a2b3d;--ok:#4cc58a;--bad:#ef7b6d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Be Vietnam Pro",system-ui,"Segoe UI",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:28px;font-weight:800;margin:0 0 4px}.sub{color:var(--mute);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+label{display:block;font-weight:600;font-size:14px;margin:10px 0 4px}
+input[type=number],textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:190px;font:13px/1.5 ui-monospace,Consolas,monospace;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>div{flex:1;min-width:90px}
+button{font:inherit;font-weight:600;border:1px solid var(--acc);background:var(--acc);color:#fff;padding:9px 16px;border-radius:6px;cursor:pointer}
+button.ghost{background:transparent;color:var(--acc)}button:disabled{opacity:.5;cursor:default}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.tip{font-size:13px;color:var(--mute);background:var(--acc2);padding:10px 12px;border-radius:6px;margin-top:10px}
+#msg{margin-top:10px;font-size:14px}.err{color:var(--bad)}
+.tw{overflow-x:auto;margin-top:12px}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;white-space:nowrap}
+tr.r{cursor:pointer}tr.r:hover,tr.sel{background:var(--acc2)}
+#view canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:6px;margin-top:10px}
+#cam video{width:100%;max-height:60vh;border-radius:6px;background:#000;margin-top:10px}
+pre{white-space:pre-wrap;font:13px/1.5 ui-monospace,Consolas,monospace;background:var(--bg);padding:10px;border-radius:6px}
+</style>
 </head>
 <body>
+<main>
+<h1>Chấm phiếu trả lời trắc nghiệm</h1>
+<p class="sub">Chọn ảnh quét hoặc ảnh chụp phiếu đã tô, nhập đáp án, trang sẽ đọc số báo danh, mã đề và chấm điểm tự động.</p>
+<div class="grid">
+ <section class="card">
+  <label for="keys">Đáp án theo từng mã đề</label>
+  <textarea id="keys" spellcheck="false">601
+1: ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD
+2: ĐSĐS SĐSĐ ĐĐSS SSĐĐ ĐSSĐ SĐĐS ĐĐĐS SSSĐ
+3: 5; -1,5; 12; 0,25; 7; 3
 
-  <div class="camera-screen">
-    <!-- Header -->
-    <div class="tn-header">
-      <button class="tn-btn-icon" onclick="startCamera()" title="Bật Camera"><i class="fas fa-video"></i></button>
-      <div class="tn-badge-made" id="headerMaDe">Mã đề: <span class="text-warning">101</span></div>
-      <button class="tn-btn-icon bg-success" onclick="openKeyModal()" title="Nhập đáp án chuẩn"><i class="fas fa-key"></i></button>
-    </div>
-
-    <!-- Video trực tiếp & Canvas vẽ khoanh tròn -->
-    <video id="videoElement" autoplay playsinline></video>
-    <canvas id="snapCanvas" style="display: none;"></canvas>
-    
-    <div class="tn-viewfinder" id="viewfinderBox">
-      <div class="marker-corner mc-tl"></div>
-      <div class="marker-corner mc-tr"></div>
-      <div class="marker-corner mc-bl"></div>
-      <div class="marker-corner mc-br"></div>
-    </div>
-
-    <div class="tn-footer">
-      <button class="btn-capture" onclick="captureAndScan()" title="Chụp chấm bài">
-        <div class="btn-capture-inner"></div>
-      </button>
-    </div>
+602
+1: DCBADCBADCBADCBADCBADCBADCBADCBADCBADCBA
+2: SĐSĐ ĐSĐS SSĐĐ ĐĐSS SĐĐS ĐSSĐ SSSĐ ĐĐĐS
+3: 4; 2,5; 9; -3; 8; 1</textarea>
+  <div class="tip">Mỗi mã đề cách nhau một dòng trống. Dòng đầu là mã đề (4 chữ số). Dòng <b>1:</b> là 40 đáp án Phần I. Dòng <b>2:</b> là 8 câu đúng/sai. Dòng <b>3:</b> là 6 đáp án Phần III.</div>
+ </section>
+ <section class="card">
+  <div class="row">
+   <div><label for="pI">Điểm/câu Phần I</label><input type="number" id="pI" step="0.05" value="0.25"></div>
+   <div><label for="pIII">Điểm/câu Phần III</label><input type="number" id="pIII" step="0.05" value="0.5"></div>
   </div>
-
-  <!-- MODAL NHẬP ĐÁP ÁN CHUẨN -->
-  <div class="custom-modal-overlay" id="keyModal">
-    <div class="custom-box">
-      <div class="custom-title text-success"><i class="fas fa-key me-2"></i>Cấu Hình Đáp Án Chuẩn</div>
-      <div class="mb-3">
-        <label class="form-label small fw-bold">Mã đề thi:</label>
-        <input type="text" id="inputKeyMaDe" class="form-control bg-dark text-white fw-bold" value="101">
-      </div>
-      <div class="mb-3">
-        <label class="form-label small fw-bold">Đáp án Phần I (Mẫu đúng):</label>
-        <textarea id="inputKeyP1" class="form-control bg-dark text-white font-monospace" rows="3" placeholder="1:A, 2:B, 3:C, 4:D..."></textarea>
-      </div>
-      <div class="custom-actions">
-        <button class="btn-action bg-secondary text-white" onclick="closeKeyModal()">Đóng</button>
-        <button class="btn-action bg-success text-white" onclick="saveAnswerKey()">Lưu Đáp Án</button>
-      </div>
-    </div>
+  <div class="row">
+   <div><label for="thr">Ngưỡng ô được tô (0–1)</label><input type="number" id="thr" step="0.05" min="0.1" max="0.9" value="0.45"></div>
+   <div><label for="dx">Lệch ngang</label><input type="number" id="dx" step="1" value="0"></div>
+   <div><label for="dy">Lệch dọc</label><input type="number" id="dy" step="1" value="0"></div>
   </div>
-
-  <!-- MODAL WARNING / CẢNH BÁO -->
-  <div class="custom-modal-overlay" id="warningModal">
-    <div class="custom-box">
-      <div class="custom-title text-danger">Warning !!!</div>
-      
-      <div class="warning-row">
-        <span>Trùng SBD</span>
-        <input type="checkbox" class="warning-checkbox" id="chkTrungSBD">
-      </div>
-      <div class="warning-row">
-        <span>Mã đề</span>
-        <input type="text" id="modalMaDe" class="form-control form-control-sm bg-dark text-white text-center fw-bold" style="width: 90px;" value="101">
-      </div>
-      <div class="warning-row">
-        <span>Nhiều đáp án</span>
-        <input type="checkbox" class="warning-checkbox" id="chkNhieuDa">
-      </div>
-      <div class="warning-row">
-        <span>Không trả lời</span>
-        <input type="checkbox" class="warning-checkbox" id="chkBoTrong">
-      </div>
-      <div class="warning-row">
-        <span>Sai quy chế</span>
-        <input type="checkbox" class="warning-checkbox" id="chkSaiQuyChe">
-      </div>
-
-      <div class="mt-3 small text-muted text-center" id="modalScoreSummary">
-        P1: 2/3 = 2.0 | Tổng điểm: <b class="text-success fs-5">2.0</b>
-      </div>
-
-      <div class="custom-actions">
-        <button class="btn-action bg-danger text-white" onclick="closeWarningAndEdit()">SỬA</button>
-        <button class="btn-action bg-success text-white" onclick="saveAndNext()">GIỮ</button>
-      </div>
-    </div>
+  <input id="files" type="file" accept="image/*" multiple hidden>
+  <div class="actions">
+   <button id="pick" type="button">Chọn ảnh phiếu</button>
+   <button class="ghost" id="btnCam" type="button">Chụp bằng camera</button>
+   <button class="ghost" id="regrade" type="button" disabled>Chấm lại</button>
+   <button class="ghost" id="csv" type="button" disabled>Tải kết quả (.csv)</button>
+   <button class="ghost" id="syncSheet" type="button" style="background:#198754;color:#fff;" disabled>Đẩy lên Google Sheets</button>
   </div>
+  <input id="shot" type="file" accept="image/*" capture="environment" hidden>
+  <div id="cam" hidden>
+   <video id="vid" playsinline muted></video>
+   <div class="actions"><button id="snap" type="button">Chụp và chấm</button><button class="ghost" id="stopCam" type="button">Đóng camera</button></div>
+  </div>
+  <div id="msg" role="status"></div>
+  <div class="tip">Ảnh cần thấy đủ 4 ô vuông đen ở 4 góc phiếu và phiếu để thẳng đứng. Sau khi chấm, bấm vào một dòng để xem chi tiết khoanh tròn đúng/sai.</div>
+ </section>
+</div>
+<section class="card" id="res" hidden style="margin-top:16px">
+ <div class="tw"><table id="tbl"></table></div>
+ <div id="view"></div>
+</section>
+</main>
+<script>
+const API_URL = (window.parent && window.parent.API_URL) 
+  ? window.parent.API_URL 
+  : "https://script.google.com/macros/s/AKfycbwXxFOzdJ-navDOyj70rsFEZIBKHnmbHtSBteRqtQLoFVlkdqS2AS94wDPkWVJ3poZwkA/exec";
 
-  <script>
-    const API_URL = (window.parent && window.parent.API_URL) 
-      ? window.parent.API_URL 
-      : "https://script.google.com/macros/s/AKfycbweqEcW9sOzge2sdst7CfM5-8WwroUJo25vuaI6zEfT3xmLoVgSGggHKYF3YQVzxEqgEA/exec";
+var $=function(i){return document.getElementById(i)};
+var TC=[[30,36],[875,36],[30,1283],[874,1283]],BX=[104,303,501,698],LADDER=[0,0.1,0.25,0.5,1];
+var LAY=(function(){
+  var L={sbd:[],md:[],p1:[],p2:[],p3:[]},k,d,q;
+  for(k=0;k<8;k++){L.sbd.push([]);for(d=0;d<10;d++)L.sbd[k].push([621+19.2*k,128+26.56*d])}
+  for(k=0;k<4;k++){L.md.push([]);for(d=0;d<10;d++)L.md[k].push([798+19.3*k,128+26.56*d])}
+  for(q=0;q<40;q++){var b=Math.floor(q/10),r=q%10;L.p1.push([0,1,2,3].map(function(o){return [BX[b]+39.5*o,497+20.67*r]}))}
+  for(q=0;q<8;q++){var b2=Math.floor(q/2),h=q%2;L.p2.push([0,1,2,3].map(function(s){return [0,39.5].map(function(o){return [BX[b2]+79*h+o,795+20.7*s]})}))}
+  for(q=0;q<6;q++){var l=70+127*q,xs=[34,57.7,82,108];
+    L.p3.push({minus:[l+28,975],comma:[[l+56,998],[l+82,998]],dig:xs.map(function(x){var a=[];for(var d=0;d<10;d++)a.push([l+x,1021+20.9*d]);return a})})}
+  return L;
+})();
+var results=[],shown=-1;
+function homog(src,dst){
+  var A=[],i,c,r,k;
+  for(i=0;i<4;i++){var x=src[i][0],y=src[i][1],u=dst[i][0],v=dst[i][1];
+    A.push([x,y,1,0,0,0,-u*x,-u*y,u]);A.push([0,0,0,x,y,1,-v*x,-v*y,v])}
+  for(c=0;c<8;c++){var p=c;for(r=c+1;r<8;r++)if(Math.abs(A[r][c])>Math.abs(A[p][c]))p=r;
+    var t=A[c];A[c]=A[p];A[p]=t;
+    for(r=0;r<8;r++){if(r===c)continue;var f=A[r][c]/A[c][c];for(k=c;k<9;k++)A[r][k]-=f*A[c][k]}}
+  return A.map(function(row,i){return row[8]/row[i]});
+}
+function mp(H,x,y){var w=H[6]*x+H[7]*y+1;return [(H[0]*x+H[1]*y+H[2])/w,(H[3]*x+H[4]*y+H[5])/w]}
+function findCorner(g,W,Hh,paper,right,bottom){
+  var rw=Math.floor(W*.3),rh=Math.floor(Hh*.25),x0=right?W-rw:0,y0=bottom?Hh-rh:0;
+  var vis=new Uint8Array(rw*rh),best=null,bd=1e18,cx=right?W:0,cy=bottom?Hh:0,lim=paper*.45;
+  for(var y=0;y<rh;y++)for(var x=0;x<rw;x++){
+    var i=y*rw+x;if(vis[i])continue;
+    if(g[(y0+y)*W+x0+x]>=lim){vis[i]=1;continue}
+    var st=[i],area=0,sx=0,sy=0,mnx=x,mxx=x,mny=y,mxy=y;vis[i]=1;
+    while(st.length){var c=st.pop(),px=c%rw,py=(c-px)/rw;area++;sx+=px;sy+=py;
+      if(px<mnx)mnx=px;if(px>mxx)mxx=px;if(py<mny)mny=py;if(py>mxy)mxy=py;
+      var nb=[[px+1,py],[px-1,py],[px,py+1],[px,py-1]];
+      for(var n=0;n<4;n++){var nx=nb[n][0],ny=nb[n][1];
+        if(nx<0||ny<0||nx>=rw||ny>=rh)continue;var ni=ny*rw+nx;if(vis[ni])continue;vis[ni]=1;
+        if(g[(y0+ny)*W+x0+nx]<lim)st.push(ni)}}
+    var bw=mxx-mnx+1,bh=mxy-mny+1,s=W*.015;
+    if(area<s*s||area>(W*.06)*(W*.06)||bw/bh<.6||bw/bh>1.6||area/(bw*bh)<.75)continue;
+    var px2=x0+sx/area,py2=y0+sy/area,dd=Math.hypot(px2-cx,py2-cy);
+    if(dd<bd){bd=dd;best=[px2,py2]}
+  }
+  return best;
+}
+function readSheet(g,W,Hh,paper,Hm,o){
+  var marks=[];
+  function f(x,y){var n=0,t=0;
+    for(var i=-5;i<=5;i+=2)for(var j=-5;j<=5;j+=2){if(i*i+j*j>30)continue;
+      var p=mp(Hm,x+i+o.dx,y+j+o.dy),ix=Math.round(p[0]),iy=Math.round(p[1]);t++;
+      if(ix>=0&&iy>=0&&ix<W&&iy<Hh&&g[iy*W+ix]<paper*.68)n++}
+    var r=n/t;marks.push([x,y,r>=o.thr]);return r}
+  function pick(fs,lab){var m=[];fs.forEach(function(v,i){if(v>=o.thr)m.push(lab[i])});return m.length===0?"":m.length===1?m[0]:"*"}
+  var dg="0123456789".split(""),res={};
+  function digits(cols){return cols.map(function(c){var v=pick(c.map(function(p){return f(p[0],p[1])}),dg);return v===""?"_":v==="*"?"?":v}).join("")}
+  res.sbd=digits(LAY.sbd);res.md=digits(LAY.md);
+  res.p1=LAY.p1.map(function(q){return pick(q.map(function(p){return f(p[0],p[1])}),["A","B","C","D"])});
+  res.p2=LAY.p2.map(function(q){return q.map(function(s){return pick(s.map(function(p){return f(p[0],p[1])}),["D","S"])})});
+  res.p3=LAY.p3.map(function(q){var s="";
+    for(var c=0;c<4;c++){var fs=[],lab=[];
+      if(c===0){fs.push(f(q.minus[0],q.minus[1]));lab.push("-")}
+      if(c===1||c===2){fs.push(f(q.comma[c-1][0],q.comma[c-1][1]));lab.push(",")}
+      q.dig[c].forEach(function(p,d){fs.push(f(p[0],p[1]));lab.push(String(d))});
+      var v=pick(fs,lab);s+=v==="*"?"?":v}
+    return s});
+  res.marks=marks;return res;
+}
+function loadImg(file){return new Promise(function(ok,no){var im=new Image();im.onload=function(){ok(im)};im.onerror=no;im.src=URL.createObjectURL(file)})}
+function prep(im){
+  var s=Math.min(1,1800/Math.max(im.naturalWidth,im.naturalHeight)),W=Math.round(im.naturalWidth*s),Hh=Math.round(im.naturalHeight*s);
+  var c=document.createElement("canvas");c.width=W;c.height=Hh;var x=c.getContext("2d");x.drawImage(im,0,0,W,Hh);
+  var d=x.getImageData(0,0,W,Hh).data,g=new Uint8Array(W*Hh),h=new Uint32Array(256),i;
+  for(i=0;i<W*Hh;i++){var v=Math.round(.299*d[4*i]+.587*d[4*i+1]+.114*d[4*i+2]);g[i]=v;h[v]++}
+  var acc=0,paper=255;for(i=0;i<256;i++){acc+=h[i];if(acc>=.9*W*Hh){paper=i;break}}
+  return {c:c,g:g,W:W,H:Hh,paper:Math.max(paper,80)};
+}
+function parseKeys(t){
+  var K={};
+  t.split(/\n\s*\n/).forEach(function(b){
+    var ls=b.trim().split("\n").map(function(s){return s.trim()}).filter(Boolean);if(!ls.length)return;
+    var k={p1:"",p2:[],p3:[]};
+    ls.slice(1).forEach(function(l){var m=l.match(/^([123])\s*:\s*(.*)$/);if(!m)return;
+      if(m[1]==="1")k.p1=m[2].replace(/[^A-Da-d]/g,"").toUpperCase();
+      else if(m[1]==="2")k.p2=m[2].trim().split(/\s+/).map(function(s){return s.toUpperCase().replace(/[ĐT]/g,"D").replace(/F/g,"S")});
+      else k.p3=m[2].split(/[;|]/).map(function(s){return s.trim().replace(/\./g,",")});});
+    K[ls[0].replace(/\D/g,"").replace(/^0+/,"")]=k;
+  });
+  return K;
+}
+function score(r,k,pI,pIII){
+  var a=0,b=0,c=0;
+  r.p1.forEach(function(v,i){if(v&&v===k.p1[i])a++});
+  r.p2.forEach(function(q,i){var n=0;q.forEach(function(v,j){if(k.p2[i]&&v&&v===k.p2[i][j])n++});b+=LADDER[n]});
+  r.p3.forEach(function(v,i){if(v&&k.p3[i]!==undefined&&v.replace(/\./g,",")===k.p3[i].replace(/\s/g,""))c++});
+  return {a:a,b:b,c:c,total:a*pI+b+c*pIII};
+}
+function drawOverlay(item,Hm){
+  var c=document.createElement("canvas");c.width=item.pr.W;c.height=item.pr.H;var x=c.getContext("2d");x.drawImage(item.pr.c,0,0);
+  item.res.marks.forEach(function(m){
+    var p=mp(Hm,m[0]+item.o.dx,m[1]+item.o.dy),q=mp(Hm,m[0]+item.o.dx+6,m[1]+item.o.dy),rr=Math.hypot(q[0]-p[0],q[1]-p[1]);
+    x.beginPath();x.arc(p[0],p[1],m[2]?rr*.8:rr*.35,0,6.283);
+    if(m[2]){x.fillStyle="rgba(0,170,80,.6)";x.fill()}else{x.strokeStyle="rgba(220,60,60,.55)";x.lineWidth=1;x.stroke()}
+  });
+  return c;
+}
+function run(){
+  var keys=parseKeys($("keys").value),o={thr:+$("thr").value||.45,dx:+$("dx").value||0,dy:+$("dy").value||0},pI=+$("pI").value,pIII=+$("pIII").value;
+  results.forEach(function(it){
+    if(!it.pr){return}
+    try{
+      var pts=[findCorner(it.pr.g,it.pr.W,it.pr.H,it.pr.paper,0,0),findCorner(it.pr.g,it.pr.W,it.pr.H,it.pr.paper,1,0),findCorner(it.pr.g,it.pr.W,it.pr.H,it.pr.paper,0,1),findCorner(it.pr.g,it.pr.W,it.pr.H,it.pr.paper,1,1)];
+      if(pts.some(function(p){return !p}))throw new Error("Không thấy đủ 4 ô vuông góc");
+      var Hm=homog(TC,pts);it.o=o;it.res=readSheet(it.pr.g,it.pr.W,it.pr.H,it.pr.paper,Hm,o);
+      it.ov=drawOverlay(it,Hm);it.err=null;
+      var k=keys[it.res.md.replace(/^0+/,"")];it.sc=k?score(it.res,k,pI,pIII):null;it.nokey=!k;
+    }catch(e){it.err=e.message||"Lỗi đọc ảnh"}
+  });
+  render();
+}
+function fmt(n){return (Math.round(n*100)/100).toString().replace(".",",")}
+function render(){
+  var t=$("tbl"),h="<tr><th>Tệp</th><th>SBD</th><th>Mã đề</th><th>Phần I</th><th>Phần II</th><th>Phần III</th><th>Điểm</th></tr>";
+  results.forEach(function(it,i){
+    h+='<tr class="r'+(i===shown?" sel":"")+'" data-i="'+i+'"><td>'+it.name.replace(/</g,"&lt;")+"</td>";
+    if(it.err)h+='<td colspan="6" class="err">'+it.err+"</td>";
+    else if(!it.sc)h+="<td>"+it.res.sbd+"</td><td>"+it.res.md+'</td><td colspan="4" class="err">Chưa có đáp án cho mã đề này</td>';
+    else h+="<td>"+it.res.sbd+"</td><td>"+it.res.md+"</td><td>"+it.sc.a+"/40</td><td>"+fmt(it.sc.b)+"</td><td>"+it.sc.c+"/6</td><td><b>"+fmt(it.sc.total)+"</b></td>";
+    h+="</tr>";
+  });
+  t.innerHTML=h;$("res").hidden=!results.length;$("csv").disabled=!results.length;$("regrade").disabled=!results.length;$("syncSheet").disabled=!results.length;
+  t.querySelectorAll("tr.r").forEach(function(tr){tr.onclick=function(){shown=+tr.getAttribute("data-i");render();detail(shown)}});
+  if(shown>=0&&results[shown])detail(shown);
+}
+function detail(i){
+  var it=results[i],v=$("view");v.innerHTML="";if(it.err||!it.res)return;
+  var r=it.res,s="Phần I:   "+r.p1.map(function(a){return a||"-"}).join("")+"\nPhần II:  "+r.p2.map(function(q){return q.map(function(a){return a||"-"}).join("")}).join(" ")+"\nPhần III: "+r.p3.map(function(a){return a||"(trống)"}).join(" ; ");
+  var pre=document.createElement("pre");pre.textContent=s+"\n\n(- là bỏ trống, * là tô nhiều ô)";v.appendChild(pre);v.appendChild(it.ov);
+}
+$("pick").onclick=function(){$("files").click()};
+$("files").onchange=function(e){
+  var fs=Array.prototype.slice.call(e.target.files);if(!fs.length)return;
+  $("msg").className="";$("msg").textContent="Đang đọc "+fs.length+" ảnh…";results=[];shown=-1;
+  var chain=Promise.resolve();
+  fs.forEach(function(f){chain=chain.then(function(){return loadImg(f).then(function(im){results.push({name:f.name,pr:prep(im)})}).catch(function(){results.push({name:f.name,err:"Không mở được ảnh"})})})});
+  chain.then(function(){run();$("msg").textContent="Đã chấm "+fs.length+" phiếu."});
+};
+$("regrade").onclick=function(){run()};
+var stream=null;
+function stopCam(){if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}$("cam").hidden=true}
+function addBlob(b,name){
+  return loadImg(b).then(function(im){results.push({name:name,pr:prep(im)})}).catch(function(){results.push({name:name,err:"Không mở được ảnh"})}).then(function(){run();shown=results.length-1;render();$("msg").className="";$("msg").textContent="Đã chấm "+results.length+" phiếu."});
+}
+function fallbackCam(){$("msg").className="err";$("msg").textContent="Không mở được camera trực tiếp trong trang này, đang mở ứng dụng chụp ảnh của máy.";$("shot").click()}
+$("btnCam").onclick=function(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){fallbackCam();return}
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1440}},audio:false}).then(function(s){
+    stream=s;var v=$("vid");v.srcObject=s;v.play();$("cam").hidden=false;
+    $("msg").className="";$("msg").textContent="Đặt phiếu thẳng đứng, thấy đủ 4 ô vuông ở 4 góc, đủ sáng, giữ yên máy rồi bấm Chụp và chấm.";
+  }).catch(fallbackCam);
+};
+$("snap").onclick=function(){
+  var v=$("vid");if(!v.videoWidth)return;
+  var c=document.createElement("canvas");c.width=v.videoWidth;c.height=v.videoHeight;c.getContext("2d").drawImage(v,0,0);
+  c.toBlob(function(b){addBlob(b,"camera-"+(results.length+1)+".jpg")},"image/jpeg",.92);
+};
+$("stopCam").onclick=stopCam;
+$("shot").onchange=function(e){var f=e.target.files[0];if(f){addBlob(f,"camera-"+(results.length+1)+".jpg");e.target.value=""}};
 
-    let mediaStream = null;
-
-    window.onload = async function() {
-      await startCamera();
-    };
-
-    async function startCamera() {
-      const video = document.getElementById('videoElement');
-      try {
-        if (mediaStream) {
-          mediaStream.getTracks().forEach(track => track.stop());
-        }
-        mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        video.srcObject = mediaStream;
-        video.style.display = 'block';
-        document.getElementById('snapCanvas').style.display = 'none';
-        document.getElementById('viewfinderBox').style.display = 'block';
-      } catch (err) {
-        alert("Không mở được camera: " + err.message);
-      }
-    }
-
-    function openKeyModal() { document.getElementById('keyModal').style.display = 'flex'; }
-    function closeKeyModal() { document.getElementById('keyModal').style.display = 'none'; }
-    function saveAnswerKey() {
-      alert("✅ Đã lưu đáp án chuẩn thành công!");
-      closeKeyModal();
-    }
-
-    // CHỤP ẢNH VÀ VẼ KHOANH TRÒN ĐỎ / XANH TRỰC TIẾP LÊN ẢNH
-    function captureAndScan() {
-      const video = document.getElementById('videoElement');
-      const canvas = document.getElementById('snapCanvas');
-      if (!mediaStream) return alert("Chưa bật camera!");
-
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
-      const ctx = canvas.getContext('2d');
-      
-      // 1. Vẽ khung hình thực tế từ camera lên Canvas
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      // 2. TỰ ĐỘNG VẼ CÁC VÒNG TRÒN KHOANH ĐỎ / XANH MÔ PHỎNG ĐÚNG SAI TRÊN BÀI
-      ctx.lineWidth = 4;
-      let simulatedResults = [
-        { x: canvas.width * 0.25, y: canvas.height * 0.45, isCorrect: true },   // Câu 1: Đúng -> Khoanh Xanh lá
-        { x: canvas.width * 0.45, y: canvas.height * 0.45, isCorrect: false },  // Câu 2: Sai -> Khoanh Đỏ
-        { x: canvas.width * 0.65, y: canvas.height * 0.45, isCorrect: true }    // Câu 3: Đúng -> Khoanh Xanh lá
-      ];
-
-      simulatedResults.forEach(res => {
-        ctx.strokeStyle = res.isCorrect ? '#22c55e' : '#ef4444'; // Xanh lá nếu đúng, Đỏ nếu sai
-        ctx.beginPath();
-        ctx.arc(res.x, res.y, 18, 0, 2 * Math.PI);
-        ctx.stroke();
-      });
-
-      // Ẩn video trực tiếp, hiện Canvas chứa ảnh đã được khoanh tròn Đỏ/Xanh
-      video.style.display = 'none';
-      canvas.style.display = 'block';
-      document.getElementById('viewfinderBox').style.display = 'none';
-
-      // Hiển thị bảng Warning
-      document.getElementById('warningModal').style.display = 'flex';
-    }
-
-    function closeWarningAndEdit() {
-      // Nút SỬA: Đóng bảng cảnh báo, bật lại camera để chụp hoặc kiểm tra lại
-      document.getElementById('warningModal').style.display = 'none';
-      startCamera();
-    }
-
-    async function saveAndNext() {
-      // Nút GIỮ: Lưu điểm lên Google Sheets và tiếp tục chụp bài tiếp theo
-      document.getElementById('warningModal').style.display = 'none';
-      
+// NÚT ĐẨY KẾT QUẢ LÊN GOOGLE SHEETS
+$("syncSheet").onclick = async function() {
+  if (!results.length) return;
+  $("msg").className = "";
+  $("msg").textContent = "Đang đồng bộ kết quả lên Google Sheets...";
+  
+  let count = 0;
+  for (let it of results) {
+    if (it.sc && !it.err) {
       let payload = {
-        sbd: "102548",
-        maDe: "101",
-        diemP1: 2.0,
-        diemP2: 0.0,
-        diemP3: 0.0,
-        tongDiem: 2.0
+        sbd: it.res.sbd || "---",
+        maDe: it.res.md || "---",
+        diemP1: it.sc.a * (+$("pI").value),
+        diemP2: it.sc.b,
+        diemP3: it.sc.c * (+$("pIII").value),
+        tongDiem: it.sc.total
       };
-
       try {
         await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ fn: 'saveScoreResult2627', args: [payload] })
         });
-        startCamera();
+        count++;
       } catch (e) {
-        alert("Lỗi lưu điểm: " + e.message);
-        startCamera();
+        console.error("Lỗi gửi dòng: ", e);
       }
     }
-  </script>
+  }
+  $("msg").textContent = "✅ Đã đồng bộ thành công " + count + " bài thi lên Google Sheets!";
+};
+
+$("csv").onclick=function(){
+  var rows=[["Tep","SBD","Ma de","Phan I","Phan II","Phan III","Diem"]];
+  results.forEach(function(it){rows.push(it.err?[it.name,"","","","","",it.err]:[it.name,it.res.sbd,it.res.md].concat(it.sc?[it.sc.a,fmt(it.sc.b),it.sc.c,fmt(it.sc.total)]:["","","","chua co dap an"]))});
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"'}).join(",")}).join("\n")],{type:"text/csv"}));
+  a.download="ket-qua-cham.csv";document.body.appendChild(a);a.click();a.remove();
+};
+</script>
 </body>
 </html>
